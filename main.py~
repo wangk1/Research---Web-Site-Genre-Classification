@@ -1,0 +1,52 @@
+__author__ = 'Kevin'
+
+from db_collection_operations.url_queue_ops import *
+from database.mongodb_connector import MongoDB
+from web_scrape_pipeline import PipeLine
+from database.database_queue import *
+import db_collections.mongo_collections as coll
+from analytics.dmoz_alexa_similarity import *
+import summary.summarizer as summarizer
+from service.RequestService import *
+
+"""
+models=MongoDB(settings.HOST_NAME,settings.PORT)
+genres=models.save_modify_url('aurl',*[{'genre':'test1','alexa':12,'dmoz':10000},{'genre':'test2'},{'genre':'test3'}])
+genres=models.save_modify_url('gaurl',*[{'genre':'test1','alexa':12,'dmoz':10000},{'genre':'test5','alexa':13,'dmoz':130000},{'genre':'test2'},{'genre':'test3'}])
+"""
+
+
+
+if __name__ =='__main__':
+
+    PipeLine.start()
+    #PipeLine.query_urls_dmoz()
+    #PipeLine.scrape_urls_multiproc().random_pick_dmoz()
+
+
+    #DBQueue('dmoz_query').decrement()
+    PipeLine.create_url_queue()
+
+    #dmoz_alexa_similarity()
+
+'''
+    not_found=set()
+    with open("C:\\Users\Kevin\\Google Drive\\Webpage Classification Research\\NOT_FOUND.txt",encoding="ISO-8859-1") as not_found_txt:
+        for url in not_found:
+            not_found.add(url)
+
+    all_webpage={}
+    with open(settings.OUTPUT_FILE,encoding="ISO-8859-1") as all_url:
+
+        for url in all_url:
+            if url in not_found:
+                url_split=url.split(':::')
+                webpage_dict={}
+                webpage_dict['url']=url_split[0]
+                webpage_dict['genre']=[url_split[1]]
+                webpage_dict['desc']=url_split[2]
+
+'''
+
+
+
