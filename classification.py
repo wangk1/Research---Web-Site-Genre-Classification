@@ -8,9 +8,10 @@ from collections import namedtuple,Counter
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 from db.db_model.mongo_websites_models import TestSetBow,TrainSetBow
-from classification.classifiers import classify,load_vocab_vectorizer
+from classification.classifiers_func import classify,load_vocab_vectorizer
 from classification.mapper import ClassificationSourceMapper
 import math
+from classification.classification_results import count_miss_ratio
 
 ignore_genre={
     "World",
@@ -138,11 +139,11 @@ if __name__=="__main__":
     #
     # map_urlAllGram(genre_dict)
 
-    load_vocab_vectorizer(TrainSetBow,extra_label="summary")
-    classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)
+    # load_vocab_vectorizer(TrainSetBow,extra_label="summary")
+    # classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)
 
     # load_vocab_vectorizer(TrainSet_urlFullTextBow,"fulltxt")
-    # classify(train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow,pickle_label="fulltxt",k=200)
+    #classify(train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow,pickle_label="fulltxt",k=200)
 
     # load_vocab_vectorizer(TrainSet_urlAllGram,"allgram")
     # classify(train_coll_cls=TrainSet_urlAllGram,test_coll_cls=TestSet_urlAllGram,pickle_label="allgram",k=200)
@@ -150,4 +151,4 @@ if __name__=="__main__":
     #
     # generate_training_testing(test_set_num) np.vstack((np.array([1,2,3])
 
-    #count_miss_ratio()
+    count_miss_ratio()

@@ -9,19 +9,31 @@ import scipy.sparse as sp
 
 """
 
-def load_train_matrix(*,train_dv=None,train_coll_cls):
+def load_train_matrix(*,train_dv=None,train_coll_cls,stack_per_sample=3000):
 
     train_bows=None
     train_labels=[]
 
+    matrix_cache=[]
     for count,train_bow_obj in enumerate(train_coll_cls.objects):
         if count %1000==0:
             print("Train load curr at:  {}".format(count))
 
         curr_bow_matrix=train_dv.transform(train_bow_obj.attr_map)[0]
-
+        matrix_cache.append(curr_bow_matrix)
         train_labels.append(train_bow_obj.short_genre)
-        train_bows=sp.vstack((train_bows,curr_bow_matrix)) if train_bows is not None else curr_bow_matrix
+
+        if len(matrix_cache)>stack_per_sample:
+            train_bows=sp.vstack(matrix_cache)
+            matrix_cache=[train_bows]
+            print("stacked, train bow size:{},labels size: {}".format(train_bows.shape[0],len(train_labels)))
+
+
+
+    if len(matrix_cache)>1:
+        print("stacking")
+        train_bows=sp.vstack(matrix_cache)
+        matrix_cache=[]
 
     print("Final training size: {}".format(train_bows.shape[0]))
     return train_bows,np.asarray(train_labels)
