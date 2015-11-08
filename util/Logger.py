@@ -30,5 +30,13 @@ class Logger:
 
     @staticmethod
     def debug(msg):
+        msg='Debug: {}'.format(msg)
+        try:
+            print(msg)
+        except:
+            print("Can't print for some reason")
+
+    @staticmethod
+    def debug(msg):
         if settings.DEBUG:
             print(msg)

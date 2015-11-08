@@ -1,8 +1,15 @@
 import itertools
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
+from sklearn.tree import DecisionTreeClassifier
 
 __author__ = 'Kevin'
 import random
 import util.base_util as util
+from sklearn.feature_selection import chi2 as chi_sq,SelectKBest
 
 from collections import namedtuple,Counter
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
@@ -10,6 +17,7 @@ from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllG
 from db.db_model.mongo_websites_models import TestSetBow,TrainSetBow
 from classification.classifiers_func import classify,load_vocab_vectorizer
 from classification.mapper import ClassificationSourceMapper
+from classification.classifiers import Classifier
 import math
 from classification.classification_results import count_miss_ratio
 
@@ -135,9 +143,20 @@ def map_urlFullText(genre_dict):
                               ,train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow)
 
 if __name__=="__main__":
-    # test_set_nums,genre_dict=pick_random_test(genre_dict)
+    #test_set_nums,genre_dict=pick_random_test(genre_dict)
     #
     # map_urlAllGram(genre_dict)
+
+    res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
+    pickle_dir="F:\\Research Data\\pickle"
+    classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
+                 RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
+
+    summary_2000_classifier=Classifier("summary_2000",
+               res_dir=res_dir,
+               vocab_vectorizer_pickle_dir=pickle_dir)
+    summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
+                                     feature_selector=SelectKBest(chi_sq,2000),classifiers=classifiers)
 
     # load_vocab_vectorizer(TrainSetBow,extra_label="summary")
     # classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)

@@ -1,6 +1,6 @@
 import itertools
 import re
-
+import os
 import numpy as np
 from sklearn.feature_extraction import DictVectorizer
 import scipy.sparse as sp
@@ -23,19 +23,20 @@ class Classifier:
     3. Keep track of the outputting location of the classification result files
 
     """
-    def __init__(self,label,*,res_dir,attr_vectorizer_dir):
+    def __init__(self,label,*,res_dir,vocab_vectorizer_pickle_dir):
         """
         :param label: Unique label
-        :param res_dir:
-        :param attr_vectorizer_dir:
+        :param res_dir: The main directory to put all classification results in
+        :param vocab_vectorizer_pickle_dir: The main directory to leave all pickled vocabulary vectorizer
         :return:
         """
         self.label=label
 
         self.res_dir=res_dir
-        self.attr_vectorizer_dir=attr_vectorizer_dir
+        self.pickle_dir=vocab_vectorizer_pickle_dir
 
         self.vocab_vectorizer=None
+        self.feat_selector=None
 
         self.train_X=None
         self.train_y=None
@@ -47,8 +48,11 @@ class Classifier:
     def pipeline(self,train_set_iter,test_set_iter,feature_selector,classifiers):
         classifier_logger.info("Starting pipeline for classifier with label {}".format(self.label))
 
-        self.load_training(train_iterable=train_set_iter).load_testing(test_iterable=test_set_iter) \
-            .feature_selection(feature_selector).classify(classifiers)
+        self.load_training(train_iterable=train_set_iter,maybe_load_vectorizer_from_pickle=True
+                           ,maybe_load_training_from_pickle=True,pickle_training=True)\
+            .feature_selection(feature_selector)\
+            .load_testing(test_iterable=test_set_iter).classify(classifiers)
+
 
         return self
 
@@ -62,13 +66,14 @@ class Classifier:
         """
 
         vocab_loaded=False
-        pickle_file=self.attr_vectorizer_dir+"/classifier_vocab_{}_pickle".format(self.label)
+        pickle_file=self.pickle_dir+"/classifier_vocab_{}_pickle".format(self.label)
 
         if load_vectorizer_from_file:
             try:
-                unpickle_obj(pickle_file)
+                self.vocab_vectorizer=unpickle_obj(pickle_file)
 
                 vocab_loaded=True
+                classifier_logger.info("Loaded pickle file {}".format(pickle_file))
             except FileNotFoundError:
                 classifier_logger.info("Failed to find pickle file {}".format(pickle_file))
                 vocab_loaded=False
@@ -77,23 +82,24 @@ class Classifier:
 
             classifier_logger.info("Fitting vocab for classifier {}".format(self.label))
 
-            train_dv=DictVectorizer()
+            self.vocab_vectorizer=DictVectorizer()
 
             words=[dict(itertools.chain(*(train_set_obj.attr_map.items() for train_set_obj in train_set_iter)))]
             #fit the dv first
-            train_dv.fit(words)
-            classifier_logger.info("vocab length is {}".format(len(train_dv.feature_names_)))
+            self.vocab_vectorizer.fit(words)
+            classifier_logger.info("vocab length is {}".format(len(self.vocab_vectorizer.feature_names_)))
 
             del words
 
             #pickle the obj if we want to
-            pickle and pickle_obj(train_dv,pickle_file)
+            pickle and pickle_obj(self.vocab_vectorizer,pickle_file)
 
 
         return self
 
 
-    def load_training(self,train_iterable,stack_per_sample=3000):
+    def load_training(self,train_iterable,stack_per_sample=3000,maybe_load_vectorizer_from_pickle=False,
+                      maybe_load_training_from_pickle=False,pickle_training=False):
         """
         Load the training set with attr_map dictionary attribute and return a scipy sparse matrix of the data fitted
             with the vocab and their labels
@@ -106,33 +112,53 @@ class Classifier:
             classifier_logger.info("Reloading training samples")
 
         if self.vocab_vectorizer is None:
-            self.fit_vocab(train_set_iter=(obj for obj in train_iterable))
+            self.fit_vocab(train_set_iter=(obj for obj in train_iterable),load_vectorizer_from_file=maybe_load_vectorizer_from_pickle)
 
         classifier_logger.info("Loading training set for classifier pipeline {}".format(self.label))
 
+        training_loaded=False
+        trainX_pickle_path=self.pickle_dir+"/classifier_trainingX_{}_pickle".format(self.label)
+        trainy_pickle_path=self.pickle_dir+"/classifier_trainingy_{}_pickle".format(self.label)
+        if maybe_load_training_from_pickle:
+            classifier_logger.info("Trying to load training samples from pickle")
+            try:
+                self.train_X=unpickle_obj(trainX_pickle_path)
+                self.train_y=unpickle_obj(trainy_pickle_path)
+                training_loaded=True
+                classifier_logger.info("Successfully loaded training samples from pickle")
+            except FileNotFoundError:
+                classifier_logger.info("Failed to load training samples from pickle")
 
-        train_labels=[]
-        matrix_cache=[]
-        for count,train_bow_obj in enumerate(train_iterable):
-            if count %1000==0:
-                classifier_logger.info("Train load curr at:  {}".format(count))
+        if not training_loaded:
+            train_labels=[]
+            matrix_cache=[]
+            for count,train_bow_obj in enumerate(train_iterable):
+                if count %1000==0:
+                    classifier_logger.info("Train load curr at:  {}".format(count))
 
-            curr_bow_matrix=self.vocab_vectorizer.transform(train_bow_obj.attr_map)[0]
-            matrix_cache.append(curr_bow_matrix)
-            train_labels.append(train_bow_obj.short_genre)
+                curr_bow_matrix=self.vocab_vectorizer.transform(train_bow_obj.attr_map)[0]
+                matrix_cache.append(curr_bow_matrix)
+                train_labels.append(train_bow_obj.short_genre)
 
-            if len(matrix_cache)>stack_per_sample:
+                if len(matrix_cache)>stack_per_sample:
+                    self.train_X=sp.vstack(matrix_cache)
+                    matrix_cache=[self.train_X]
+                    classifier_logger.info("stacked, train bow size:{},labels size: {}".format(
+                        self.train_X.shape[0],len(train_labels)))
+
+            if len(matrix_cache)>0:
+                classifier_logger.info("stacking")
                 self.train_X=sp.vstack(matrix_cache)
-                matrix_cache=[self.train_X]
-                classifier_logger.info("stacked, train bow size:{},labels size: {}".format(
-                    self.train_X.shape[0],len(train_labels)))
+                del matrix_cache
 
-        if len(matrix_cache)>0:
-            classifier_logger.info("stacking")
-            self.train_X=sp.vstack(matrix_cache)
-            del matrix_cache
+            self.train_y=np.asarray(train_labels)
 
-        self.train_y=np.asarray(train_labels)
+            #pickle if so
+            if pickle_training:
+                classifier_logger.info("Pickling training set")
+                pickle_obj(self.train_X,trainX_pickle_path)
+                pickle_obj(self.train_y,trainy_pickle_path)
+                classifier_logger.info("Successfully save training samples from pickle")
 
         classifier_logger.info("Final training size: {}".format(self.train_X.shape[0]))
         return self
@@ -141,6 +167,9 @@ class Classifier:
     def load_testing(self,*,test_iterable):
         """
         Load the testing set from an iterable of objects with attr_map dictionary attribute and ref_index attribute
+
+        Note: Any feature selection should be done before this step. Or else, we will default to the default vocab
+            vectorizer
 
         :return:
         """
@@ -169,9 +198,12 @@ class Classifier:
             ref_indexes.append(test_obj.ref_index)
 
 
-        self.test_X=self.vocab_vectorizer.transform(test_X)
+        self.test_X=self.vocab_vectorizer.transform(test_X) if self.feat_selector is None else \
+            self.feat_selector.transform(self.vocab_vectorizer.transform(test_X))
         self.test_y=np.asarray(test_labels)
         self.test_ref_index_matrix=np.asarray(ref_indexes)
+
+        classifier_logger.info("Testing load successful, num of samples: {}, number of features {}".format(*self.test_X.shape))
 
         return self
 
@@ -185,12 +217,17 @@ class Classifier:
         num_labels=len(self.test_y)
 
         for classifier in classifiers:
-            classifier_logger.info("Classifying with {}".format(str(type(classifier))))
+            classifier_name=re.search(r"(?<=')(.*)(?=')",str(type(classifier))).group(1).split(".")[-1]
+
+            classifier_logger.info("Classifying with {} with {} training and {} labels".format(classifier_name,
+                                                                                               self.train_X.shape[0],
+                                                                                               self.train_y.shape[0]))
+            classifier.fit(self.train_X,self.train_y)
 
             for l in range(0,num_labels,increment):
                 res=classifier.predict(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
-                self.print_res(classifier_name=re.search(r"(?<=')(.*)(?=')",str(type([]))).group(1),
-                          labels=num_labels[l:l+increment if l+increment<num_labels else num_labels],
+                self.print_res(classifier_name=classifier_name,
+                          labels=self.test_y[l:l+increment if l+increment<num_labels else num_labels],
                           predictions=res,
                           ref_indexes=self.test_ref_index_matrix[l:l+increment])
 
@@ -205,8 +242,13 @@ class Classifier:
         :param ref_indexes:
         :return:
         """
-        with open("{}/{}/{}.txt".format(self.res_dir,self.label,classifier_name+"_wrong"),mode="a") as out_wrong, \
-            open("{}/{}/{}.txt".format(self.res_dir,self.label,classifier_name+"_wrong").format(classifier_name+"_right"),mode="a") as out_right:
+        folder_path="{}/{}".format(self.res_dir,self.label)
+        if not os.path.exists(folder_path):
+            classifier_logger.debug("Creating folder {}".format(folder_path))
+            os.mkdir(folder_path)
+
+        with open("{}/{}.txt".format(folder_path,classifier_name+"_wrong"),mode="a") as out_wrong, \
+            open("{}/{}.txt".format(folder_path,classifier_name+"_right"),mode="a") as out_right:
             wrong_labels=(predictions != labels)
 
             for l in range(0,len(wrong_labels)):
@@ -218,7 +260,7 @@ class Classifier:
 
     def feature_selection(self,feat_selector):
         """
-        Perform feature selection
+        Perform feature selection. Must be done before loading testing sets
 
         :param feat_selector:
         :return:
@@ -226,6 +268,9 @@ class Classifier:
 
         assert hasattr(feat_selector,"transform")
 
+        classifier_logger.info("Pre feature selection: num features: {}".format(self.train_X.shape[1]))
+        self.feat_selector=feat_selector
         self.train_X=feat_selector.fit_transform(self.train_X,self.train_y)
+        classifier_logger.info("Post feature selection: num features: {}".format(self.train_X.shape[1]))
 
         return self
