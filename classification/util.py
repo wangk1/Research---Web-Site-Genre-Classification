@@ -1,10 +1,15 @@
-from sklearn.feature_extraction import DictVectorizer
-
 __author__ = 'Kevin'
 
 import numpy as np
 import scipy.sparse as sp
 
+import pickle
+
+from sklearn.feature_extraction import DictVectorizer
+
+from util.Logger import Logger
+
+util_logger=Logger()
 """
 
 """
@@ -65,3 +70,33 @@ def load_test_matrix(*,test_dv=None,test_coll_cls):
         return test_dv.transform(test_bows),np.asarray(test_labels),np.asarray(bow_indexes)
 
 
+def pickle_obj(obj,file_path):
+    """
+    Pick the object at file at file_path. Will overwrite files so be careful
+
+    :param file_path:
+    :param obj:
+    :return:
+    """
+
+    util_logger.info("Pickling")
+    with open(file_path,mode="wb") as pickle_file_handle:
+        pickle.dump(obj,pickle_file_handle)
+    util_logger.info("Pickling done")
+
+def unpickle_obj(file_path):
+    """
+    Unpickle the file stored at path of file_path
+
+    :param file_path:
+    :return:
+    """
+
+    util_logger.info("UnPickling")
+    obj=None
+
+    with open(file_path,mode="rb") as pickle_file_handle:
+        obj=pickle.load(pickle_file_handle)
+
+
+    return obj
