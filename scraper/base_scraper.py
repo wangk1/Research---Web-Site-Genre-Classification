@@ -4,21 +4,7 @@ from service.RequestService import Request
 from util.base_util import *
 
 
-def safe_scrape(func):
-    """
-    Catch any attribute errors that may be associated with querying an alexa or dmoz page not present
-    and send back an empty list instead
 
-    :param func:
-    :return:
-    """
-    def wrapper(*args,**kwargs):
-        try:
-            return func(*args,**kwargs)
-        except (AttributeError,AssertionError) as e:
-            return []
-
-    return wrapper
 
 class BaseScraper:
 
@@ -32,3 +18,20 @@ class BaseScraper:
         :return:
         """
         return utf_8_safe_decode(self.http.get_data(url))
+
+def safe_scrape(func):
+    """
+    Catch any attribute errors that may be associated with querying an alexa or dmoz page not present
+    and send back an empty list instead
+
+    :param func:
+    :return: a list of string categories or just an empty list upon error
+    """
+    def wrapper(*args,**kwargs):
+        try:
+            return func(*args,**kwargs)
+        except (AttributeError,AssertionError) as e:
+
+            return []
+
+    return wrapper

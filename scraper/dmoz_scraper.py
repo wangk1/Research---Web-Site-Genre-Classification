@@ -119,6 +119,8 @@ class DMOZScraper(BaseScraper):
         """
         Query DMOZ for the exact genre matches for the url.
 
+        Returns normalized genre, aka any leading / or trailing / is removed
+
         :param: url: The url to be queried
         :return: a list of genre strings found
 

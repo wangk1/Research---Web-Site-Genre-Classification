@@ -6,6 +6,11 @@ from mongoengine import DoesNotExist
 
 import collections as coll
 
+"""
+Define special operations on mongodb collection provided in addition to the basic MongoEngine operations.
+"""
+
+
 class Genres:
 
     @staticmethod
@@ -17,7 +22,7 @@ class Genres:
         If genre exists, return it instead of creating a new one.
         Also, this method makes sure that there are no repeats
 
-        :param genre_list: Each genre level should be delimited by _ and be of type str
+        :param genre_list: Each genre level should be delimited by / and be of type str
         :return: List of Genre collection references to documents.
         """
 

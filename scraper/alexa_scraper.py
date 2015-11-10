@@ -19,6 +19,8 @@ class AlexaScraper(BaseScraper):
         """
         Query the url in alexa, will automatically unreplace the &dot;
 
+        Returns normalized genre, aka any leading / or trailing / is removed
+
         :raise AssertionError: Assertion error(None page or empty page)
         :param url: url to be
         :return genrestring: genre string

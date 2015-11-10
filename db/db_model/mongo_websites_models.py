@@ -27,7 +27,7 @@ class ShortGenre(DynamicDocument):
 
 class EmbeddedGenre(EmbeddedDocument):
     type=StringField(required=True)
-    count=IntField(required=True,default=-1)
+    #count=IntField(required=True,default=-1)
     genre=ReferenceField(Genre,required=True)
     result_type=StringField(default='NA')
 
@@ -58,7 +58,20 @@ class URLToGenre(DynamicDocument):
 
           ]}
 
+class URLToGenreAlexa300K(DynamicDocument):
+    url=StringField(unique=True,required=True)
+    genres_data=ReferenceField('GenreMetaData')
+    original=BooleanField(required=True,default=False)
+    page=StringField()
 
+    #the following are optional fields that may exist
+    parent=ListField()
+
+    meta={'collection':'URLToGenre',
+          'indexes':[
+              'url'
+
+          ]}
 
 class URLQueue(Document):
     number=IntField(required=True,unique=True)
