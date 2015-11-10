@@ -5,6 +5,7 @@ __author__ = 'Kevin'
 from analytics.mutual_information import *
 from analytics.genre_similarity import get_genre_similarities
 from db.db_model.mongo_websites_models import TrainSetBow
+from analytics.classification_results import plot_miss_per_genre,count_miss_ratio
 
 def calculate_top_percent():
     import db.db_collections.mongo_collections as coll, operator
@@ -40,7 +41,11 @@ def calculate_top_percent():
 
 
 if __name__=="__main__":
-    calculate_training_set_mu(TrainSetBow)
+    #count_miss_ratio()
+    # plot_miss_per_genre("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2",
+    #                     "C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt",
+    #                     by_classifier=True)
+    # #calculate_training_set_mu(TrainSetBow)
 
     #mutual_information_similarity("genre_similarity.txt")
 

@@ -3,6 +3,7 @@ import re
 import os
 import numpy as np
 from sklearn.feature_extraction import DictVectorizer
+
 import scipy.sparse as sp
 
 from util.Logger import Logger

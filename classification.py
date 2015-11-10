@@ -1,4 +1,5 @@
 import itertools
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
@@ -11,15 +12,14 @@ import random
 import util.base_util as util
 from sklearn.feature_selection import chi2 as chi_sq,SelectKBest
 
-from collections import namedtuple,Counter
+from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 from db.db_model.mongo_websites_models import TestSetBow,TrainSetBow
-from classification.classifiers_func import classify,load_vocab_vectorizer
-from classification.mapper import ClassificationSourceMapper
 from classification.classifiers import Classifier
 import math
-from classification.classification_results import count_miss_ratio
+from analytics.classification_results import count_miss_ratio
+from sklearn.decomposition import TruncatedSVD
 
 ignore_genre={
     "World",
@@ -152,11 +152,12 @@ if __name__=="__main__":
     classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
                  RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
 
-    summary_2000_classifier=Classifier("summary_2000",
-               res_dir=res_dir,
-               vocab_vectorizer_pickle_dir=pickle_dir)
-    summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
-                                     feature_selector=SelectKBest(chi_sq,2000),classifiers=classifiers)
+    for i in sorted({1000},reverse=True):
+        summary_2000_classifier=Classifier("summary_{}_truncated_lsa".format(i),
+                   res_dir=res_dir,
+                   vocab_vectorizer_pickle_dir=pickle_dir)
+        summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
+                                         feature_selector=TruncatedSVD(n_components=i),classifiers=classifiers)
 
     # load_vocab_vectorizer(TrainSetBow,extra_label="summary")
     # classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)

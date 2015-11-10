@@ -4,7 +4,7 @@ import settings
 from util import base_util
 from db.db_model.mongo_websites_models import *
 from db.database import MongoDB
-from scraper.web_scraper import WebScraper
+from scraper.web_scrape_oldr import WebScraper
 from scraper.dmoz_scraper import DMOZScraper
 
 class PipeLine:

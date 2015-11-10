@@ -32,14 +32,15 @@ if __name__ =='__main__':
     """
 
 
-    c=set()
-    for count,train_bow_obj in enumerate(TrainSetBow.objects):
-        count%1000==0 and print(count)
-        c|=set(k for k in train_bow_obj.bow.keys() if len(k)<10)
-
-    TrainTestWordCount(type="train",vocab=c).save()
-
-    pass
+    # c=set()
+    # for count,train_bow_obj in enumerate(TrainSetBow.objects):
+    #     count%1000==0 and print(count)
+    #     c|=set(k for k in train_bow_obj.bow.keys() if len(k)<10)
+    #
+    # TrainTestWordCount(type="train",vocab=c).save()
+    #
+    # pass
+    print("hellos")
 
 
 
