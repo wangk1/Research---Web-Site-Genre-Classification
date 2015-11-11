@@ -1,7 +1,7 @@
 __author__ = 'Kevin'
 from util.base_util import *
 
-from db.db_model.mongo_websites_models import Genre,EmbeddedGenre
+from db.db_model.mongo_websites_models import Genre,EmbeddedGenre,GenreTest,GenreMetaData,GenreMetaDataTest
 from mongoengine import DoesNotExist
 
 import collections as coll
@@ -34,11 +34,11 @@ class Genres:
             assert isinstance(genre_string,str)
 
             try:
-                genre_ref=Genre.objects.get(genre=genre_string)
+                genre_ref=GenreTest.objects.get(genre=genre_string)
 
                 genre_refs.append(genre_ref)
             except DoesNotExist:
-                genre_ref=Genre.objects(genre=genre_string).modify(set__urls=[url],upsert=True,new=True)
+                genre_ref=GenreTest.objects(genre=genre_string).modify(set__urls=[url],upsert=True,new=True)
                 genre_refs.append(genre_ref)
 
         return genre_refs
@@ -58,15 +58,16 @@ class GenreMetaData:
         """
         assert url is not None
         assert genre_ref_list is not []
+        assert isinstance(genre_ref_list,list)
 
         try:
-            genre_metadata_ref=GenreMetaData.objects.get(url=url)
+            genre_metadata_ref=GenreMetaDataTest.objects.get(url=url)
             genre_string_set=set(embedded_genre.genre.genre for embedded_genre in genre_metadata_ref.genres)
 
             new_embedded_genre_list=[]
             #get all the genres not in the genre metadata
             for embedded_genre_entry in genre_ref_list:
-                assert isinstance(embedded_genre_entry,EmbeddedGenre)
+
 
                 if embedded_genre_entry.genre.genre not in genre_string_set:
                     new_embedded_genre_list.append(embedded_genre_entry)
@@ -76,7 +77,8 @@ class GenreMetaData:
             genre_metadata_ref.reload()
 
         except DoesNotExist:
-            genre_metadata_ref=GenreMetaData.objects(url=url).modify(set__genres=genre_ref_list,upsert=True,new=True)
+            GenreMetaDataTest(url=url,genres=genre_ref_list).save()
+            genre_metadata_ref=GenreMetaDataTest.objects.get(url=url)
 
         return genre_metadata_ref
 

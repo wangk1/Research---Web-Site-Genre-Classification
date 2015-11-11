@@ -1,6 +1,6 @@
 __author__ = 'Kevin'
 
-DEBUG=False
+DEBUG=True
 
 """
 Http request settings
@@ -18,6 +18,8 @@ INTERNET_TEST_ADDR='www.google.com'
 RETRIE_UPON_ERROR=1
 
 NO_DATA_RETRIE=1
+
+MIN_PAGE_SIZE=500 #min page size in char, gets rid of much 404 errors
 
 """
 Database settings

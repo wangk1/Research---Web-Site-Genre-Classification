@@ -42,6 +42,8 @@ class DBQueue:
     def create_queue(self,iterable):
         """
         Populate the queue from each item in the iterable where the reference of each item is the document of the queue.
+
+        The iterable items becomes the document portion
         """
 
         for c,doc_obj in enumerate(filter(lambda x: x, iterable)):

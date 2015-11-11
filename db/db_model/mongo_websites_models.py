@@ -15,6 +15,17 @@ class Genre(DynamicDocument):
 
           ]}
 
+class GenreTest(DynamicDocument):
+    genre=StringField(required=True,unique=True)
+    dmoz=DictField(default={})
+    urls=ListField(StringField())
+
+    meta={'collection':'GenreTest',
+          'indexes':[
+              'genre'
+
+          ]}
+
 class ShortGenre(DynamicDocument):
     short_genre=StringField(required=True,unique=True)
     genres=ListField(ReferenceField(Genre,reverse_delete_rule=PULL),default=[],required=True)
@@ -31,6 +42,12 @@ class EmbeddedGenre(EmbeddedDocument):
     genre=ReferenceField(Genre,required=True)
     result_type=StringField(default='NA')
 
+class EmbeddedGenreTest(EmbeddedDocument):
+    type=StringField(required=True)
+    #count=IntField(required=True,default=-1)
+    genre=ReferenceField(GenreTest,required=True)
+    result_type=StringField(default='NA')
+
 class GenreMetaData(DynamicDocument):
     genres=ListField(EmbeddedDocumentField(EmbeddedGenre),default=[])
     url=StringField()
@@ -42,10 +59,21 @@ class GenreMetaData(DynamicDocument):
           ]
           }
 
+class GenreMetaDataTest(DynamicDocument):
+    genres=ListField(EmbeddedDocumentField(EmbeddedGenreTest),required=True)
+    url=StringField()
+
+    meta={'collection':'GenreMetaDataTest',
+          'indexes':[
+              'url'
+
+          ]
+          }
+
 class URLToGenre(DynamicDocument):
     genre=ListField(ReferenceField(Genre))
     url=StringField(unique=True,required=True)
-    genres=ReferenceField('GenreMetaData')
+    genres=ReferenceField(GenreMetaData)
     original=BooleanField(required=True,default=False)
 
     #the following are optional fields that may exist
@@ -60,14 +88,15 @@ class URLToGenre(DynamicDocument):
 
 class URLToGenreAlexa300K(DynamicDocument):
     url=StringField(unique=True,required=True)
-    genres_data=ReferenceField('GenreMetaData')
+    genres_data=ReferenceField(GenreMetaDataTest,required=True)
     original=BooleanField(required=True,default=False)
     page=StringField()
+    ranking=IntField()
 
     #the following are optional fields that may exist
     parent=ListField()
 
-    meta={'collection':'URLToGenre',
+    meta={'collection':'URLToGenre300K',
           'indexes':[
               'url'
 

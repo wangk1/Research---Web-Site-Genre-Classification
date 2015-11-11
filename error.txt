@@ -8718,3 +8718,105 @@ New Log on date: 2015-11-09---------
 New Log on date: 2015-11-09---------
 
 New Log on date: 2015-11-09---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+ERROR: Exception occured: HTTPSConnectionPool(host='google.com\n', port=443): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x0000000004E95D68>: Failed to establish a new connection: [Errno 11004] getaddrinfo failed',))
+ERROR: WebScraping Issue: HTTPSConnectionPool(host='google.com\n', port=443): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x0000000004E95D68>: Failed to establish a new connection: [Errno 11004] getaddrinfo failed',))
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------
+
+New Log on date: 2015-11-10---------

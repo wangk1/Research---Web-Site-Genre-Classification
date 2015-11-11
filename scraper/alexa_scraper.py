@@ -42,7 +42,6 @@ class AlexaScraper(BaseScraper):
             for tr in all_genre_tr:
                 span=tr.find("span")
 
-                if span.find("a").string not in AlexaScraper.ignored_top_level:
-                    all_genre_strings.append('/'.join([genre_component_link.string for genre_component_link in span.find_all("a")]))
+                all_genre_strings.append('/'.join([genre_component_link.string for genre_component_link in span.find_all("a")]))
 
         return all_genre_strings

@@ -23,7 +23,7 @@ class Request:
     http=urllib3.PoolManager(headers=headers,timeout=urllib3.Timeout(settings.TIME_OUT),retries=settings.RETRIE_UPON_ERROR)
     bad_count=0
 
-    header_combo={"http://","https://"}
+    header_combo={"https://","http://"}
 
     """Must wait so as to not trigger
     """
@@ -32,17 +32,21 @@ class Request:
 
     @fail_safe_web
     def get_data(self,url):
-        response=self.get(url)
 
-        if hasattr(response,"data") and response.data.strip() != "":
-            return response.data
-
+        #retry twice if the url doesn't work
         for retrie in range(0,settings.NO_DATA_RETRIE):
 
             for header in self.header_combo:
-                if(not hasattr(response,'data') and not url.startswith(header)):
-                    response=self.get(header+url)
+                try:
+                    response=self.get((header if not url.startswith(header) else "")+url)
 
+                except Exception as ex:
+                    pass
+
+                if hasattr(response,"data") and len(response.data)>settings.MIN_PAGE_SIZE:
+                    break
+                else:
+                    response=None
 
             if hasattr(response,"data"):
                 break

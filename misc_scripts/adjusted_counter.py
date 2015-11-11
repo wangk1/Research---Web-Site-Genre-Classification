@@ -12,7 +12,7 @@ __author__ = 'Kevin'
 
 
 
-def calculate_adjusted_miss_rate(path_of_classifier_res):
+def calculate_adjusted_miss_rate(res_folder):
     """
     Given the path to folder containing classifier results files that have the form of ClassifierName_wrong.txt or *_right.txt.
 
@@ -25,50 +25,44 @@ def calculate_adjusted_miss_rate(path_of_classifier_res):
     Script that reads how many wrong we have
     """
 
-    res_folder="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
-    folder_patterns="^summary_.*_chi2$"
+    #counter the number of instances classified as wrong, but is actually predicted
+    #into one of its many genres
+    swing_counter=collections.Counter()
 
-    all_folders=[folder for folder in (os.path.join(res_folder,f) for f in os.listdir(res_folder)
-                                       if re.match(folder_patterns,f)
-                                       )]
-    all_folders=sorted(all_folders)
-    for path in all_folders:
-        print(path)
+    #get all result files that ends with _right or _wrong
+    for a_result in filter(lambda x: os.path.isfile(os.path.join(res_folder,x)),os.listdir(res_folder)):
+        assert isinstance(a_result,str)
+        abs_result=os.path.join(res_folder,a_result)
+        print(a_result)
 
+        right=0
+        wrong=0
+        if a_result.find("right") > -1:
+            #count the rights
+            with open(abs_result) as file:
+                right+=sum((1 for i in file if i.strip() != ""))
 
-        #get all result files that ends with _right or _wrong
-        for a_result in filter(lambda x: os.path.isfile(os.path.join(path,x)),os.listdir(path)):
-            assert isinstance(a_result,str)
-            abs_result=os.path.join(path,a_result)
-            print(a_result)
+        elif a_result.find("wrong")>-1:
+            wrong_res_objs=get_classification_res(abs_result)
 
-            right=0
-            wrong=0
-            if a_result.find("right") > -1:
-                #count the rights
-                with open(abs_result) as file:
-                    right+=sum((1 for i in file if i.strip() != ""))
+            #grab all the genres and see if it exists
+            for c,res_obj in enumerate(wrong_res_objs):
+                found=False
 
-            elif a_result.find("wrong")>-1:
-                wrong_res_objs=get_classification_res(abs_result)
+                #grab all short genres and see if it matches
+                url_bow_obj=URLBow.objects(index=res_obj.ref_id).only("short_genres")[0]
 
+                found=res_obj.predicted in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres) or found
 
-                #grab all the genres and see if it exists
-                for c,res_obj in enumerate(wrong_res_objs):
-                    found=False
+                if found:
+                    swing_counter.update([res_obj.ref_id])
+                    right+=1
 
-                    #grab all short genres and see if it matches
-                    url_bow_obj=URLBow.objects(index=res_obj.ref_id).only("short_genres")[0]
+                else:
+                    wrong+=1
 
-                    found=res_obj.predicted in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres) or found
+        print("Total right: {}, total wrong: {}".format(right,wrong))
 
-                    if found:
-                        right+=1
+    print("Swing counter {}".format(str(swing_counter)))
+    print("Swing counter size : {}".format(len(swing_counter)))
 
-                    else:
-                        wrong+=1
-
-
-
-            print("Total right: {}, total wrong: {}".format(right,wrong))
-    print(all_folders)
