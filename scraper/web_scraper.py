@@ -45,46 +45,47 @@ class WebScraper(BaseScraper):
 
             url=unreplace_dot_url(webpageinfo_obj.url)
 
-            #first get the webpage
-            page=self.get_page(url)
+            try:
+                #first get the webpage
+                page=self.get_page(url)
 
-            if page is None:
-                #TODO: catch errors
-                webscraper_logger.info("Skippin rank {}".format(rank))
-                continue
+                if page is None:
+                    raise AssertionError("Skippin rank {} due to empty page".format(rank))
 
-            webscraper_logger.debug("Found page of length {}".format(len(page)))
+                webscraper_logger.debug("Found page of length {}".format(len(page)))
 
-            dot_replaced_url=replace_dot_url(url)
+                dot_replaced_url=replace_dot_url(url)
 
-            alexa_genre_strings=self.alexa_scraper.query_url(url)
-            dmoz_genre_strings=self.dmoz_scraper.query_url(url)
-
-            if len(alexa_genre_strings)+len(dmoz_genre_strings)==0:
-                #TODO: catch errors
-
-                webscraper_logger.info("Skippin rank {} due to no genres".format(rank))
-                continue
-
-            webscraper_logger.debug("Found {} alexa genres ".format(len(alexa_genre_strings)))
-            webscraper_logger.debug("Found {} dmoz genres".format(len(dmoz_genre_strings)))
-
-            #then get the urls's genres from alexa and dmoz that are EXACT matches and convert from string -> genre coll objects
-            alexa_genre_refs=Genres.create_genres(alexa_genre_strings,dot_replaced_url)
-            dmoz_genre_refs=Genres.create_genres(dmoz_genre_strings,dot_replaced_url)
-
-            #convert from genres -> embedded genres for more info and storage in genre_metadata
-            alexa_embedded_ref_list=(EmbeddedGenreTest(type="url",genre=g_ref,result_type="alexa") for g_ref in alexa_genre_refs)
-            dmoz_embedded_ref_list=(EmbeddedGenreTest(type="url",genre=g_ref,result_type="dmoz") for g_ref in dmoz_genre_refs)
-
-            #Create the genre metadata
-            genre_metadata=GenreMetaData.create_genremetadata([eg for eg in itertools.chain(alexa_embedded_ref_list,dmoz_embedded_ref_list)],dot_replaced_url)
+                alexa_genre_strings=self.alexa_scraper.query_url(url)
+                dmoz_genre_strings=list(set(self.dmoz_scraper.query_url(url))-set(alexa_genre_strings))
 
 
-            #finally put page in collection
-            output_collection_cls(genres_data=genre_metadata,url=dot_replaced_url,original=True,page=page,ranking=rank).save()
-            webscraper_logger.debug("Done, commited to URlToGenreAlexa300k, there are now {} objects"
-                                   .format(output_collection_cls.objects.count()))
+
+                if len(alexa_genre_strings)+len(dmoz_genre_strings)==0:
+                    raise AssertionError("Skippin rank {} due to no genres".format(rank))
+
+                webscraper_logger.debug("Found {} alexa genres ".format(len(alexa_genre_strings)))
+                webscraper_logger.debug("Found {} dmoz genres".format(len(dmoz_genre_strings)))
+
+                #then get the urls's genres from alexa and dmoz that are EXACT matches and convert from string -> genre coll objects
+                alexa_genre_refs=Genres.create_genres(alexa_genre_strings,dot_replaced_url)
+                dmoz_genre_refs=Genres.create_genres(dmoz_genre_strings,dot_replaced_url)
+
+                #convert from genres -> embedded genres for more info and storage in genre_metadata
+                alexa_embedded_ref_list=(EmbeddedGenreTest(type="url",genre=g_ref,result_type="alexa") for g_ref in alexa_genre_refs)
+                dmoz_embedded_ref_list=(EmbeddedGenreTest(type="url",genre=g_ref,result_type="dmoz") for g_ref in dmoz_genre_refs)
+
+                #Create the genre metadata
+                genre_metadata=GenreMetaData.create_genremetadata([eg for eg in itertools.chain(alexa_embedded_ref_list,dmoz_embedded_ref_list)],dot_replaced_url)
+
+
+                #finally put page in collection
+                output_collection_cls(genres_data=genre_metadata,url=dot_replaced_url,original=True,page=page,ranking=rank).save()
+                webscraper_logger.debug("Done, commited to URlToGenreAlexa300k, there are now {} objects"
+                                       .format(output_collection_cls.objects.count()))
+
+            except Exception as ex:
+                webscraper_logger.info("Exception occured: {}".format(str(ex)))
 
             #update reference so we don't go over the same again
             self.queue.increment_location()

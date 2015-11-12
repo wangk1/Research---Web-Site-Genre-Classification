@@ -28,6 +28,10 @@ def calculate_adjusted_miss_rate(res_folder):
     #counter the number of instances classified as wrong, but is actually predicted
     #into one of its many genres
     swing_counter=collections.Counter()
+    total_wrong_size=0
+    total_right_size=0
+    num_wrong=0
+    num_right=0
 
     #get all result files that ends with _right or _wrong
     for a_result in filter(lambda x: os.path.isfile(os.path.join(res_folder,x)),os.listdir(res_folder)):
@@ -65,4 +69,5 @@ def calculate_adjusted_miss_rate(res_folder):
 
     print("Swing counter {}".format(str(swing_counter)))
     print("Swing counter size : {}".format(len(swing_counter)))
+    print("Average bow size of rights: {}. For wrong: {}".format(total_right_size/num_right,total_wrong_size/num_wrong))
 
