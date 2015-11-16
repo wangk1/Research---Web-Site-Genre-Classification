@@ -17,7 +17,7 @@ class Request:
     """Must wait so as to not trigger
     """
     def _randomized_wait(self):
-        time.sleep(random.random()*settings.WAIT_TIME_MULTIPLIER)
+        time.sleep(random.random()*settings.WAIT_TIME)
 
     def get(self, url):
         self._randomized_wait()

@@ -38,7 +38,7 @@ class ShortGenre(DynamicDocument):
 
 class EmbeddedGenre(EmbeddedDocument):
     type=StringField(required=True)
-    #count=IntField(required=True,default=-1)
+    count=IntField(required=True,default=-1)
     genre=ReferenceField(Genre,required=True)
     result_type=StringField(default='NA')
 
@@ -88,7 +88,7 @@ class URLToGenre(DynamicDocument):
 
 class URLToGenreAlexa300K(DynamicDocument):
     url=StringField(unique=True,required=True)
-    genres_data=ReferenceField(GenreMetaDataTest,required=True)
+    genres_data=ReferenceField(GenreMetaData,required=True)
     original=BooleanField(required=True,default=False)
     page=StringField()
     ranking=IntField()

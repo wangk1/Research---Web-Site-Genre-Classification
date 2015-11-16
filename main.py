@@ -5,8 +5,12 @@ from db.db_collection_operations.url_queue_ops import *
 from collections import Counter
 import os,itertools
 from classification_attribute.word_based import EnglishStemmer
+from classification_attribute.feature_selection import SparseSVD
 from db.db_model.mongo_websites_models import TrainTestWordCount,TrainSetBow
 from db.db_model.mongo_websites_models import URLBow
+import numpy as np
+from scipy.sparse import coo_matrix
+
 
 """
 models=MongoDB(settings.HOST_NAME,settings.PORT)
@@ -15,6 +19,13 @@ genres=models.save_modify_url('gaurl',*[{'genre':'test1','alexa':12,'dmoz':10000
 """
 
 if __name__ =='__main__':
+    row  = np.array([0, 3, 1, 0])
+    col  = np.array([0, 3, 1, 2])
+    data = np.array([4, 5, 7, 9])
+    matrix=coo_matrix((data, (row, col)), shape=(4, 4),dtype=np.dtype('Float64')).toarray()
+
+    ma=SparseSVD(k=3).transform(matrix)
+    print(ma)
     """
     url_coll=coll.URLToGenre()
 

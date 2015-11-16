@@ -1,9 +1,23 @@
 __author__ = 'Kevin'
 from sklearn.feature_selection import SelectKBest,chi2 as chi_sq
+from scipy.sparse.linalg import svds
 
 from util.text_preprocessor import preprocess
 from .word_based import BagOfWords
 from classification.util import load_train_matrix,load_test_matrix
+
+from scipy.sparse import identity
+
+class SparseSVD:
+
+    def __init__(self,k):
+        self.k=k
+
+    def transform(self,X):
+        lu,s,ru=svds(X,k=self.k)
+        s=identity(self.k,dtype='Float64',format='dia').multiply(s)
+
+        return lu.multiply(s).multiply(ru)
 
 
 

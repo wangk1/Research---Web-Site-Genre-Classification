@@ -9246,3 +9246,303 @@ New Log on date: 2015-11-11---------
 New Log on date: 2015-11-11---------
 
 New Log on date: 2015-11-11---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-13---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-13---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-13---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-13---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-13---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-14---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-15---------

@@ -41,11 +41,11 @@ def calculate_top_percent():
 
 
 if __name__=="__main__":
-    #count_miss_ratio()
-    # plot_miss_per_genre("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2",
-    #                     "C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt",
-    #                     by_classifier=True)
-    # #calculate_training_set_mu(TrainSetBow)
+    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2"
+    outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
+
+    plot_miss_per_genre(path,outpath,classifiers="LogisticRegression")
+
 
     #mutual_information_similarity("genre_similarity.txt")
 

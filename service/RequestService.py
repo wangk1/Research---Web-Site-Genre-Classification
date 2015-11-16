@@ -20,15 +20,26 @@ class Request:
     #self.http
     headers=urllib3.make_headers(keep_alive=connection,accept_encoding=AcceptEncoding
                          ,user_agent=user_agent)
-    http=urllib3.PoolManager(headers=headers,timeout=urllib3.Timeout(settings.TIME_OUT),retries=settings.RETRIE_UPON_ERROR)
-    bad_count=0
 
     header_combo={"https://","http://"}
 
-    """Must wait so as to not trigger
-    """
+    def __init__(self,wait_time=settings.WAIT_TIME,timeout=settings.TIME_OUT):
+        #used for timeouts
+        self.bad_count=0
+        self.timeout=timeout
+        self.http=urllib3.PoolManager(headers=Request.headers,timeout=urllib3.Timeout(self.timeout),retries=settings.RETRIE_UPON_ERROR)
+        #this is a number that is multiplied by a random number for a number of miliseconds to wait.
+        #essentially, this extends/shrinks the wait time, allowing user to adjust the wait time
+        self.wait_time=wait_time
+
+
     def _randomized_wait(self):
-        time.sleep(random.random()*settings.WAIT_TIME_MULTIPLIER)
+        """
+        Don't want to trigger a lockout on some webpages, so we randomize the wait
+
+        :return:
+        """
+        time.sleep(random.randint(self.wait_time,self.wait_time+10))
 
     @fail_safe_web
     def get_data(self,url):

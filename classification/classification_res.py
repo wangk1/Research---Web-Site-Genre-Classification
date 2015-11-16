@@ -1,6 +1,10 @@
 import collections
 import os
 import re
+
+from db.db_model.mongo_websites_models import URLBow
+from util.base_util import normalize_genre_string
+
 """
 This module is geared towards providing functions that transforms the classification result file.
 
@@ -12,7 +16,8 @@ Current functions:
 
 __author__ = 'Kevin'
 
-ClassificationResultInstance=collections.namedtuple("ClassificationInstance",("ref_id","actual","predicted","classifier"))
+
+
 
 def get_classification_res(filepath):
     """
@@ -33,6 +38,40 @@ def get_classification_res(filepath):
 
     return prediction_objs
 
+def create_true_results(res_path):
+    """
+    Create files of actual misses,swings, and rights
+
+    :param res_path:
+    :return:
+    """
+    pass
+
+class ClassificationResultInstance:
+
+    def __init__(self,ref_id,actual,predicted,classifier):
+        self.ref_id=ref_id
+        self.actual=actual
+        self.predicted=predicted
+        self.classifier=classifier
+
+    def __str__(self):
+        return "{}, predicted: {}, actual: {}".format(self.ref_id,self.predicted,self.actual)
+
+    def is_swing_sample(self):
+        """
+        Test if the ClassificationResultInstance object is a swing instance, its predicted class is within one of its
+        multiple classes. So, right predictions are automatically also swing instances. But, wrong predicted samples
+        may be a swing instance
+
+        :return: True or False if the sample is swing instance
+        """
+
+        #grab all short genres and see if it matches
+        url_bow_obj=URLBow.objects(index=self.ref_id).only("short_genres")[0]
+
+        return self.predicted in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres)
+
 class ClassificationResultStream:
     """
     Base class for streaming prediction results from the text files, regardless of the results
@@ -49,14 +88,14 @@ class ClassificationResultStream:
 
         :param result_path: The path to folder containing all the classifier results
         :param classifier: Allow use to only stream the data from the results of one classifier.
-            Current this feature is not supported.
+            Can be an iterable or just a string along
         """
-        assert os.path.isdir(result_path) and os.path.exists(result_path)
 
         self.result_path=result_path
 
-        if classifier is not None:
-            raise NotImplementedError("Current streaming by classifier does not exist")
+        #set of classifiers to look for
+        self.classifiers=classifier if not isinstance(classifier,str) else (classifier,)
+
 
     def get_classification_res(self,filepath):
         """
@@ -88,7 +127,13 @@ class ClassificationResultStream:
         """
         abs_result_path=os.path.abspath(self.result_path)
 
-        right_files=(f for f in os.listdir(abs_result_path) if f.endswith(suffix))
+        #in case we only chose some classifiers
+        if self.classifiers is not None:
+            right_files=(f for f in os.listdir(abs_result_path)
+                         if f.endswith(suffix) and any(f.startswith(c) for c in self.classifiers))
+
+        else:
+            right_files=(f for f in os.listdir(abs_result_path) if f.endswith(suffix))
 
         for right_file in right_files:
             for right_instance in self.get_classification_res(os.path.join(abs_result_path,right_file)):
@@ -115,7 +160,6 @@ class RightResultsIter(ClassificationResultStream):
 
     def __iter__(self):
         return self
-
 
 
 class WrongResultsIter(ClassificationResultStream):

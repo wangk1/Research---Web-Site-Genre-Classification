@@ -1,15 +1,16 @@
 __author__ = 'Kevin'
 from util.base_util import *
+from util.Logger import Logger
 
-from db.db_model.mongo_websites_models import Genre,EmbeddedGenre,GenreTest,GenreMetaData,GenreMetaDataTest
+import db.db_model.mongo_websites_models as models
 from mongoengine import DoesNotExist
 
-import collections as coll
 
 """
 Define special operations on mongodb collection provided in addition to the basic MongoEngine operations.
 """
 
+db_logger=Logger()
 
 class Genres:
 
@@ -34,16 +35,18 @@ class Genres:
             assert isinstance(genre_string,str)
 
             try:
-                genre_ref=GenreTest.objects.get(genre=genre_string)
+                genre_ref=models.Genre.objects.get(genre=genre_string)
 
                 genre_refs.append(genre_ref)
             except DoesNotExist:
-                genre_ref=GenreTest.objects(genre=genre_string).modify(set__urls=[url],upsert=True,new=True)
+                db_logger.debug("Genre: Creating new genre entry")
+
+                genre_ref=models.Genre.objects(genre=genre_string).modify(set__urls=[url],upsert=True,new=True)
                 genre_refs.append(genre_ref)
 
         return genre_refs
 
-#embedded document in each document in GenreMetaData
+#embedded document in each document in `
 class GenreMetaData:
 
     @staticmethod
@@ -61,7 +64,7 @@ class GenreMetaData:
         assert isinstance(genre_ref_list,list)
 
         try:
-            genre_metadata_ref=GenreMetaDataTest.objects.get(url=url)
+            genre_metadata_ref=models.GenreMetaData.objects.get(url=url)
             genre_string_set=set(embedded_genre.genre.genre for embedded_genre in genre_metadata_ref.genres)
 
             new_embedded_genre_list=[]
@@ -77,8 +80,10 @@ class GenreMetaData:
             genre_metadata_ref.reload()
 
         except DoesNotExist:
-            GenreMetaDataTest(url=url,genres=genre_ref_list).save()
-            genre_metadata_ref=GenreMetaDataTest.objects.get(url=url)
+            db_logger.debug("GenreMeta: Creating new genremeta entry")
+
+            models.GenreMetaData(url=url,genres=genre_ref_list).save()
+            genre_metadata_ref=models.GenreMetaData.objects.get(url=url)
 
         return genre_metadata_ref
 

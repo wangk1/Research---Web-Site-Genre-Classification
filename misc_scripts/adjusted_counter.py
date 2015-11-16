@@ -1,15 +1,108 @@
 import collections
 import os
-import re
+import re,operator
 
 
-from classification.classification_res import get_classification_res
+from classification.classification_res import get_classification_res, RightResultsIter,WrongResultsIter,ClassificationResultInstance
 from db.db_model.mongo_websites_models import URLBow
 from util.base_util import normalize_genre_string
+from util.Logger import Logger
 
 __author__ = 'Kevin'
 
+def calculate_average_page_size(res_folder):
+    total_bow_sizes={"right":0,"wrong":0,"swing":0}
+    bow_count={"right":0,"wrong":0,"swing":0}
 
+
+    Logger.info("Average bow size, on right bow size")
+    for right_res in RightResultsIter(res_folder):
+        total_bow_sizes["right"]+=len(URLBow.objects.get(index=right_res.ref_id).bow)
+        bow_count["right"]+=1
+
+    Logger.info("Average bow size, on wrong bow size")
+    for wrong_res in WrongResultsIter(res_folder):
+        if wrong_res.is_swing_sample():
+            label="swing"
+        else:
+            label="wrong"
+
+        bow_count[label]+=1
+        total_bow_sizes[label]+=len(URLBow.objects.get(index=wrong_res.ref_id).bow)
+
+    print([(label,total/bow_count[label],bow_count[label]) for label,total in total_bow_sizes.items()])
+
+def calculate_average_bow_size(res_folder):
+    """
+    Calculate average bow size for the URLBow database
+
+    :param res_folder:
+    :return:
+    """
+
+    total_bow_sizes={"right":0,"wrong":0,"swing":0}
+    bow_count={"right":0,"wrong":0,"swing":0}
+
+    Logger.info("Average bow size, on right bow size")
+    for right_res in RightResultsIter(res_folder):
+        total_bow_sizes["right"]+=len(URLBow.objects.get(index=right_res.ref_id).bow)
+        bow_count["right"]+=1
+
+    Logger.info("Average bow size, on wrong bow size")
+    for wrong_res in WrongResultsIter(res_folder):
+        if wrong_res.is_swing_sample():
+            label="swing"
+        else:
+            label="wrong"
+
+        bow_count[label]+=1
+        total_bow_sizes[label]+=len(URLBow.objects.get(index=wrong_res.ref_id).bow)
+
+    print([(label,total/bow_count[label],bow_count[label]) for label,total in total_bow_sizes.items()])
+
+
+def calculate_genres_per_instance(res_folder):
+    current_classifier=""
+
+    right_genresize_counter=collections.Counter()
+    wrong_genresize_counter=collections.Counter()
+    swing_genresize_counter=collections.Counter()
+
+    Logger.info("Current on rights")
+
+    with open(res_folder+"/right_true.txt",mode="w") as right_handle:
+        #iterate over the right samples first
+        for right_res_obj in {x.ref_id: x for x in RightResultsIter(res_folder)}.values():
+            assert isinstance(right_res_obj,ClassificationResultInstance)
+            if right_res_obj.classifier != current_classifier:
+                current_classifier=right_res_obj.classifier
+
+            #now find the size of its genre
+            right_genresize_counter.update([len(URLBow.objects.get(index=right_res_obj.ref_id).short_genres)])
+
+    Logger.info("Current on wrongs")
+
+    with open(res_folder+"/swing.txt",mode="w") as swing_handle,open(res_folder+"/wrong_true.txt",mode="w") as wrong_handle:
+        #iterate over the wrong samples
+        for wrong_res_obj in {x.ref_id: x for x in WrongResultsIter(res_folder)}.values():
+            assert isinstance(wrong_res_obj,ClassificationResultInstance)
+            if wrong_res_obj.classifier != current_classifier:
+                current_classifier=wrong_res_obj.classifier
+
+            if wrong_res_obj.is_swing_sample():
+                swing_handle.write(str(wrong_res_obj)+"\n")
+
+                swing_genresize_counter.update([len(URLBow.objects.get(index=wrong_res_obj.ref_id).short_genres)])
+
+            else:
+                wrong_handle.write(str(wrong_res_obj)+"\n")
+
+                #now find the size of its genre
+                wrong_genresize_counter.update([len(URLBow.objects.get(index=wrong_res_obj.ref_id).short_genres)])
+
+    print("Wrong predicted sample distrbution: {}".format(sorted(wrong_genresize_counter.items(),key=operator.itemgetter(0))))
+    print("Right predicted sample distrbution: {}".format(sorted(right_genresize_counter.items(),key=operator.itemgetter(0))))
+    print("Swing sample distrbution: {}".format(sorted(swing_genresize_counter.items(),key=operator.itemgetter(0))))
 
 
 def calculate_adjusted_miss_rate(res_folder):
@@ -28,10 +121,6 @@ def calculate_adjusted_miss_rate(res_folder):
     #counter the number of instances classified as wrong, but is actually predicted
     #into one of its many genres
     swing_counter=collections.Counter()
-    total_wrong_size=0
-    total_right_size=0
-    num_wrong=0
-    num_right=0
 
     #get all result files that ends with _right or _wrong
     for a_result in filter(lambda x: os.path.isfile(os.path.join(res_folder,x)),os.listdir(res_folder)):
@@ -69,5 +158,4 @@ def calculate_adjusted_miss_rate(res_folder):
 
     print("Swing counter {}".format(str(swing_counter)))
     print("Swing counter size : {}".format(len(swing_counter)))
-    print("Average bow size of rights: {}. For wrong: {}".format(total_right_size/num_right,total_wrong_size/num_wrong))
 

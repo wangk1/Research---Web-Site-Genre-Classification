@@ -4,6 +4,7 @@ __author__ = 'Kevin'
 import os,re,collections,operator
 from util.Logger import Logger
 from analytics.graphics import plot_word_frequency,save
+from classification.classification_res import WrongResultsIter, ClassificationResultInstance
 
 WrongPrediction=collections.namedtuple("WrongPrediction",("ref_id","actual","predicted","classifier"))
 def get_wrongly_predicted_samples(filepath):
@@ -72,46 +73,39 @@ def transform_to_each_genre_missed(missed_samples,by_classifer=False):
     return actual_to_predicted
 
 
-def plot_miss_per_genre(path,outpath,by_classifier=False):
+def plot_miss_per_genre(path,outpath,classifiers=None):
     """
-    Given the path to
+    Given the path to classification result folder of multiple classifier.
 
-    :param path:
+    produce a plot of the classifier's misses.
+
+    :param path: the input folder where the classifiers' result(s) are
+    :param classifiers: A set of classifier whose results to graph. Note that if none, all of classifier's
+        results will be combined.
+
     :return:
     """
 
-    wrong_file_list=[os.path.join(path,f) for f in os.listdir(path) if os.path.isfile(os.path.join(path,f)) and re.match("^.*_wrong[.]txt$",f)]
+    #grab the actual misses, counter in default dict in default dict. First layer for classifiers, second layer
+    #is for correct genres, finally the counter is to count how many times it got miss classified as somethine else
+    classifier_to_misses_genre=collections.defaultdict(lambda:collections.defaultdict(lambda:collections.Counter()))
+    for true_miss in (w for w in WrongResultsIter(path,classifiers) if not w.is_swing_sample()):
+        assert isinstance(true_miss,ClassificationResultInstance)
 
-    Logger.info("found the following files: {}".format(str(wrong_file_list)))
+        classifier_to_misses_genre[true_miss.classifier][true_miss.actual].update([true_miss.predicted])
 
-    count=collections.Counter()
 
-    actual_to_missed_genre_mapping=transform_to_each_genre_missed(
-                itertools.chain(*(get_wrongly_predicted_samples(f) for f in wrong_file_list)),by_classifier)
+    #now plot each one, output to OUTPUT/classifier
+    for classifier, actual_to_miss in classifier_to_misses_genre.items():
+        for actual_genre,miss_freq in actual_to_miss.items():
+            plt=plot_word_frequency("{}-{} Misclassifications".format(classifier,actual_genre),miss_freq,plot_top=len(miss_freq))
 
-    if not os.path.exists(outpath):
-        os.mkdir(outpath)
+            out_path=os.path.join(outpath,classifier)
+            if not os.path.exists(out_path):
+                os.mkdir(out_path)
 
-    #now plot each one
-    for actual_genre, inner_dict in actual_to_missed_genre_mapping.items():
-        #total_sum=sum((i[1] for i in counter.items()))
-        #counter=dict(((k,v/total_sum) for k,v in counter.items()))
-
-        if not by_classifier:
-            plt=plot_word_frequency("{} Misclassifications".format(actual_genre),inner_dict,plot_top=len(inner_dict))
-            save("{}/{}_miss.pdf".format(outpath,actual_genre),plt)
-        else:
-            for classifier in actual_to_missed_genre_mapping.keys():
-                Logger.info("Plotting for classifier {}".format(classifier))
-                for actual_genre in actual_to_missed_genre_mapping[classifier].keys():
-                    inner_dict=actual_to_missed_genre_mapping[classifier][actual_genre]
-                    out_path=os.path.join(outpath,classifier)
-
-                    os.path.exists(out_path) or os.makedirs(out_path)
-
-                    plt=plot_word_frequency("{} Misclassifications".format(actual_genre),inner_dict,plot_top=len(inner_dict))
-                    save("{}/{}_miss.pdf".format(out_path,actual_genre),plt)
-                    plt.close()
+            save("{}/{}_miss_true.pdf".format(out_path,actual_genre),plt)
+            plt.close()
 
 
 

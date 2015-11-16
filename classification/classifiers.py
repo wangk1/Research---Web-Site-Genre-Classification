@@ -218,19 +218,23 @@ class Classifier:
         num_labels=len(self.test_y)
 
         for classifier in classifiers:
-            classifier_name=re.search(r"(?<=')(.*)(?=')",str(type(classifier))).group(1).split(".")[-1]
+            try:
+                classifier_name=re.search(r"(?<=')(.*)(?=')",str(type(classifier))).group(1).split(".")[-1]
 
-            classifier_logger.info("Classifying with {} with {} training and {} labels".format(classifier_name,
-                                                                                               self.train_X.shape[0],
-                                                                                               self.train_y.shape[0]))
-            classifier.fit(self.train_X,self.train_y)
+                classifier_logger.info("Classifying with {} with {} training and {} labels".format(classifier_name,
+                                                                                                   self.train_X.shape[0],
+                                                                                                   self.train_y.shape[0]))
+                classifier.fit(self.train_X,self.train_y)
 
-            for l in range(0,num_labels,increment):
-                res=classifier.predict(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
-                self.print_res(classifier_name=classifier_name,
-                          labels=self.test_y[l:l+increment if l+increment<num_labels else num_labels],
-                          predictions=res,
-                          ref_indexes=self.test_ref_index_matrix[l:l+increment])
+                for l in range(0,num_labels,increment):
+                    res=classifier.predict(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
+                    self.print_res(classifier_name=classifier_name,
+                              labels=self.test_y[l:l+increment if l+increment<num_labels else num_labels],
+                              predictions=res,
+                              ref_indexes=self.test_ref_index_matrix[l:l+increment])
+            except ValueError:
+                pass
+
 
     def print_res(self,classifier_name,predictions,labels,ref_indexes):
         """

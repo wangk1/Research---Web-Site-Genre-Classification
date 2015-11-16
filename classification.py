@@ -11,6 +11,7 @@ __author__ = 'Kevin'
 import random
 import util.base_util as util
 from sklearn.feature_selection import chi2 as chi_sq,SelectKBest
+from sklearn.pipeline import Pipeline
 
 from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
@@ -152,12 +153,13 @@ if __name__=="__main__":
     classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
                  RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
 
-    for i in sorted({1000},reverse=True):
-        summary_2000_classifier=Classifier("summary_{}_truncated_lsa".format(i),
+    for i in sorted({3000,5000,10000}):
+        summary_2000_classifier=Classifier("summary_{}_chi_truncated_lsa".format(i),
                    res_dir=res_dir,
                    vocab_vectorizer_pickle_dir=pickle_dir)
         summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
-                                         feature_selector=TruncatedSVD(n_components=i),classifiers=classifiers)
+                                         feature_selector=Pipeline([("chi2",SelectKBest(chi_sq,i)),("svd",TruncatedSVD(n_components=i/2))])
+                                         ,classifiers=classifiers)
 
     # load_vocab_vectorizer(TrainSetBow,extra_label="summary")
     # classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)
