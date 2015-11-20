@@ -8,7 +8,20 @@ from db.db_model.mongo_websites_models import URLBow
 from util.base_util import normalize_genre_string
 from util.Logger import Logger
 
+
 __author__ = 'Kevin'
+
+
+def get_result_distribution(path,classifier):
+    counts=[0]*3
+
+    for res in RightResultsIter(path,classifier):
+        assert isinstance(res,ClassificationResultInstance)
+
+        counts[res.predicted.index(res.actual)]+=1
+
+    print(counts)
+
 
 def calculate_average_page_size(res_folder):
     total_bow_sizes={"right":0,"wrong":0,"swing":0}
@@ -58,11 +71,11 @@ def calculate_average_bow_size(res_folder):
         bow_count[label]+=1
         total_bow_sizes[label]+=len(URLBow.objects.get(index=wrong_res.ref_id).bow)
 
-    print([(label,total/bow_count[label],bow_count[label]) for label,total in total_bow_sizes.items()])
+    print([(label,total/bow_count[label] if bow_count[label] != 0 else 1,bow_count[label]) for label,total in total_bow_sizes.items()])
 
 
-def calculate_genres_per_instance(res_folder):
-    current_classifier=""
+def calculate_genres_per_instance(res_folder,classifiers=""):
+    current_classifier=classifiers
 
     right_genresize_counter=collections.Counter()
     wrong_genresize_counter=collections.Counter()
@@ -70,21 +83,24 @@ def calculate_genres_per_instance(res_folder):
 
     Logger.info("Current on rights")
 
-    with open(res_folder+"/right_true.txt",mode="w") as right_handle:
-        #iterate over the right samples first
-        for right_res_obj in {x.ref_id: x for x in RightResultsIter(res_folder)}.values():
-            assert isinstance(right_res_obj,ClassificationResultInstance)
-            if right_res_obj.classifier != current_classifier:
-                current_classifier=right_res_obj.classifier
 
-            #now find the size of its genre
-            right_genresize_counter.update([len(URLBow.objects.get(index=right_res_obj.ref_id).short_genres)])
+    #iterate over the right samples first, we don't write to file because right files are the same
+    for right_res_obj in {x.ref_id: x for x in RightResultsIter(res_folder,classifiers)}.values():
+        assert isinstance(right_res_obj,ClassificationResultInstance)
+        if right_res_obj.classifier != current_classifier:
+            current_classifier=right_res_obj.classifier
+
+        #now find the size of its genre
+        right_genresize_counter.update([len(URLBow.objects.get(index=right_res_obj.ref_id).short_genres)])
 
     Logger.info("Current on wrongs")
 
-    with open(res_folder+"/swing.txt",mode="w") as swing_handle,open(res_folder+"/wrong_true.txt",mode="w") as wrong_handle:
+    swing_file=res_folder+"/{}swing.txt".format(classifiers+"_" if classifiers.strip()!="" else classifiers)
+    wrong_file=res_folder+"/{}wrong_true.txt".format(classifiers+"_" if classifiers.strip()!="" else classifiers)
+
+    with open(swing_file,mode="w") as swing_handle,open(wrong_file,mode="w") as wrong_handle:
         #iterate over the wrong samples
-        for wrong_res_obj in {x.ref_id: x for x in WrongResultsIter(res_folder)}.values():
+        for wrong_res_obj in {x.ref_id: x for x in WrongResultsIter(res_folder,classifiers)}.values():
             assert isinstance(wrong_res_obj,ClassificationResultInstance)
             if wrong_res_obj.classifier != current_classifier:
                 current_classifier=wrong_res_obj.classifier

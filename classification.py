@@ -17,7 +17,7 @@ from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 from db.db_model.mongo_websites_models import TestSetBow,TrainSetBow
-from classification.classifiers import Classifier
+import classification.classifiers as classifiers
 import math
 from analytics.classification_results import count_miss_ratio
 from sklearn.decomposition import TruncatedSVD
@@ -150,27 +150,19 @@ if __name__=="__main__":
 
     res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
     pickle_dir="F:\\Research Data\\pickle"
-    classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
-                 RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
+    # classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
+    #              RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
+    #
+    threshold=1.5
+    ll_ranking=True
 
-    for i in sorted({3000,5000,10000}):
-        summary_2000_classifier=Classifier("summary_{}_chi_truncated_lsa".format(i),
+    classifiers_list=[classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking)]
+    #,("svd",TruncatedSVD(n_components=i/2))
+    for i in sorted({10000}):
+        summary_2000_classifier=classifiers.Classifier("summary_chi_top{}ll_{}".format(threshold,i),
                    res_dir=res_dir,
                    vocab_vectorizer_pickle_dir=pickle_dir)
         summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
-                                         feature_selector=Pipeline([("chi2",SelectKBest(chi_sq,i)),("svd",TruncatedSVD(n_components=i/2))])
-                                         ,classifiers=classifiers)
+                                         feature_selector=Pipeline([("chi2",SelectKBest(chi_sq,i))])
+                                         ,classifiers=classifiers_list)
 
-    # load_vocab_vectorizer(TrainSetBow,extra_label="summary")
-    # classify(train_coll_cls=TrainSetBow,test_coll_cls=TestSetBow,pickle_label="summary",k=100)
-
-    # load_vocab_vectorizer(TrainSet_urlFullTextBow,"fulltxt")
-    #classify(train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow,pickle_label="fulltxt",k=200)
-
-    # load_vocab_vectorizer(TrainSet_urlAllGram,"allgram")
-    # classify(train_coll_cls=TrainSet_urlAllGram,test_coll_cls=TestSet_urlAllGram,pickle_label="allgram",k=200)
-
-    #
-    # generate_training_testing(test_set_num) np.vstack((np.array([1,2,3])
-
-    count_miss_ratio()

@@ -31,7 +31,7 @@ class DMOZScraper(BaseScraper):
     dmoz_search_query_url="http://www.dmoz.org/search?q=u%3A%22{}%22&start=0&all=no&cat=all"
 
     def __init__(self):
-        super().__init__(RequestService.Request(wait_time=0))
+        super().__init__(RequestService.Request(wait_time=3))
         self.exclusions=set()
 
     def scrape(self):

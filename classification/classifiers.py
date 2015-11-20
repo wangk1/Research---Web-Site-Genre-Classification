@@ -2,9 +2,11 @@ import itertools
 import re
 import os
 import numpy as np
+import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 
 import scipy.sparse as sp
+from sklearn.linear_model.logistic import LogisticRegression as LR
 
 from util.Logger import Logger
 from classification.util import pickle_obj,unpickle_obj
@@ -15,6 +17,9 @@ classifier_logger=Logger()
 
 class Classifier:
     """
+    Important formats:
+        Coming soon
+
     Class used as a pipeline for classification. Makes things easier to manager
 
     An instance of this class is used to keep track of the state of classification
@@ -45,6 +50,9 @@ class Classifier:
         self.test_X=None
         self.test_y=None
         self.test_ref_index_matrix=None #unique id of nx1 where n is the number of samples in test set.
+        self.csv_indexes=["ref id","Predicted","Actual"] #output csv column labels
+        self.__first_wrong=True #used for keeping track of index
+        self.__first_right=True
 
     def pipeline(self,train_set_iter,test_set_iter,feature_selector,classifiers):
         classifier_logger.info("Starting pipeline for classifier with label {}".format(self.label))
@@ -67,7 +75,7 @@ class Classifier:
         """
 
         vocab_loaded=False
-        pickle_file=self.pickle_dir+"/classifier_vocab_{}_pickle".format(self.label)
+        pickle_file=self.pickle_dir+"/classifier_vocab_{}_pickle".format(self.label.split("_")[0])
 
         if load_vectorizer_from_file:
             try:
@@ -118,8 +126,8 @@ class Classifier:
         classifier_logger.info("Loading training set for classifier pipeline {}".format(self.label))
 
         training_loaded=False
-        trainX_pickle_path=self.pickle_dir+"/classifier_trainingX_{}_pickle".format(self.label)
-        trainy_pickle_path=self.pickle_dir+"/classifier_trainingy_{}_pickle".format(self.label)
+        trainX_pickle_path=self.pickle_dir+"/classifier_trainingX_{}_pickle".format(self.label.split("_")[0])
+        trainy_pickle_path=self.pickle_dir+"/classifier_trainingy_{}_pickle".format(self.label.split("_")[0])
         if maybe_load_training_from_pickle:
             classifier_logger.info("Trying to load training samples from pickle")
             try:
@@ -217,6 +225,8 @@ class Classifier:
         """
         num_labels=len(self.test_y)
 
+
+
         for classifier in classifiers:
             try:
                 classifier_name=re.search(r"(?<=')(.*)(?=')",str(type(classifier))).group(1).split(".")[-1]
@@ -225,6 +235,9 @@ class Classifier:
                                                                                                    self.train_X.shape[0],
                                                                                                    self.train_y.shape[0]))
                 classifier.fit(self.train_X,self.train_y)
+
+                self.__first_wrong=True
+                self.__first_right=True
 
                 for l in range(0,num_labels,increment):
                     res=classifier.predict(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
@@ -252,15 +265,33 @@ class Classifier:
             classifier_logger.debug("Creating folder {}".format(folder_path))
             os.mkdir(folder_path)
 
-        with open("{}/{}.txt".format(folder_path,classifier_name+"_wrong"),mode="a") as out_wrong, \
-            open("{}/{}.txt".format(folder_path,classifier_name+"_right"),mode="a") as out_right:
+        wrong_file="{}/{}.txt".format(folder_path,classifier_name+"_wrong")
+        right_file="{}/{}.txt".format(folder_path,classifier_name+"_right")
+        #1d array, just basic single class prediction, avoids the log likehood predictions
+        #as numpy array is not used for those
+        if hasattr(predictions,"shape") and len(predictions.shape)==1:
             wrong_labels=(predictions != labels)
+        else:
+            wrong_labels=np.array([int(l not in preds) for l,preds in zip(labels,predictions)])
 
-            for l in range(0,len(wrong_labels)):
-                if wrong_labels[l]==1:
-                    out_wrong.write("{}, predicted: {}, actual: {}\n".format(ref_indexes[l],predictions[l],labels[l]))
-                else:
-                    out_right.write("{}, predicted: {}, actual: {}\n".format(ref_indexes[l],predictions[l],labels[l]))
+        wrong_instances=[]
+        right_instances=[]
+        for l in range(0,len(wrong_labels)):
+
+            if wrong_labels[l]==1:
+                wrong_instances.append([ref_indexes[l],list(predictions[l]),labels[l]])
+
+            else:
+                right_instances.append([ref_indexes[l],list(predictions[l]),labels[l]])
+
+        right_data=pd.DataFrame(right_instances,columns=self.csv_indexes)
+        wrong_data=pd.DataFrame(wrong_instances,columns=self.csv_indexes)
+
+        right_data.to_csv(right_file,mode="a",index=False,header=self.__first_wrong,columns=self.csv_indexes)
+        wrong_data.to_csv(wrong_file,mode="a",index=False,header= self.__first_right,columns=self.csv_indexes)
+
+        self.__first_wrong=False
+        self.__first_right=False
 
 
     def feature_selection(self,feat_selector):
@@ -279,3 +310,41 @@ class Classifier:
         classifier_logger.info("Post feature selection: num features: {}".format(self.train_X.shape[1]))
 
         return self
+
+class LogisticRegression(LR):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        super().__init__(**kwargs)
+        self.threshold=threshold
+        self.ll_ranking=ll_ranking
+
+
+    def predict(self, X):
+        """
+        Alternative predict function for logistic regression, returns the top predictions for test instances
+
+        :param X:
+        :param top_k:
+        :return:
+        """
+
+
+        if self.ll_ranking:
+            #get the best class based on log likelihood
+            predictions=self.predict_log_proba(X)
+            indexes=np.argsort(predictions)
+            best_value_indexes=indexes[:,-1:].reshape(-1)
+            res_classes=[]
+            best_values=predictions[list(range(0,best_value_indexes.shape[0])),best_value_indexes]
+            threshold=1.5
+
+            for c,row in enumerate(predictions):
+                res_classes.append(self.classes_[[c for c,ll in enumerate(row) if best_values[c]-ll<=threshold]])
+
+        else:
+            assert self.threshold<self.classes_.shape[0]
+
+            top_x_indexes=np.argsort(self.predict_log_proba(X))[:,:-(self.threshold+1):-1]
+
+            res_classes=self.classes_[top_x_indexes]
+
+        return res_classes

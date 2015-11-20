@@ -1,6 +1,8 @@
 import collections
 import os
 import re
+import pandas as pd
+import ast
 
 from db.db_model.mongo_websites_models import URLBow
 from util.base_util import normalize_genre_string
@@ -17,7 +19,7 @@ Current functions:
 __author__ = 'Kevin'
 
 
-
+CLASSIFICATION_HEADERS=["ref id","Predicted","Actual"]
 
 def get_classification_res(filepath):
     """
@@ -58,19 +60,23 @@ class ClassificationResultInstance:
     def __str__(self):
         return "{}, predicted: {}, actual: {}".format(self.ref_id,self.predicted,self.actual)
 
-    def is_swing_sample(self):
+    def __repr__(self):
+        return self.__str__()
+
+    def is_swing_sample(self,top_x_predicted=1):
         """
         Test if the ClassificationResultInstance object is a swing instance, its predicted class is within one of its
         multiple classes. So, right predictions are automatically also swing instances. But, wrong predicted samples
         may be a swing instance
 
+        :param: top_x_predicted: check if the top x predictions are in the class's genres. If they all are,
         :return: True or False if the sample is swing instance
         """
 
         #grab all short genres and see if it matches
         url_bow_obj=URLBow.objects(index=self.ref_id).only("short_genres")[0]
 
-        return self.predicted in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres)
+        return all(pred_g in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres) for pred_g in self.predicted[:top_x_predicted])
 
 class ClassificationResultStream:
     """
@@ -106,12 +112,12 @@ class ClassificationResultStream:
         prediction_objs=[]
 
         classifier=re.search(".*(?=_(wrong|right).txt)",filepath.split("\\")[-1]).group(0)
-        with open(filepath) as sample_file:
-            for line in sample_file:
 
-                res_list=line.split(" ")
+        file_datagram=pd.read_csv(filepath)
 
-                prediction_objs.append(ClassificationResultInstance(ref_id=res_list[0][:-1],predicted=res_list[2][:-1],actual=res_list[4][:-1],
+        for f in file_datagram.values:
+            prediction_objs.append(ClassificationResultInstance(ref_id=f[0],predicted=ast.literal_eval(f[1])
+                                                                ,actual=f[2],
                                                         classifier=classifier))
 
         return prediction_objs

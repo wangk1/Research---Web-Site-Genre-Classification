@@ -9546,3 +9546,197 @@ New Log on date: 2015-11-15---------
 New Log on date: 2015-11-15---------
 
 New Log on date: 2015-11-15---------
+
+New Log on date: 2015-11-16---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-16---------
+
+New Log on date: 2015-11-16---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-16---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+ERROR: Exception occured: HTTPSConnectionPool(host='http', port=443): Max retries exceeded with url: //www.alexa.com/siteinfo/quill.com (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x00000000049C1240>: Failed to establish a new connection: [Errno 11004] getaddrinfo failed',))
+ERROR: WebScraping Issue: HTTPSConnectionPool(host='http', port=443): Max retries exceeded with url: //www.alexa.com/siteinfo/quill.com (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x00000000049C1240>: Failed to establish a new connection: [Errno 11004] getaddrinfo failed',))
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+
+New Log on date: 2015-11-17---------
+ERROR: Exception occured: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: WebScraping Issue: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+
+New Log on date: 2015-11-18---------
+
+New Log on date: 2015-11-18---------
+ERROR: Exception occured: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: WebScraping Issue: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: Exception occured: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: WebScraping Issue: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: Exception occured: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: WebScraping Issue: HTTPConnectionPool(host='www.alexa.com', port=80): Read timed out.
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-19---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+ERROR: Exception occured: 'NoneType' object has no attribute 'data'
+ERROR: WebScraping Issue: 'NoneType' object has no attribute 'data'
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
+
+New Log on date: 2015-11-20---------
