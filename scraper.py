@@ -10,7 +10,7 @@ def scrape_alexa_300k():
 
     scraper=WebScraper(queue=queue)
 
-    with open("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\top_300k_alexa\\top_300k.txt") as top_300k_file:
+    with open("C:\\Users\\wangk1\\Desktop\\Research\\research\\top_300k_alexa\\top_300k.txt") as top_300k_file:
         scraper.scrape_pipeline((WebPageInfo(url=i[:-1]) for i in top_300k_file),URLToGenreAlexa300K)
 
 def scrape_genre_data():
@@ -21,4 +21,4 @@ def scrape_genre_data():
     scraper.scrape_pipeline((WebPageInfo(url=URLQueue.objects.get(number=i).document.url) for i in range(0,URLQueue.objects.count())),URLToGenre)
 
 if __name__=="__main__":
-    scrape_genre_data()
+    scrape_alexa_300k()

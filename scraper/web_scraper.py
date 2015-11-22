@@ -1,6 +1,7 @@
 import collections
-import itertools
+import itertools,time
 
+from mongoengine import DoesNotExist
 from .base_scraper import BaseScraper
 from service.RequestService import Request
 from db import DBQueue
@@ -61,9 +62,13 @@ class WebScraper(BaseScraper):
 
                 dot_replaced_url=replace_dot_url(url)
 
-                alexa_genre_strings=self.alexa_scraper.query_url(url)
-                dmoz_genre_strings=list(set(self.dmoz_scraper.query_url(url))-set(alexa_genre_strings))
-
+                try:
+                    alexa_genre_strings=self.alexa_scraper.query_url(url)
+                    dmoz_genre_strings=list(set(self.dmoz_scraper.query_url(url))-set(alexa_genre_strings))
+                except DoesNotExist:
+                    #sleep for 200 seconds and then try again
+                    time.sleep(200)
+                    dmoz_genre_strings=list(set(self.dmoz_scraper.query_url(url))-set(alexa_genre_strings))
 
 
                 if len(alexa_genre_strings)+len(dmoz_genre_strings)==0:
