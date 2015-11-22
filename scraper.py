@@ -18,7 +18,9 @@ def scrape_genre_data():
 
     scraper=GenreScraper(queue=queue)
 
-    scraper.scrape_pipeline((WebPageInfo(url=URLQueue.objects.get(number=i).document.url) for i in range(0,URLQueue.objects.count())),URLToGenre)
+    start=queue.get_location()
+    scraper.scrape_pipeline((WebPageInfo(url=URLQueue.objects.get(number=i).document.url) for i in range(start,URLQueue.objects.count())),URLToGenre,
+                            start=start)
 
 if __name__=="__main__":
     scrape_genre_data()

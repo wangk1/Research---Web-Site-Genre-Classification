@@ -123,7 +123,7 @@ class GenreScraper(BaseScraper):
         self.alexa_scraper=AlexaScraper()
         self.dmoz_scraper=DMOZScraper()
 
-    def scrape_pipeline(self,webpageinfo_iterable,input_collection_cls):
+    def scrape_pipeline(self,webpageinfo_iterable,input_collection_cls,start=0):
         """
         Iterate over WebSiteInfo named tuple iterable. Get the url and grab its genres
 
@@ -131,7 +131,7 @@ class GenreScraper(BaseScraper):
         webscraper_logger.debug("Starting webscraper, input from iterable {}, output to {}".format(str(webpageinfo_iterable)
                                                                                                   , input_collection_cls))
 
-        for count,webpageinfo_obj in itertools.islice(enumerate(webpageinfo_iterable),self.queue.get_location(),None):
+        for count,webpageinfo_obj in enumerate(webpageinfo_iterable,start=start):
             assert isinstance(webpageinfo_obj,WebPageInfo)
 
             url=unreplace_dot_url(webpageinfo_obj.url)
