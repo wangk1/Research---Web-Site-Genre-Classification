@@ -98,8 +98,33 @@ class DBQueue_old:
     def get(self):
         return self.queue.find_one().position
 
+authentication={"username":db_settings.USER_NAME,"password":db_settings.PASSWORD,"authentication_source":db_settings.ADMIN_DB}
+
 #Websites db
-connection.connect(db=global_settings.USE_DB,host=global_settings.HOST_NAME,port=global_settings.PORT)
-connection.connect(db=db_settings.MUTUAL_INFO_DB,host=global_settings.HOST_NAME,port=global_settings.PORT,alias=db_settings.MUTUAL_INFO_DB)
-connection.connect(db=db_settings.CLASSIFICATION_DB,host=global_settings.HOST_NAME,port=global_settings.PORT,alias=db_settings.CLASSIFICATION_DB)
-connection.connect(db=db_settings.QUEUE_DB,host=global_settings.HOST_NAME,port=global_settings.PORT,alias=db_settings.QUEUE_DB)
+connection.connect(
+    db=global_settings.USE_DB,
+    host=db_settings.HOST,
+    port=global_settings.PORT,
+    **authentication
+)
+connection.connect(
+    db=db_settings.MUTUAL_INFO_DB,
+    host=db_settings.HOST,
+    port=global_settings.PORT,
+    alias=db_settings.MUTUAL_INFO_DB,
+    **authentication
+)
+connection.connect(
+    db=db_settings.CLASSIFICATION_DB,
+    host=db_settings.HOST,
+    port=global_settings.PORT,
+    alias=db_settings.CLASSIFICATION_DB,
+    **authentication
+)
+connection.connect(
+    db=db_settings.QUEUE_DB,
+    host=db_settings.HOST,
+    port=global_settings.PORT,
+    alias=db_settings.QUEUE_DB,
+    **authentication
+)
