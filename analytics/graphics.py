@@ -27,7 +27,7 @@ def plot_word_frequency(title,word_dictionary,plot_top=PLOT_TOP_X,reversed=False
 
     return plt
 
-def save(file_name,plt):
+def save_fig(file_name,plt):
     plt.savefig(file_name)
 
 

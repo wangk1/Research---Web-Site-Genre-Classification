@@ -3,9 +3,15 @@ import os
 import re
 import pandas as pd
 import ast
+import settings
+import util.Logger as Logger
 
 from db.db_model.mongo_websites_models import URLBow
 from util.base_util import normalize_genre_string
+from classification.util import unpickle_obj,pickle_obj
+
+classification_res_logger=Logger.Logger()
+
 
 """
 This module is geared towards providing functions that transforms the classification result file.
@@ -51,17 +57,28 @@ def create_true_results(res_path):
 
 class ClassificationResultInstance:
 
-    def __init__(self,ref_id,actual,predicted,classifier):
+    def __init__(self,ref_id,actual,predicted,classifier,genre_lv=1):
         self.ref_id=ref_id
-        self.actual=actual
+        self.__actual=actual
         self.predicted=predicted
         self.classifier=classifier
+        self.genre_lv=genre_lv
 
     def __str__(self):
         return "{}, predicted: {}, actual: {}".format(self.ref_id,self.predicted,self.actual)
 
     def __repr__(self):
         return self.__str__()
+
+    @property
+    def actual(self):
+        """
+        Get all the genres of the instance. Normalized to the level of self.genre_lv
+
+        :return:
+        """
+        return [normalize_genre_string(g,self.genre_lv) for g in self.__actual]
+
 
     def is_swing_sample(self,top_x_predicted=1):
         """
@@ -76,7 +93,7 @@ class ClassificationResultInstance:
         #grab all short genres and see if it matches
         url_bow_obj=URLBow.objects(index=self.ref_id).only("short_genres")[0]
 
-        return all(pred_g in (normalize_genre_string(g,1) for g in url_bow_obj.short_genres) for pred_g in self.predicted[:top_x_predicted])
+        return all(pred_g in (normalize_genre_string(g,self.genre_lv) for g in url_bow_obj.short_genres) for pred_g in self.predicted[:top_x_predicted])
 
 class ClassificationResultStream:
     """
@@ -86,7 +103,7 @@ class ClassificationResultStream:
     Most of the time, the subclasses RightResultsStreamIter or WrongResultsStreamIter should be used
     """
 
-    def __init__(self,result_path,classifier=None):
+    def __init__(self,result_path,classifier=None,get_all_actual=True):
         """
         Read results from the path of the results and prepare the iterator.
 
@@ -98,6 +115,7 @@ class ClassificationResultStream:
         """
 
         self.result_path=result_path
+        self.get_all_actual=get_all_actual
 
         #set of classifiers to look for
         self.classifiers=classifier if not isinstance(classifier,str) else (classifier,)
@@ -116,8 +134,13 @@ class ClassificationResultStream:
         file_datagram=pd.read_csv(filepath)
 
         for f in file_datagram.values:
+            actual=[f[2]]
+
+            #if self.get_all_actual:
+                #actual=URLBow.objects.get(index=f[0]).short_genres
+
             prediction_objs.append(ClassificationResultInstance(ref_id=f[0],predicted=ast.literal_eval(f[1])
-                                                                ,actual=f[2],
+                                                                ,actual=actual,
                                                         classifier=classifier))
 
         return prediction_objs
@@ -148,6 +171,7 @@ class ClassificationResultStream:
         raise StopIteration("End of right result stream")
 
 
+
 class RightResultsIter(ClassificationResultStream):
     """
     Converts all the text files in a classification result directory that contains
@@ -166,6 +190,19 @@ class RightResultsIter(ClassificationResultStream):
 
     def __iter__(self):
         return self
+
+    @staticmethod
+    def load_iter_from_file(res_path,classifier=None,pickle_path=settings.PICKLE_DIR):
+        right_iter_path=os.path.join(pickle_path,"right_res_iter")
+
+        try:
+            right_res_iter=unpickle_obj(right_iter_path)
+        except FileNotFoundError:
+            classification_res_logger.debug("Not found {}, loading from db".format(right_iter_path))
+            right_res_iter=[i for i in RightResultsIter(result_path=res_path,classifier=classifier)]
+            pickle_obj(right_res_iter,right_iter_path)
+
+        return right_res_iter
 
 
 class WrongResultsIter(ClassificationResultStream):
@@ -186,3 +223,16 @@ class WrongResultsIter(ClassificationResultStream):
 
     def __iter__(self):
         return self
+
+    @staticmethod
+    def load_iter_from_file(res_path,classifier=None,pickle_path=settings.PICKLE_DIR):
+        wrong_iter_path=os.path.join(pickle_path,"wrong_res_iter")
+
+        try:
+            wrong_res_iter=unpickle_obj(wrong_iter_path)
+        except FileNotFoundError:
+            classification_res_logger.debug("Not found {}, loading from db".format(wrong_iter_path))
+            wrong_res_iter=[i for i in WrongResultsIter(result_path=res_path,classifier=classifier)]
+            pickle_obj(wrong_res_iter,wrong_iter_path)
+
+        return wrong_res_iter

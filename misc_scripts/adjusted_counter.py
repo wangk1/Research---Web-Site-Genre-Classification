@@ -18,7 +18,7 @@ def get_result_distribution(path,classifier):
     for res in RightResultsIter(path,classifier):
         assert isinstance(res,ClassificationResultInstance)
 
-        counts[res.predicted.index(res.actual)]+=1
+        counts[res.predicted.index(res.__actual)]+=1
 
     print(counts)
 

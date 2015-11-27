@@ -7,6 +7,11 @@ from sklearn.feature_extraction import DictVectorizer
 
 import scipy.sparse as sp
 from sklearn.linear_model.logistic import LogisticRegression as LR
+from sklearn.neighbors import KNeighborsClassifier as kN
+from sklearn.naive_bayes import MultinomialNB as MB
+from sklearn.ensemble import RandomForestClassifier as RF
+from sklearn.tree import DecisionTreeClassifier as DT
+from sklearn.svm import SVC as SV
 
 from util.Logger import Logger
 from classification.util import pickle_obj,unpickle_obj
@@ -58,9 +63,9 @@ class Classifier:
         classifier_logger.info("Starting pipeline for classifier with label {}".format(self.label))
 
         self.load_training(train_iterable=train_set_iter,maybe_load_vectorizer_from_pickle=True
-                           ,maybe_load_training_from_pickle=True,pickle_training=True)\
+                           ,maybe_load_training_from_pickle=False,pickle_training=True)\
             .feature_selection(feature_selector)\
-            .load_testing(test_iterable=test_set_iter).classify(classifiers)
+            .load_testing(test_iterable=test_set_iter,maybe_load_testing_from_pickle=False,pickle_testing=True).classify(classifiers)
 
 
         return self
@@ -106,7 +111,8 @@ class Classifier:
 
         return self
 
-
+    genre_mapping={}
+    #genre_mapping={"Business":"Computers","Shopping":"Computers"}
     def load_training(self,train_iterable,stack_per_sample=3000,maybe_load_vectorizer_from_pickle=False,
                       maybe_load_training_from_pickle=False,pickle_training=False):
         """
@@ -147,7 +153,9 @@ class Classifier:
 
                 curr_bow_matrix=self.vocab_vectorizer.transform(train_bow_obj.attr_map)[0]
                 matrix_cache.append(curr_bow_matrix)
-                train_labels.append(train_bow_obj.short_genre)
+                global genre_mapping
+                #genre mapping allows us to change the distribution of classes
+                train_labels.append(self.genre_mapping.get(train_bow_obj.short_genre,train_bow_obj.short_genre))
 
                 if len(matrix_cache)>stack_per_sample:
                     self.train_X=sp.vstack(matrix_cache)
@@ -173,7 +181,7 @@ class Classifier:
         return self
 
 
-    def load_testing(self,*,test_iterable):
+    def load_testing(self,*,test_iterable,maybe_load_testing_from_pickle=False,pickle_testing=False):
         """
         Load the testing set from an iterable of objects with attr_map dictionary attribute and ref_index attribute
 
@@ -188,27 +196,47 @@ class Classifier:
 
         classifier_logger.info("Loading testing set for classifier {}".format(self.label))
 
+        testing_loaded=False
+        testX_pickle_path=self.pickle_dir+"/classifier_testX_{}_pickle".format(self.label.split("_")[0])
+        testy_pickle_path=self.pickle_dir+"/classifier_testy_{}_pickle".format(self.label.split("_")[0])
+        test_ref_matrix_path=self.pickle_dir+"/classifier_ref_matrix_{}_pickle".format(self.label.split("_")[0])
+
         test_X=[]
         test_labels=[]
         ref_indexes=[]
+        if maybe_load_testing_from_pickle:
+            try:
+                test_X=unpickle_obj(testX_pickle_path)
+                test_labels=unpickle_obj(testy_pickle_path)
+                ref_indexes=unpickle_obj(test_ref_matrix_path)
+                testing_loaded=True
+            except:
+                classifier_logger.debug("Failed to load test set from pickle")
 
-        explored=set()
-        for count,test_obj in enumerate(test_iterable):
-            if count %1000==0:
-                classifier_logger.info("Test load curr at:  {}".format(count))
+        if not testing_loaded:
 
-            if test_obj.ref_index in explored:
-                continue
+            explored=set()
+            for count,test_obj in enumerate(test_iterable):
+                if count %1000==0:
+                    classifier_logger.info("Test load curr at:  {}".format(count))
 
-            explored.add(test_obj.ref_index)
+                if test_obj.ref_index in explored:
+                    continue
 
-            test_labels.append(test_obj.short_genre)
-            test_X.append(test_obj.attr_map)
-            ref_indexes.append(test_obj.ref_index)
+                explored.add(test_obj.ref_index)
 
+                test_labels.append(self.genre_mapping.get(test_obj.short_genre,test_obj.short_genre))
+                test_X.append(test_obj.attr_map)
+                ref_indexes.append(test_obj.ref_index)
+
+            if pickle_testing:
+                classifier_logger.debug("Pickling test files")
+                pickle_obj(test_X,testX_pickle_path)
+                pickle_obj(test_labels,testy_pickle_path)
+                pickle_obj(ref_indexes,test_ref_matrix_path)
 
         self.test_X=self.vocab_vectorizer.transform(test_X) if self.feat_selector is None else \
-            self.feat_selector.transform(self.vocab_vectorizer.transform(test_X))
+        self.feat_selector.transform(self.vocab_vectorizer.transform(test_X))
         self.test_y=np.asarray(test_labels)
         self.test_ref_index_matrix=np.asarray(ref_indexes)
 
@@ -240,11 +268,19 @@ class Classifier:
                 self.__first_right=True
 
                 for l in range(0,num_labels,increment):
-                    res=classifier.predict(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
+                    res,res_prob_list=classifier.predict_multi(self.test_X[l:l+increment if l+increment<num_labels else num_labels])
                     self.print_res(classifier_name=classifier_name,
                               labels=self.test_y[l:l+increment if l+increment<num_labels else num_labels],
                               predictions=res,
                               ref_indexes=self.test_ref_index_matrix[l:l+increment])
+
+                    #write out the probability
+                    with open("ll_prob_1",mode="a") as ll_file:
+                        for c,prob in enumerate(res_prob_list):
+                            giant_list=itertools.chain(*[(k,v) for k,v in prob.items()])
+
+                            ll_file.write("{}\n".format(','.join([str(self.test_ref_index_matrix[l:l+increment][c])]+[str(i) for i in giant_list])))
+
             except ValueError:
                 pass
 
@@ -311,14 +347,12 @@ class Classifier:
 
         return self
 
-class LogisticRegression(LR):
-    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
-        super().__init__(**kwargs)
+class BaseClassifier:
+    def __init__(self,threshold=1,ll_ranking=False):
         self.threshold=threshold
         self.ll_ranking=ll_ranking
 
-
-    def predict(self, X):
+    def predict_multi(self, X):
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
 
@@ -330,21 +364,59 @@ class LogisticRegression(LR):
 
         if self.ll_ranking:
             #get the best class based on log likelihood
-            predictions=self.predict_log_proba(X)
+            predictions=self.predict_proba(X)
             indexes=np.argsort(predictions)
             best_value_indexes=indexes[:,-1:].reshape(-1)
             res_classes=[]
             best_values=predictions[list(range(0,best_value_indexes.shape[0])),best_value_indexes]
-            threshold=1.5
 
             for c,row in enumerate(predictions):
-                res_classes.append(self.classes_[[c for c,ll in enumerate(row) if best_values[c]-ll<=threshold]])
+                res_classes.append(self.classes_[[c for c,ll in enumerate(row) if best_values[c]-ll<=self.threshold]])
 
         else:
             assert self.threshold<self.classes_.shape[0]
 
-            top_x_indexes=np.argsort(self.predict_log_proba(X))[:,:-(self.threshold+1):-1]
+            predictions=self.predict_proba(X)
+            top_x_indexes=np.argsort(predictions)[:,:-(self.threshold+1):-1]
 
             res_classes=self.classes_[top_x_indexes]
 
-        return res_classes
+        class_to_prob_list=[]
+        #construction a list of dictionary of classes to their likelihood values
+        for p_row in predictions:
+            class_to_prob_list.append({c:p for (p,c) in zip(p_row,self.classes_)})
+
+        return res_classes,class_to_prob_list
+
+
+class LogisticRegression(LR,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        LR.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
+
+
+class kNN(kN,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        kN.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
+
+
+class mNB(MB,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        MB.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
+
+class RandomForest(RF,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        RF.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
+
+class DecisionTree(DT,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        DT.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
+
+class SVC(SV,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        SV.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)

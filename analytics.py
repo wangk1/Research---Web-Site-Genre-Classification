@@ -2,6 +2,9 @@ import functools
 
 __author__ = 'Kevin'
 
+from analytics.combine_genre_analysis import single_class_mispredition_freq,frequently_predicted_class\
+    ,multi_class_misprediction_freq,consensus_class,count_num_multi_predict,load_prob_dict,calculate_miss_classification_log_dist,\
+    top_level_cdf
 from analytics.mutual_information import *
 from analytics.genre_similarity import get_genre_similarities
 from db.db_model.mongo_websites_models import TrainSetBow
@@ -41,10 +44,15 @@ def calculate_top_percent():
 
 
 if __name__=="__main__":
-    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2"
+    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top1cls_10000"
     outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
 
-    plot_miss_per_genre(path,outpath,classifiers="LogisticRegression")
+    #prob_dict=load_prob_dict()
+    top_level_cdf(path)
+
+    #multi_class_misprediction_freq(path)
+
+    #plot_miss_per_genre(path,outpath,classifiers="LogisticRegression")
 
 
     #mutual_information_similarity("genre_similarity.txt")

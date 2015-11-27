@@ -3,7 +3,7 @@ import itertools
 __author__ = 'Kevin'
 import os,re,collections,operator
 from util.Logger import Logger
-from analytics.graphics import plot_word_frequency,save
+from analytics.graphics import plot_word_frequency,save_fig
 from classification.classification_res import WrongResultsIter, ClassificationResultInstance
 
 WrongPrediction=collections.namedtuple("WrongPrediction",("ref_id","actual","predicted","classifier"))
@@ -92,7 +92,7 @@ def plot_miss_per_genre(path,outpath,classifiers=None):
     for true_miss in (w for w in WrongResultsIter(path,classifiers) if not w.is_swing_sample()):
         assert isinstance(true_miss,ClassificationResultInstance)
 
-        classifier_to_misses_genre[true_miss.classifier][true_miss.actual].update([true_miss.predicted])
+        classifier_to_misses_genre[true_miss.classifier][true_miss.__actual].update([true_miss.predicted])
 
 
     #now plot each one, output to OUTPUT/classifier
@@ -104,7 +104,7 @@ def plot_miss_per_genre(path,outpath,classifiers=None):
             if not os.path.exists(out_path):
                 os.mkdir(out_path)
 
-            save("{}/{}_miss_true.pdf".format(out_path,actual_genre),plt)
+            save_fig("{}/{}_miss_true.pdf".format(out_path,actual_genre),plt)
             plt.close()
 
 

@@ -37,7 +37,7 @@ def get_all_mi_and_plot(reversed=False):
                 filtered_bow_mit[k]=v
 
         plt=graphics.plot_word_frequency(genre,filtered_bow_mit,reversed=reversed)
-        graphics.save("graphs/{}.pdf".format(("reversed_" if reversed else "")+genre.replace("/","_")),plt)
+        graphics.save_fig("graphs/{}.pdf".format(("reversed_" if reversed else "")+genre.replace("/","_")),plt)
 
         print(genre)
 

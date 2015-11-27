@@ -149,17 +149,24 @@ if __name__=="__main__":
     # map_urlAllGram(genre_dict)
 
     res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
-    pickle_dir="F:\\Research Data\\pickle"
+    pickle_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
     # classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
     #              RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
     #
-    threshold=1.5
-    ll_ranking=True
+    threshold=1
+    ll_ranking=False
 
-    classifiers_list=[classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking)]
+    classifiers_list=[#classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
+
+                      classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),]
+                      # classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
+                      # classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      # classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
+                      # classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
+
     #,("svd",TruncatedSVD(n_components=i/2))
     for i in sorted({10000}):
-        summary_2000_classifier=classifiers.Classifier("summary_chi_top{}ll_{}".format(threshold,i),
+        summary_2000_classifier=classifiers.Classifier("summary_chi_top{}{}_{}".format(threshold,'ll' if ll_ranking else 'cls' ,i),
                    res_dir=res_dir,
                    vocab_vectorizer_pickle_dir=pickle_dir)
         summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
