@@ -93,7 +93,6 @@ def unpickle_obj(file_path):
     """
 
     util_logger.info("UnPickling")
-    obj=None
 
     with open(file_path,mode="rb") as pickle_file_handle:
         obj=pickle.load(pickle_file_handle)

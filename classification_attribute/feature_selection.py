@@ -1,12 +1,12 @@
 __author__ = 'Kevin'
 from sklearn.feature_selection import SelectKBest,chi2 as chi_sq
 from scipy.sparse.linalg import svds
+from scipy.sparse import identity
 
 from util.text_preprocessor import preprocess
 from .word_based import BagOfWords
-from classification.util import load_train_matrix,load_test_matrix
+from data.util import load_train_matrix
 
-from scipy.sparse import identity
 
 class SparseSVD:
 
@@ -21,7 +21,7 @@ class SparseSVD:
 
 
 
-def chi_squared_feature_select(k_best=1500):
+def chi_squared_feature_select(X,y,k_best=1500):
     """
     Rank the best attributes for discrimination based on chi square test.
 
@@ -32,7 +32,6 @@ def chi_squared_feature_select(k_best=1500):
     """
 
     #load training
-    X,y=load_train_matrix()
 
     return SelectKBest(chi_sq,k_best).fit_transform(X,y)
 

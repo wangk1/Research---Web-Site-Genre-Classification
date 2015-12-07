@@ -1,10 +1,10 @@
 import itertools
 import re
 import os
+
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
-
 import scipy.sparse as sp
 from sklearn.linear_model.logistic import LogisticRegression as LR
 from sklearn.neighbors import KNeighborsClassifier as kN
@@ -14,7 +14,7 @@ from sklearn.tree import DecisionTreeClassifier as DT
 from sklearn.svm import SVC as SV
 
 from util.Logger import Logger
-from classification.util import pickle_obj,unpickle_obj
+from data.util import pickle_obj,unpickle_obj
 
 __author__ = 'Kevin'
 
@@ -252,8 +252,6 @@ class Classifier:
         :return:
         """
         num_labels=len(self.test_y)
-
-
 
         for classifier in classifiers:
             try:

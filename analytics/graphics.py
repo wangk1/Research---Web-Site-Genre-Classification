@@ -1,11 +1,13 @@
 __author__ = 'Kevin'
 import matplotlib.pyplot as plt
 import operator
+import os,re
 
 PLOT_TOP_X=90
 IGNORE_TOP_X=50
 #stop words
 #BUZZ_WORDS={"sentence","order","rating","sentenceinfo","www","http","com","https","us","aspx",'net'}
+FIGURE=0
 
 def plot_word_frequency(title,word_dictionary,plot_top=PLOT_TOP_X,reversed=False):
     """
@@ -19,15 +21,50 @@ def plot_word_frequency(title,word_dictionary,plot_top=PLOT_TOP_X,reversed=False
 
     word_count=len(words)
 
+
     plt.title(title)
     plt.bar(range(word_count),[k[1] for k in words])
     plt.xticks(range(word_count),[k[0] for k in words],size= 6)
     locs,labels=plt.xticks()
     plt.setp(labels,rotation=90)
 
+    plt.tight_layout()
+
     return plt
 
 def save_fig(file_name,plt):
+    folder_name="/".join(re.split("\\\\|/",file_name)[:-1])
+
+    if not os.path.exists(folder_name):
+        print("Creating folder: {}".format(folder_name))
+        os.makedirs(folder_name)
+
     plt.savefig(file_name)
+
+total_plot_number=4
+fig_num=0
+curr_figure=None
+def subplot_four_corner(plt_num):
+    """
+    Automatically shape plt into a four plot per figure plot with each plot occupying four corners
+
+    :param plt_num:
+    :return:
+    """
+
+    global  fig_num
+    global  total_plot_number
+    global  curr_figure
+
+    if plt_num%total_plot_number==0:
+        fig_num+=1
+        print("New figure number:{}".format(fig_num))
+
+        curr_figure=plt.figure(fig_num)
+
+    plt.subplot(2,2,(plt_num%4)+1)
+
+    return plt_num==total_plot_number-1,curr_figure
+
 
 

@@ -4,7 +4,7 @@ __author__ = 'Kevin'
 
 from analytics.combine_genre_analysis import single_class_mispredition_freq,frequently_predicted_class\
     ,multi_class_misprediction_freq,consensus_class,count_num_multi_predict,load_prob_dict,calculate_miss_classification_log_dist,\
-    top_level_cdf
+    top_level_cdf,consensus_class_per_genre
 from analytics.mutual_information import *
 from analytics.genre_similarity import get_genre_similarities
 from db.db_model.mongo_websites_models import TrainSetBow
@@ -48,7 +48,7 @@ if __name__=="__main__":
     outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
 
     #prob_dict=load_prob_dict()
-    top_level_cdf(path)
+    consensus_class_per_genre(path,filter_func=lambda x:len(x)==2)
 
     #multi_class_misprediction_freq(path)
 

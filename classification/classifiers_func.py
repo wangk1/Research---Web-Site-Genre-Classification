@@ -12,9 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import LinearSVC
 from sklearn.feature_selection import SelectKBest,chi2 as chi_sq
 
-from db.db_model.mongo_websites_models import TopWordGenre,TrainSetBow
-from .util import load_test_matrix,load_train_matrix
-from collections import Counter
+from data.util import load_test_matrix,load_train_matrix
 
 genre_count={
 'Business': 8495,

@@ -1,9 +1,13 @@
 __author__ = 'Kevin'
 
+import collections as coll
+import operator as op
+import itertools as it
+
 from classification.classification_res import RightResultsIter,WrongResultsIter
-import collections as coll,operator as op,itertools as it, os
-from classification.util import pickle_obj,unpickle_obj
 from analytics.graphics import plot_word_frequency,save_fig
+from matplotlib import pyplot
+
 
 def single_class_mispredition_freq(res_path):
     """
@@ -131,51 +135,139 @@ def calculate_miss_classification_log_dist(res_folder,log_prob_dict):
 
     print(sorted_list)
 
-def consensus_class(res_path):
+def consensus_class(res_path,top_prediction=2,filter_func=lambda x:len(x)==4):
+    """
+    Calculates the portions of the predictions that agrees with the classes's multiple classes
+
+    For example: if
+
+
+    :param res_path:
+    :return:
+    """
+    #dictionary to hold the xth class and the number of agreements for it
+    consensus_count=coll.defaultdict(lambda:0)
+    consensus_total=coll.defaultdict(lambda:0)
 
     ref_id_to_pred_and_actual={}
 
     print("Loading Iter")
 
-    wrong_res_iter=WrongResultsIter.load_iter_from_file(res_path)
+    #wrong_res_iter=WrongResultsIter.load_iter_from_file(res_path)
     right_res_iter=RightResultsIter.load_iter_from_file(res_path)
 
+    #gather together all of an instance's data and id
+    right_res_instances=coll.defaultdict(lambda: [])
+
+    for res_obj in right_res_iter:
+        right_res_instances[res_obj.ref_id].append(res_obj)
+
+
     #just grab the mispredictions
-    for res_obj in it.chain(wrong_res_iter,right_res_iter):
-        ref_id=res_obj.ref_id
-        actual=tuple(set(res_obj.actual))
-        pred=tuple(sorted(res_obj.predicted[:len(actual)]))
+    for ref_id,list_of_res_obj in right_res_instances.items():
+        actual=tuple(set(list_of_res_obj[0].actual))
 
-        #get some wrong sample
-        if sum(i not in pred for i in actual)==0:
+        #Todo:change here
+        if not filter_func(actual):
             continue
 
-        pred_actual_dict=ref_id_to_pred_and_actual.get(ref_id,{})
-        pred_actual_dict["actual"]=actual
-        #add new entries
+        genre_hit_count=[0]*len(actual)
 
-        pred_counter=pred_actual_dict.get("pred",coll.Counter())
-        pred_counter.update([pred])
+        genre_by_consensus=sorted([sum(g in set(res_obj.predicted[:top_prediction]) for res_obj in list_of_res_obj) for g in actual]
+               ,reverse=True)
 
-        pred_actual_dict["pred"]= pred_counter
 
-        ref_id_to_pred_and_actual[ref_id]=pred_actual_dict
+        for c,g_hit in enumerate(genre_by_consensus):
+            genre_hit_count[c]+=g_hit
 
-    actual_to_majority_vote=coll.Counter()
-    #now iter over k,v pairs
-    for k,v in ref_id_to_pred_and_actual.items():
-        actual_tuple=v["actual"]
-        pred_counter=v["pred"]
+        #now we sort the the hit for each class
+        #genre_hit_count=sorted(genre_hit_count,reverse=True)
 
-        #skip if no consensus
-        if all((v<3 for k,v in pred_counter.items())):
+        for class_num in range(0,len(actual)):
+            consensus_count[class_num]+=genre_hit_count[class_num]
+            consensus_total[class_num]+=6
+
+    print(sorted(consensus_count.items()))
+    print(sorted(consensus_total.items()))
+
+
+def consensus_class_per_genre(res_path,top_prediction=2,filter_func=lambda x:len(x)==4):
+    """
+    Get the consensus for each genre, return the list
+
+    :param res_path:
+    :param top_prediction:
+    :param filter_func:
+    :return:
+    """
+    #dictionary to hold the xth class and the number of agreements for it
+    consensus_count=coll.defaultdict(lambda:coll.defaultdict(lambda:0))
+    consensus_total=coll.defaultdict(lambda:coll.defaultdict(lambda:0))
+
+    ref_id_to_pred_and_actual={}
+    num_classes=0
+
+    print("Loading Iter")
+
+    #wrong_res_iter=WrongResultsIter.load_iter_from_file(res_path)
+    right_res_iter=RightResultsIter.load_iter_from_file(res_path)
+
+    #gather together all of an instance's data and id
+    right_res_instances=coll.defaultdict(lambda: [])
+
+    for res_obj in right_res_iter:
+        right_res_instances[res_obj.ref_id].append(res_obj)
+
+
+    #just grab the mispredictions
+    for ref_id,list_of_res_obj in right_res_instances.items():
+        actual=tuple(set(list_of_res_obj[0].actual))
+
+        #Todo:change here
+        if not filter_func(actual):
             continue
 
-        pred_tuple=tuple(sorted(pred_counter.items(),key=op.itemgetter(1),reverse=True)[0][0])
+        genre_consensus={g:sum(g in set(res_obj.predicted[:top_prediction]) for res_obj in list_of_res_obj) for g in actual}
+        num_classes=len(genre_consensus)
 
-        actual_to_majority_vote.update([(actual_tuple,pred_tuple)])
+        for index,(g,count) in enumerate(sorted(genre_consensus.items(),key=op.itemgetter(1),reverse=True)):
+            consensus_count[index][g]+=count
+            consensus_total[index][g]+=6
 
-    print(sorted(actual_to_majority_vote.items(),key=op.itemgetter(1),reverse=True))
+        #now we sort the the hit for each class
+        #genre_hit_count=sorted(genre_hit_count,reverse=True)
+
+    consensus_count=sorted(consensus_count.items(),key=lambda entry:entry)
+
+    pyplot.figure(1)
+    for c in range(0,num_classes):
+
+        ax=pyplot.subplot(num_classes,1,c)
+        genre_dict=consensus_count[c][1]
+        genre_total_dict=consensus_total[c]
+
+        genre_to_counts=[]
+
+        for genre,count in genre_dict.items():
+            genre_to_counts.append((genre,count,genre_total_dict[genre]))
+
+        genre_to_counts=sorted(genre_to_counts,key=lambda t:t[0])
+
+        pyplot.hold(True)
+        pyplot.title("Consensus plot for class of size {}".format(c))
+
+        pyplot.bar(range(len(genre_to_counts)),[g[2] for g in genre_to_counts],color='#deb0b0',label="Consensus Total",align='center')
+        pyplot.bar(range(len(genre_to_counts)),[g[1] for g in genre_to_counts],color='#b0c4de',label="Consensus Counts",align='center')
+
+        pyplot.xticks(range(len(genre_to_counts)),[g[0] for g in genre_to_counts],size= 10)
+        pyplot.legend(loc="upper right")
+        pyplot.hold(False)
+
+
+    pyplot.show()
+
+    print("Done")
+
 
 def count_num_multi_predict(res_path):
 

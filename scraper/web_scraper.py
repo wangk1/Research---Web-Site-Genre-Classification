@@ -181,7 +181,7 @@ class GenreScraper(BaseScraper):
                 fetched_genre_data=models.GenreMetaData.objects.get(url=dot_replaced_url).genres
 
 
-            except AssertionError as ex:
+            except (AssertionError,DoesNotExist) as ex:
                 webscraper_logger.info("AssertException occured: {}".format(str(ex)))
 
             #update reference so we don't go over the same again
