@@ -8,6 +8,7 @@ import collections as coll
 import sklearn.metrics.pairwise as pw
 
 from util.Logger import Logger
+from data import Label
 
 clustering_logger=Logger()
 
@@ -25,31 +26,6 @@ class Clustering:
     3. Keep track of the outputting location of the classification result files
 
     """
-    def __init__(self):
-        """
-        :param label: Unique label
-        :param res_dir: The main directory to put all classification results in
-        :param vocab_vectorizer_pickle_dir: The main directory to leave all pickled vocabulary vectorizer
-        :return:
-        """
-        self.label=None
-
-        self.res_dir=None
-        self.pickle_dir=None
-
-        self.vocab_vectorizer=None
-        self.feat_selector=None
-
-        self.train_X=None
-        self.train_y=None
-
-        self.test_X=None
-        self.test_y=None
-        self.test_ref_index_matrix=None #unique id of nx1 where n is the number of samples in test set.
-        self.csv_indexes=["ref id","Predicted","Actual"] #output csv column labels
-        self.__first_wrong=True #used for keeping track of index
-        self.__first_right=True
-
 
     def get_clusters_genre_distribution(self,y,pred_y):
         pred_to_actual=coll.defaultdict(lambda: coll.Counter())
@@ -76,7 +52,7 @@ class Clustering:
 
         for c,p_y in enumerate(pred_y):
             #compare the webpage to its cluster center
-            inter_diffs=[list(score_func(X[c],center))[0] for center in centers]
+            inter_diffs=[score_func(X[c],center)[0,0] for center in centers]
 
             for cluster,diff in enumerate(inter_diffs):
                 if cluster==p_y:
@@ -98,7 +74,7 @@ class Clustering:
 
         return inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count
 
-    def feature_selection(self,train_X,train_y,feature_selector):
+    def feature_selection(self,data_set,feature_selector,fit=True):
         """
         Perform feature selection. Must be done before loading testing sets
 
@@ -108,10 +84,16 @@ class Clustering:
 
         assert hasattr(feature_selector,"transform")
 
-        clustering_logger.info("Pre feature selection: num features: {}".format(train_X.shape[1]))
-        train_X=feature_selector.fit_transform(train_X,train_y)
+        clustering_logger.info("Pre feature selection: num features: {}".format(data_set.X.shape[1]))
+
+        if fit:
+            feature_selector.fit(data_set.X,data_set.y)
+
+        train_X=feature_selector.transform(data_set.X)
+
         clustering_logger.info("Post feature selection: num features: {}".format(train_X.shape[1]))
 
-        return train_X
+        data_set.X=train_X
+
 
 

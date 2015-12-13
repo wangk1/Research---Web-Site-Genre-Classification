@@ -59,7 +59,7 @@ class ClassificationResultInstance:
 
     def __init__(self,ref_id,actual,predicted,classifier,genre_lv=1):
         self.ref_id=ref_id
-        self.__actual=actual
+        self.__actual=[actual] if isinstance(actual,str) else actual
         self.predicted=predicted
         self.classifier=classifier
         self.genre_lv=genre_lv

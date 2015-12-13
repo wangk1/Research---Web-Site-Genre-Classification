@@ -3,6 +3,7 @@ __author__ = 'Kevin'
 import collections as coll
 import operator as op
 import itertools as it
+import analytics.graphics as graphics
 
 from classification.classification_res import RightResultsIter,WrongResultsIter
 from analytics.graphics import plot_word_frequency,save_fig
@@ -201,8 +202,8 @@ def consensus_class_per_genre(res_path,top_prediction=2,filter_func=lambda x:len
     :return:
     """
     #dictionary to hold the xth class and the number of agreements for it
-    consensus_count=coll.defaultdict(lambda:coll.defaultdict(lambda:0))
-    consensus_total=coll.defaultdict(lambda:coll.defaultdict(lambda:0))
+    consensus_count=coll.defaultdict(lambda:coll.defaultdict(lambda:[]))
+    consensus_total=coll.defaultdict(lambda:coll.defaultdict(lambda:[]))
 
     ref_id_to_pred_and_actual={}
     num_classes=0
@@ -231,13 +232,60 @@ def consensus_class_per_genre(res_path,top_prediction=2,filter_func=lambda x:len
         num_classes=len(genre_consensus)
 
         for index,(g,count) in enumerate(sorted(genre_consensus.items(),key=op.itemgetter(1),reverse=True)):
-            consensus_count[index][g]+=count
-            consensus_total[index][g]+=6
+            consensus_count[index][g].append(count)
+            consensus_total[index][g].append(6)
 
         #now we sort the the hit for each class
         #genre_hit_count=sorted(genre_hit_count,reverse=True)
 
+
+
+    return consensus_count,consensus_total
+
+def plot_total_consensus(consensus_count,consensus_total):
     consensus_count=sorted(consensus_count.items(),key=lambda entry:entry)
+    num_classes=len(consensus_count)
+
+    pyplot.close()
+    pyplot.figure(1)
+
+    for c in range(0,num_classes):
+
+        ax=pyplot.subplot(num_classes,1,c)
+        genre_dict=consensus_count[c][1]
+        genre_total_dict=consensus_total[c]
+
+        genre_to_counts=[]
+
+        for genre,count in genre_dict.items():
+            genre_to_counts.append((genre,sum(count),sum(genre_total_dict[genre])))
+
+        genre_to_counts=sorted(genre_to_counts,key=lambda t:t[0])
+
+        pyplot.hold(True)
+        pyplot.title("Consensus plot for Genre {}".format(c))
+
+
+        pyplot.bar(range(len(genre_to_counts)),[g[2] for g in genre_to_counts],color='#deb0b0',label="Consensus Total",align='center')
+        pyplot.bar(range(len(genre_to_counts)),[g[1] for g in genre_to_counts],color='#b0c4de',label="Consensus Counts",align='center')
+
+        pyplot.xticks(range(len(genre_to_counts)),[g[0] for g in genre_to_counts],size= 5)
+        legend=pyplot.legend(loc="upper right")
+        legend.set_visible(False)
+        pyplot.hold(False)
+
+
+    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\consensus_plots\\total_{}.pdf"
+    graphics.save_fig(path.format(num_classes),pyplot)
+    pyplot.close()
+
+    print("Done")
+
+    print("Done")
+
+def plot_consensus_percentile(consensus_count,consensus_total):
+    consensus_count=sorted(consensus_count.items(),key=lambda entry:entry)
+    num_classes=len(consensus_count)
 
     pyplot.figure(1)
     for c in range(0,num_classes):
@@ -253,18 +301,19 @@ def consensus_class_per_genre(res_path,top_prediction=2,filter_func=lambda x:len
 
         genre_to_counts=sorted(genre_to_counts,key=lambda t:t[0])
 
-        pyplot.hold(True)
-        pyplot.title("Consensus plot for class of size {}".format(c))
+        pyplot.title("Consensus plot for Genre {}, total number of instances {}".format(c,sum(it.chain(*(g[2] for g in genre_to_counts)))/6))
 
-        pyplot.bar(range(len(genre_to_counts)),[g[2] for g in genre_to_counts],color='#deb0b0',label="Consensus Total",align='center')
-        pyplot.bar(range(len(genre_to_counts)),[g[1] for g in genre_to_counts],color='#b0c4de',label="Consensus Counts",align='center')
+        pyplot.boxplot([g[1] for g in genre_to_counts],labels=[g[0] for g in genre_to_counts])
 
-        pyplot.xticks(range(len(genre_to_counts)),[g[0] for g in genre_to_counts],size= 10)
+        pyplot.xticks(range(len(genre_to_counts)),["0"]+[g[0] for g in genre_to_counts],size= 5)
         pyplot.legend(loc="upper right")
-        pyplot.hold(False)
 
 
-    pyplot.show()
+    pyplot.tight_layout()
+
+    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\consensus_plots\\percentile_{}.pdf"
+    graphics.save_fig(path.format(num_classes),pyplot)
+    pyplot.close()
 
     print("Done")
 

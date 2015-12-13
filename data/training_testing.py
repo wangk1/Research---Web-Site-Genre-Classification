@@ -2,10 +2,20 @@ import itertools,copy
 from .util import *
 
 from util.Logger import Logger
+from data import Label
+
 __author__ = 'Kevin'
 
 
 data_logger=Logger()
+
+"""
+Label Convention
+
+<cluster/classification>_
+
+
+"""
 
 class BaseData:
     """
@@ -22,6 +32,8 @@ class BaseData:
         :param source:
         :return:
         """
+        assert isinstance(label,Label)
+
         self.choose_ids=choose_ids
         self.source=source
         self.type=type
@@ -39,6 +51,8 @@ class BaseData:
     def _load(self,*,stack_per_sample,pickle_X_path,pickle_y_path,pickle_ref_id_path,maybe_load_from_pickle,pickle):
         """
         Private method used to load both testing and training samples. Do not use
+
+        If pickle file exists load the pickle file and X and y, else load from the self.source
 
         :param stack_per_sample:
         :param pickle_X_path:
@@ -64,6 +78,9 @@ class BaseData:
                 data_logger.info("Failed to load samples from pickle")
 
         if not loaded:
+            if self.vocab_vectorizer is None:
+                raise AttributeError("Vocab vectorizer does not exist")
+
             labels=[]
             matrix_cache=[]
             ref_indexes=[]
@@ -93,13 +110,26 @@ class BaseData:
 
             #pickle if so
             if pickle:
-                data_logger.info("Pickling {} set".format(self.type))
-                pickle_obj(self._X,pickle_X_path)
-                pickle_obj(self._y,pickle_y_path)
-                pickle_obj(self._ref_indexes,pickle_ref_id_path)
-                data_logger.info("Successfully save {} samples from pickle".format(self.type))
+                self.save_to_pickle(pickle_X_path,pickle_y_path,pickle_ref_id_path)
 
         data_logger.info("Final training size: {}".format(self._X.shape[0]))
+
+    def save_to_pickle(self,pickle_X_path,pickle_y_path,pickle_ref_id_path):
+        """
+        Pickle the X,y, ref_id matrices with appropriate pickle path.
+
+        :param pickle_X_path:
+        :param pickle_y_path:
+        :param pickle_ref_id_path:
+        :return:
+        """
+
+        data_logger.info("Pickling {} set".format(self.type))
+        pickle_obj(self._X,pickle_X_path)
+        pickle_obj(self._y,pickle_y_path)
+        pickle_obj(self._ref_indexes,pickle_ref_id_path)
+        data_logger.info("Successfully save {} samples from pickle".format(self.type))
+
 
     def to_matrices(self):
         """
@@ -166,7 +196,7 @@ class Training(BaseData):
         """
 
         vocab_loaded=False
-        pickle_file=self.pickle_dir+"/vocab_{}_pickle".format(self.label.split("_")[0])
+        pickle_file=self.pickle_dir+"/vocab_{}_pickle".format(self.label.attr_select_technique)
 
         if load_vectorizer_from_file:
             try:
@@ -215,11 +245,9 @@ class Training(BaseData):
 
         data_logger.info("Loading training set for {}".format(self.label))
 
-        pickle_label=self.label.split("_")[0]
-
-        trainX_pickle_path=self.pickle_dir+"/cluster_trainX_{}_pickle".format(pickle_label)
-        trainy_pickle_path=self.pickle_dir+"/cluster_trainy_{}_pickle".format(pickle_label)
-        ref_id_pickle_path=self.pickle_dir+"/cluster_trainRefIndex_{}_pickle".format(pickle_label)
+        trainX_pickle_path=self.pickle_dir+"/{}_trainX_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        trainy_pickle_path=self.pickle_dir+"/{}_trainy_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        ref_id_pickle_path=self.pickle_dir+"/{}_trainRefIndex_{}_pickle".format(self.label.type,self.label.attr_select_technique)
 
         self._load(stack_per_sample=stack_per_sample,
                   pickle_X_path=trainX_pickle_path,
@@ -235,4 +263,41 @@ class Training(BaseData):
 
 
 class Testing(BaseData):
-    pass
+    def __init__(self,label,*,test_set_source=None,pickle_dir,genre_mapping=None,choose_ids=None,vocab_vectorizer=None):
+        """
+        :param label: Unique label
+        :param pickle_dir: The main directory to leave all pickled vocabulary vectorizer
+        :return:
+        """
+        super(Testing, self).__init__(choose_ids=choose_ids,
+                                       source=test_set_source,
+                                       genre_mapping={} if not genre_mapping else genre_mapping,
+                                       type="Testing",label=label,pickle_dir=pickle_dir)
+
+        self.vocab_vectorizer=vocab_vectorizer
+
+
+    def load_testing(self,stack_per_sample=3000,pickle_testing=True,maybe_load_testing_from_pickle=True):
+        """
+        Load the training set with attr_map dictionary attribute and return a scipy sparse matrix of the data fitted
+            with the vocab and their labels
+
+        :returns: train_X: the data matrix. train_y: the train set labels
+
+        """
+
+        data_logger.info("Loading testing set for {}".format(self.label))
+
+        testX_pickle_path=self.pickle_dir+"/{}_testX_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        testy_pickle_path=self.pickle_dir+"/{}_testy_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        ref_id_pickle_path=self.pickle_dir+"/{}_testRefIndex_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+
+        self._load(stack_per_sample=stack_per_sample,
+                  pickle_X_path=testX_pickle_path,
+                  pickle_y_path=testy_pickle_path,
+                  pickle_ref_id_path=ref_id_pickle_path,
+                  maybe_load_from_pickle=maybe_load_testing_from_pickle,
+
+                  pickle=pickle_testing)
+
+        return self

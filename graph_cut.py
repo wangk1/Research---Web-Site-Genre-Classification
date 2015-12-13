@@ -9,6 +9,7 @@ from classification_attribute.feature_selection import chi_squared_feature_selec
 
 from util.base_util import normalize_genre_string
 
+
 pickle_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
 
 if __name__=="__main__":
@@ -24,7 +25,7 @@ if __name__=="__main__":
 
     label="summary_unsupervised_chi_top1cls_10000"
 
-    #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),30)
+    #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),1000)
 
     #load training, feature selection
     train_set=Training(label,pickle_dir=pickle_dir)
