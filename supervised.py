@@ -1,26 +1,26 @@
 import itertools
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 
 __author__ = 'Kevin'
-import random
-import util.base_util as util
-from sklearn.feature_selection import chi2 as chi_sq,SelectKBest
-from sklearn.pipeline import Pipeline
+import util.base_util as util,numpy as np
+from classification_attribute.feature_selection import feature_selection
 
 from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
-from db.db_model.mongo_websites_models import TestSetBow,TrainSetBow
 import classification.classifiers as classifiers
-import math
-from analytics.classification_results import count_miss_ratio
-from sklearn.decomposition import TruncatedSVD
+from data.training_testing import Training,Testing,randomized_training_testing
+from data import LearningSettings
+from data.util import unpickle_obj,flatten_training
+from util.base_util import normalize_genre_string
 
 ignore_genre={
     "World",
@@ -30,7 +30,9 @@ ignore_genre={
     "parent",
     "url",
     "genres",
-    "Kids_and_Teens"
+    "Kids_and_Teens",
+    "Kids",
+    "Regional"
 }
 
 genre_dict={'Sports': 8757,
@@ -52,26 +54,6 @@ genre_dict={'Sports': 8757,
             }
 
 
-def pick_random_test(counter,percent_of_sample=0.1):
-    """
-    Randomly pick x percent of sample
-
-    WARNING:be careful of repeating genres for the same element, this will throw the random pick off
-
-    :param: genre_iterable: Iterable that produces genres to be counted
-    :return: test picks, the nth items from each class we are choosing for the test set
-    """
-    # counter=Counter(util.normalize_genre_string(genre,1) for genre in genre_iterable
-    #                 if util.normalize_genre_string(genre,1) not in ignore_genre)
-
-    print(counter)
-
-    test_picks={}
-    for k,c in counter.items():
-        #genre a few random numbers from 0 to number of urls in the genre. These random number are the
-        #picks we will take for the testing set when we are iteration over the entire sample collection
-        test_picks[k]=set(random.sample(range(0,c),math.floor(percent_of_sample*c)))
-    return test_picks,counter
 
 ClassificationSource=namedtuple("Source",("ref_index","attr_map","short_genre"))
 def generate_training_testing(source,test_set_indexes,genres,*,train_coll_cls,test_coll_cls):
@@ -143,6 +125,27 @@ def map_urlFullText(genre_dict):
                               ,test_set_nums,genre_dict.keys()
                               ,train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow)
 
+def filter_genres(X,y,ref_indexes):
+    """
+    Cleans up the label set, remove those in the ignore list from the websites.
+
+    :param X:
+    :param y:
+    :param ref_indexes:
+    :return:
+    """
+    removal_count={g:0 for g in ignore_genre}
+
+    for index,g_list in enumerate(y):
+        y[index]=list(set(g_list)-ignore_genre)
+
+    keep_index=np.array([i!=[] for i in y])
+
+    print("Eliminated {} webpages".format(y.shape[0]-sum(keep_index)))
+
+    return X[keep_index],y[keep_index],ref_indexes[keep_index]
+
+
 if __name__=="__main__":
     #test_set_nums,genre_dict=pick_random_test(genre_dict)
     #
@@ -150,12 +153,32 @@ if __name__=="__main__":
 
     res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
     pickle_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
-    # classifiers=[KNeighborsClassifier(n_neighbors=len(genre_dict)),LogisticRegression(),MultinomialNB(),
-    #              RandomForestClassifier(),DecisionTreeClassifier(),LinearSVC()]
-    #
-    threshold=1
-    ll_ranking=False
 
+    #CLASSIFICATION SETTINGS
+    settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
+                              pickle_dir=pickle_dir,res_dir=res_dir)
+    settings.result_file_label="no_regional"
+    threshold=4
+    ll_ranking=False
+    num_attributes={50000}
+
+    train_set_size=50000
+    random_pick_test_training=False
+
+
+    #ENTIRE DATA SET
+    X=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\X_summary_pickle")
+    y=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle")
+    #normalize genres
+    y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
+    ref_indexes=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\refIndex_summary_pickle")
+
+    #filter out unwanted genres
+    X,y,ref_indexes=filter_genres(X,y,ref_indexes)
+
+
+    #CLASSIFIERS
+    classifier=classifiers.Classifier()
     classifiers_list=[#classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
 
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),]
@@ -164,12 +187,28 @@ if __name__=="__main__":
                       # classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
                       # classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
 
-    #,("svd",TruncatedSVD(n_components=i/2))
-    for i in sorted({10000}):
-        summary_2000_classifier=classifiers.Classifier("summary_chi_top{}{}_{}".format(threshold,'ll' if ll_ranking else 'cls' ,i),
-                   res_dir=res_dir,
-                   vocab_vectorizer_pickle_dir=pickle_dir)
-        summary_2000_classifier.pipeline(train_set_iter=TrainSetBow.objects,test_set_iter=TestSetBow.objects,
-                                         feature_selector=Pipeline([("chi2",SelectKBest(chi_sq,i))])
-                                         ,classifiers=classifiers_list)
+    for i in num_attributes:
+        settings.num_feats=i
+        feature_selector=Pipeline([("chi2",SelectKBest(chi2,i))])
+
+        #LOAD TRAINING AND TESTING
+        #randomly pick from the entire set
+        if random_pick_test_training:
+            train_set,test_set=randomized_training_testing(settings,X,y,ref_indexes,train_set_size)
+        else:
+            train_set=Training(settings,pickle_dir=settings.pickle_dir)
+            train_set.load_training()
+
+            test_set=Testing(settings,pickle_dir=settings.pickle_dir)
+            test_set.load_testing()
+
+        #flatten training
+        flatten_training(train_set)
+
+        #FEATURE SELECTION
+        feature_selection(train_set,test_set,feature_selector,fit=True)
+
+        #CLASSIFICATION
+        classifier=classifiers.Classifier()
+        classifier.classify(settings,train_set,test_set,classifiers_list)
 

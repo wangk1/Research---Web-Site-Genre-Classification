@@ -1,8 +1,8 @@
-import itertools,copy
+import itertools,copy, random as rand,os
 from .util import *
 
 from util.Logger import Logger
-from data import Label
+from data import LearningSettings
 
 __author__ = 'Kevin'
 
@@ -17,22 +17,89 @@ Label Convention
 
 """
 
+def _pick_random_samples(X,y,ref_index,num):
+    """
+    Pickle random X,y,ref_index. Used to pick random number from X and y
+
+    :param X:
+    :param y:
+    :param ref_index:
+    :param num:
+    :return:
+    """
+    choices=list(np.array(rand.sample(range(0,len(ref_index)),num)))
+
+    non_choices=list(set(range(0,len(ref_index)))-set(choices))
+
+    return X[choices],y[choices],ref_index[choices],X[non_choices],y[non_choices],ref_index[non_choices]
+
+def randomized_training_testing(settings,X,y,ref_index,num,do_pickle=True):
+    """
+    Randomly choose from a super set of data and split it into a training set of size num. The remainder will become
+        the Test set. Uses _pick_random_samples
+
+    :param settings:
+    :param X:
+    :param y:
+    :param ref_index:
+    :param num:
+    :return: tuple_training,tuple_testing
+    """
+
+    selector=np.not_equal(ref_index,None)
+    ref_index=ref_index[selector]
+    X=X[selector]
+    y=y[selector]
+
+    pickle_dir=settings.pickle_dir
+
+    train_X_path=os.path.join(pickle_dir,"{}_trainX_{}_pickle".format(settings.type,settings.feature_selection))
+    train_y_path=os.path.join(pickle_dir,"{}_trainy_{}_pickle".format(settings.type,settings.feature_selection))
+    train_ref_index_path=os.path.join(pickle_dir,"{}_trainRefIndex_{}_pickle".format(settings.type,settings.feature_selection))
+    test_X_path=os.path.join(pickle_dir,"{}_testX_{}_pickle".format(settings.type,settings.feature_selection))
+    test_y_path=os.path.join(pickle_dir,"{}_testy_{}_pickle".format(settings.type,settings.feature_selection))
+    test_ref_index_path=os.path.join(pickle_dir,"{}_testRefIndex_{}_pickle".format(settings.type,settings.feature_selection))
+
+    train_X,train_y,train_ref_index,test_X,test_y,test_ref_index=_pick_random_samples(X,y,ref_index,num)
+
+    if do_pickle:
+        pickle_obj(train_X,train_X_path)
+        pickle_obj(train_y,train_y_path)
+        pickle_obj(train_ref_index,train_ref_index_path)
+
+        pickle_obj(test_X,test_X_path)
+        pickle_obj(test_y,test_y_path)
+        pickle_obj(test_ref_index,test_ref_index_path)
+
+    training_obj=Training(label=settings,pickle_dir=pickle_dir)
+    training_obj.set_data(train_X,train_y,train_ref_index)
+
+    testing_obj=Testing(label=settings,pickle_dir=pickle_dir)
+    testing_obj.set_data(test_X,test_y,test_ref_index)
+
+    return training_obj,testing_obj
+
+
 class BaseData:
     """
-    Base class for training and testing objects.
+    Base class for testing and testing objects.
 
-    A wrapper around the matrix that is the training or testing sets
+    A wrapper around the matrix that is the testing or testing sets
 
     """
 
     def __init__(self,*,label,choose_ids,source,genre_mapping,pickle_dir,type="",vocab_vectorizer=None):
         """
-        Source is an iterable adhering to the training and testing interface
+        Base Class for handling testing and training data
 
+        Source is an iterable adhering to the testing and testing interface aka object of the class SourceMapper
+            or equivalent
+
+        We will load and create matrix from the source if _load is called
         :param source:
         :return:
         """
-        assert isinstance(label,Label)
+        assert isinstance(label,LearningSettings)
 
         self.choose_ids=choose_ids
         self.source=source
@@ -48,11 +115,11 @@ class BaseData:
 
         self.pickle_dir=pickle_dir
 
-    def _load(self,*,stack_per_sample,pickle_X_path,pickle_y_path,pickle_ref_id_path,maybe_load_from_pickle,pickle):
+    def _load_from_source(self,*,stack_per_sample,pickle_X_path,pickle_y_path,pickle_ref_id_path,maybe_load_from_pickle,pickle):
         """
         Private method used to load both testing and training samples. Do not use
 
-        If pickle file exists load the pickle file and X and y, else load from the self.source
+        If pickle file exists load the pickle file and X and y, else load from the self.source.
 
         :param stack_per_sample:
         :param pickle_X_path:
@@ -63,7 +130,7 @@ class BaseData:
         :return:
         """
 
-        assert hasattr(self,"vocab_vectorizer")
+        assert hasattr(self,"source")
 
         loaded=False
         if maybe_load_from_pickle:
@@ -112,7 +179,7 @@ class BaseData:
             if pickle:
                 self.save_to_pickle(pickle_X_path,pickle_y_path,pickle_ref_id_path)
 
-        data_logger.info("Final training size: {}".format(self._X.shape[0]))
+        data_logger.info("Final set size: {}".format(self._X.shape[0]))
 
     def save_to_pickle(self,pickle_X_path,pickle_y_path,pickle_ref_id_path):
         """
@@ -153,6 +220,12 @@ class BaseData:
 
         return X,y,ref_indexes
 
+
+    def set_data(self,X,y,ref_id):
+        self.X=X
+        self.y=y
+        self.ref_indexes=ref_id
+
     @property
     def shape(self):
         return self._X.shape
@@ -173,6 +246,14 @@ class BaseData:
     @y.setter
     def y(self,y):
         self._y=y
+
+    @property
+    def ref_indexes(self):
+        return self._ref_indexes
+
+    @ref_indexes.setter
+    def ref_indexes(self,r_i):
+        self._ref_indexes=r_i
 
 class Training(BaseData):
     def __init__(self,label,*,train_set_source=None,pickle_dir,genre_mapping=None,choose_ids=None):
@@ -196,7 +277,7 @@ class Training(BaseData):
         """
 
         vocab_loaded=False
-        pickle_file=self.pickle_dir+"/vocab_{}_pickle".format(self.label.attr_select_technique)
+        pickle_file=self.pickle_dir+"/vocab_{}_pickle".format(self.label.feature_selection)
 
         if load_vectorizer_from_file:
             try:
@@ -240,16 +321,16 @@ class Training(BaseData):
         if self._X is not None:
             data_logger.info("Reloading training samples")
 
-        if self.vocab_vectorizer is None:
-            self.fit_vocab(load_vectorizer_from_file=maybe_load_vectorizer_from_pickle)
+        # if self.vocab_vectorizer is None:
+        #     self.fit_vocab(load_vectorizer_from_file=maybe_load_vectorizer_from_pickle)
 
         data_logger.info("Loading training set for {}".format(self.label))
 
-        trainX_pickle_path=self.pickle_dir+"/{}_trainX_{}_pickle".format(self.label.type,self.label.attr_select_technique)
-        trainy_pickle_path=self.pickle_dir+"/{}_trainy_{}_pickle".format(self.label.type,self.label.attr_select_technique)
-        ref_id_pickle_path=self.pickle_dir+"/{}_trainRefIndex_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        trainX_pickle_path=self.pickle_dir+"/{}_trainX_{}_pickle".format(self.label.type,self.label.feature_selection)
+        trainy_pickle_path=self.pickle_dir+"/{}_trainy_{}_pickle".format(self.label.type,self.label.feature_selection)
+        ref_id_pickle_path=self.pickle_dir+"/{}_trainRefIndex_{}_pickle".format(self.label.type,self.label.feature_selection)
 
-        self._load(stack_per_sample=stack_per_sample,
+        self._load_from_source(stack_per_sample=stack_per_sample,
                   pickle_X_path=trainX_pickle_path,
                   pickle_y_path=trainy_pickle_path,
                   pickle_ref_id_path=ref_id_pickle_path,
@@ -288,11 +369,11 @@ class Testing(BaseData):
 
         data_logger.info("Loading testing set for {}".format(self.label))
 
-        testX_pickle_path=self.pickle_dir+"/{}_testX_{}_pickle".format(self.label.type,self.label.attr_select_technique)
-        testy_pickle_path=self.pickle_dir+"/{}_testy_{}_pickle".format(self.label.type,self.label.attr_select_technique)
-        ref_id_pickle_path=self.pickle_dir+"/{}_testRefIndex_{}_pickle".format(self.label.type,self.label.attr_select_technique)
+        testX_pickle_path=self.pickle_dir+"/{}_testX_{}_pickle".format(self.label.type,self.label.feature_selection)
+        testy_pickle_path=self.pickle_dir+"/{}_testy_{}_pickle".format(self.label.type,self.label.feature_selection)
+        ref_id_pickle_path=self.pickle_dir+"/{}_testRefIndex_{}_pickle".format(self.label.type,self.label.feature_selection)
 
-        self._load(stack_per_sample=stack_per_sample,
+        self._load_from_source(stack_per_sample=stack_per_sample,
                   pickle_X_path=testX_pickle_path,
                   pickle_y_path=testy_pickle_path,
                   pickle_ref_id_path=ref_id_pickle_path,
@@ -301,3 +382,4 @@ class Testing(BaseData):
                   pickle=pickle_testing)
 
         return self
+

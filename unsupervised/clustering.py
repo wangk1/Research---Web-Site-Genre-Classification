@@ -8,7 +8,7 @@ import collections as coll
 import sklearn.metrics.pairwise as pw
 
 from util.Logger import Logger
-from data import Label
+from data import LearningSettings
 
 clustering_logger=Logger()
 

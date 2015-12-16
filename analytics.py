@@ -48,15 +48,14 @@ if __name__=="__main__":
     outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
 
     y_path=""
-    num_genre_per_webpage("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle")
+    #num_genre_per_webpage("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle")
 
 
-    # dmoz_alexa_similarity()
-    # exit(0)
+    #dmoz_alexa_similarity()
     # #prob_dict=load_prob_dict()
-    # for i in range(1,5):
-    #     consensus_count,consensus_total=consensus_class_per_genre(path,filter_func=lambda x:len(x)==i)
-    #     plot_total_consensus(consensus_count,consensus_total)
+    #for i in range(1,5):
+        #consensus_count,consensus_total=consensus_class_per_genre(path,filter_func=lambda x:len(x)==i)
+        #plot_consensus_percentile(consensus_count,consensus_total)
     #multi_class_misprediction_freq(path)
 
     #plot_miss_per_genre(path,outpath,classifiers="LogisticRegression")

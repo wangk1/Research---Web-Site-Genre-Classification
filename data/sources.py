@@ -18,7 +18,8 @@ import math
 ClassificationSource=namedtuple("Source",("ref_index","attr_map","short_genre"))
 def generate_training_testing(source,test_set_indexes,genres,*,train_coll_cls,test_coll_cls):
     """
-    Takes a list of test set indexes and genres.
+    Takes a list of test set indexes and genres and save to their respective collections via
+        aka train_coll_cls and test_coll_cls
 
     The source is an object that has the following interface:
         ref_index: field that is usually a reference to a element in one of the queues

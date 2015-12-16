@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import operator
 import os,re
 
+from scipy.stats import scoreatpercentile
+
 PLOT_TOP_X=90
 IGNORE_TOP_X=50
 #stop words
@@ -67,4 +69,28 @@ def subplot_four_corner(plt_num):
     return plt_num==total_plot_number-1,curr_figure
 
 
+def add_bar_plot(x,y):
+    """
+    Plot a single box plot of y values at coordinate x
+
+    :param y: list of numbers
+    :param x: x coord
+    :return:
+    """
+
+    # percentiles of interest
+    perc = [min(y), scoreatpercentile(y,10), scoreatpercentile(y,25),
+                   scoreatpercentile(y,50), scoreatpercentile(y,75),
+                   scoreatpercentile(y,90), max(y)]
+    midpoint = x # time-series time
+
+    # min/max
+    plt.broken_barh([(midpoint-.01,.02)], (perc[0], perc[1]-perc[0]),edgecolor="k",facecolor="w")
+    plt.broken_barh([(midpoint-.01,.02)], (perc[5], perc[6]-perc[5]),edgecolor="k",facecolor="w")
+    # 10/90
+    plt.broken_barh([(midpoint-.1,.2)], (perc[1], perc[2]-perc[1]),edgecolor="r",facecolor="w")
+    plt.broken_barh([(midpoint-.1,.2)], (perc[4], perc[5]-perc[4]),edgecolor="r",facecolor="w")
+    # 25/75
+    plt.broken_barh([(midpoint-.4,.8)], (perc[2], perc[3]-perc[2]),edgecolor="b",facecolor="w")
+    plt.broken_barh([(midpoint-.4,.8)], (perc[3], perc[4]-perc[3]),edgecolor="c",facecolor="w")
 

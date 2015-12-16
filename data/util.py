@@ -3,7 +3,7 @@ __author__ = 'Kevin'
 import numpy as np
 import scipy.sparse as sp
 
-import pickle
+import pickle,itertools
 
 from sklearn.feature_extraction import DictVectorizer
 
@@ -99,3 +99,28 @@ def unpickle_obj(file_path):
 
 
     return obj
+
+def flatten_training(train_set):
+    """
+    Flatten the training set where there may be multiple genre classes. Split that into 2
+
+    :param train_set:
+    :return:
+    """
+    new_y=[]
+    new_x_index=[]
+    new_ref_id=[]
+
+    for index,g_list in enumerate(train_set.y):
+        new_ref_id.extend((len(g_list))*[train_set.ref_indexes[index]])
+        new_x_index.extend([index]*len(g_list))
+        new_y.extend(g_list)
+
+    #now project out
+    train_set.X=train_set.X[new_x_index]
+    train_set.y=np.array(new_y)
+    train_set.ref_indexes=np.array(new_ref_id)
+
+
+
+

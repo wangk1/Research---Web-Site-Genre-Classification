@@ -6,7 +6,31 @@ from scipy.sparse import identity
 from util.text_preprocessor import preprocess
 from .word_based import BagOfWords
 from data.util import load_train_matrix
+from util.Logger import Logger
 
+feature_logger=Logger()
+
+def feature_selection(train_set,test_set,feature_selector,fit=True):
+        """
+        Perform feature selection, applied to the whole dataset. Must be done before loading testing sets
+
+        :param feat_selector: The feature selector
+        :return:
+        """
+
+        assert hasattr(feature_selector,"transform")
+
+        feature_logger.info("Pre feature selection: num features: {}".format(train_set.X.shape[1]))
+
+        if fit:
+            feature_selector.fit(train_set.X,train_set.y)
+
+        train_set.X=feature_selector.transform(train_set.X)
+
+        feature_logger.info("Post feature selection Train set: num features: {}".format(train_set.X.shape[1]))
+
+        test_set.X=feature_selector.transform(test_set.X)
+        feature_logger.info("Post feature selection Test set: num features: {}".format(test_set.X.shape[1]))
 
 class SparseSVD:
 

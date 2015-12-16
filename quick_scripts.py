@@ -6,7 +6,7 @@ from misc_scripts.grab_urls_and_genres import grab_urls_and_genres
 import itertools
 
 if __name__=="__main__":
-    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top1cls_500"
+    path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top4cls_10000"
     #path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_100_chi_truncated_lsa"
     classifier="LogisticRegression"
     num_top=1

@@ -284,6 +284,14 @@ def plot_total_consensus(consensus_count,consensus_total):
     print("Done")
 
 def plot_consensus_percentile(consensus_count,consensus_total):
+    """
+    Uses the 90th percentile plot.
+
+    :param consensus_count:
+    :param consensus_total:
+    :return:
+    """
+
     consensus_count=sorted(consensus_count.items(),key=lambda entry:entry)
     num_classes=len(consensus_count)
 
@@ -303,9 +311,15 @@ def plot_consensus_percentile(consensus_count,consensus_total):
 
         pyplot.title("Consensus plot for Genre {}, total number of instances {}".format(c,sum(it.chain(*(g[2] for g in genre_to_counts)))/6))
 
-        pyplot.boxplot([g[1] for g in genre_to_counts],labels=[g[0] for g in genre_to_counts])
+        #set up xaxis labels
+        pyplot.xticks(list(range(1,len(genre_to_counts)+1)),[g[0] for g in genre_to_counts])
+        pyplot.tick_params(axis='both', which='major', labelsize=5)
 
-        pyplot.xticks(range(len(genre_to_counts)),["0"]+[g[0] for g in genre_to_counts],size= 5)
+        #now plot y axis
+        for index,res in enumerate(genre_to_counts):
+            graphics.add_bar_plot(index+1,res[1])
+
+        #pyplot.xticks(range(len(genre_to_counts)),["0"]+[g[0] for g in genre_to_counts],size= 5)
         pyplot.legend(loc="upper right")
 
 
@@ -317,26 +331,6 @@ def plot_consensus_percentile(consensus_count,consensus_total):
 
     print("Done")
 
-
-def count_num_multi_predict(res_path):
-
-    ref_id_set=set()
-
-    wrong_res_iter=WrongResultsIter.load_iter_from_file(res_path)
-    right_res_iter=RightResultsIter.load_iter_from_file(res_path)
-
-    count=0
-    single_genre=0
-    for res_obj in it.chain(wrong_res_iter,right_res_iter):
-        if res_obj.ref_id not in ref_id_set and len(set(res_obj.actual)) >1:
-            count+=1
-            ref_id_set.add(res_obj.ref_id)
-        elif res_obj.ref_id not in ref_id_set and len(set(res_obj.actual)) ==1:
-            single_genre+=1
-            ref_id_set.add(res_obj.ref_id)
-
-    print(count)
-    print(single_genre)
 
 def frequently_predicted_class(res_path,top_x=2):
     """

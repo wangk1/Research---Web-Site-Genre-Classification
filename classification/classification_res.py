@@ -27,34 +27,6 @@ __author__ = 'Kevin'
 
 CLASSIFICATION_HEADERS=["ref id","Predicted","Actual"]
 
-def get_classification_res(filepath):
-    """
-    Convert a result file into multiple objects
-
-    :return: list of ClassificationInstance objects that represents an id of webpage and its actual, predicted, and classifier.
-    """
-    prediction_objs=[]
-
-    classifier=re.search(".*(?=_wrong.txt)",filepath.split("\\")[-1]).group(0)
-    with open(filepath) as sample_file:
-        for line in sample_file:
-
-            res_list=line.split(" ")
-
-            prediction_objs.append(ClassificationResultInstance(ref_id=res_list[0][:-1],predicted=res_list[2][:-1],actual=res_list[4][:-1],
-                                                    classifier=classifier))
-
-    return prediction_objs
-
-def create_true_results(res_path):
-    """
-    Create files of actual misses,swings, and rights
-
-    :param res_path:
-    :return:
-    """
-    pass
-
 class ClassificationResultInstance:
 
     def __init__(self,ref_id,actual,predicted,classifier,genre_lv=1):
@@ -129,23 +101,27 @@ class ClassificationResultStream:
         """
         prediction_objs=[]
 
-        classifier=re.search(".*(?=_(wrong|right).txt)",filepath.split("\\")[-1]).group(0)
+        #isolate the name of the classifier
+        classifier=re.search(".*(?=_cres.txt)",filepath.split("\\")[-1]).group(0)
 
-        file_datagram=pd.read_csv(filepath)
+        #file_datagram=pd.read_csv(filepath)
 
-        for f in file_datagram.values:
-            actual=[f[2]]
+        #for f in file_datagram.values:
 
-            #if self.get_all_actual:
-                #actual=URLBow.objects.get(index=f[0]).short_genres
+        with open(filepath) as res_file:
+            next(res_file) #burn first line, the column headings
+            for line in res_file:
+                line=line[:-1]
 
-            prediction_objs.append(ClassificationResultInstance(ref_id=f[0],predicted=ast.literal_eval(f[1])
-                                                                ,actual=actual,
+                lines=re.split(",(?= *\[)",line)
+
+                prediction_objs.append(ClassificationResultInstance(ref_id=lines[0],predicted=ast.literal_eval(lines[1])
+                                                                ,actual=ast.literal_eval(lines[2]),
                                                         classifier=classifier))
 
         return prediction_objs
 
-    def get_classification_res_gen(self,suffix=".txt"):
+    def get_classification_res_gen(self,suffix="_cres.txt"):
         """
         Generator that generates the next classification result entry.
 
@@ -158,19 +134,31 @@ class ClassificationResultStream:
 
         #in case we only chose some classifiers
         if self.classifiers is not None:
-            right_files=(f for f in os.listdir(abs_result_path)
+            res_files=(f for f in os.listdir(abs_result_path)
                          if f.endswith(suffix) and any(f.startswith(c) for c in self.classifiers))
 
         else:
-            right_files=(f for f in os.listdir(abs_result_path) if f.endswith(suffix))
+            res_files=(f for f in os.listdir(abs_result_path) if f.endswith(suffix))
 
-        for right_file in right_files:
-            for right_instance in self.get_classification_res(os.path.join(abs_result_path,right_file)):
-                yield right_instance
+        for res_file in res_files:
+            for res_obj in self.get_classification_res(os.path.join(abs_result_path,res_file)):
+                yield res_obj
 
         raise StopIteration("End of right result stream")
 
+def default_right_comp(pred,actual):
+    """
+    Function that determines if the predicted class matches actual.
 
+    This is the default used. It compares the top prediction at index 0 in the pred parameter to
+        each element in actual. If it matches one, it is a hit.
+
+    :param pred:
+    :param actual:
+    :return:
+    """
+
+    return pred[0] in actual
 
 class RightResultsIter(ClassificationResultStream):
     """
@@ -180,29 +168,23 @@ class RightResultsIter(ClassificationResultStream):
 
     """
 
-    def __init__(self,result_path,classifier=None):
+    def __init__(self,result_path,classifier=None,comparator=default_right_comp):
         super().__init__(result_path,classifier)
 
-        self.res_gen=super().get_classification_res_gen("_right.txt")
+        self.res_gen=super().get_classification_res_gen("_cres.txt")
+        self.is_right=comparator
 
     def __next__(self):
-        return next(self.res_gen)
+        pred_obj= next(self.res_gen)
+
+        #check to see if actually a right instance
+        while not self.is_right(pred_obj.predicted,pred_obj.actual):
+            pred_obj=next(self.res_gen)
+
+        return pred_obj
 
     def __iter__(self):
         return self
-
-    @staticmethod
-    def load_iter_from_file(res_path,classifier=None,pickle_path=settings.PICKLE_DIR):
-        right_iter_path=os.path.join(pickle_path,"right_res_iter")
-
-        try:
-            right_res_iter=unpickle_obj(right_iter_path)
-        except FileNotFoundError:
-            classification_res_logger.debug("Not found {}, loading from db".format(right_iter_path))
-            right_res_iter=[i for i in RightResultsIter(result_path=res_path,classifier=classifier)]
-            pickle_obj(right_res_iter,right_iter_path)
-
-        return right_res_iter
 
 
 class WrongResultsIter(ClassificationResultStream):
@@ -213,26 +195,20 @@ class WrongResultsIter(ClassificationResultStream):
 
     """
 
-    def __init__(self,result_path,classifier=None):
+    def __init__(self,result_path,classifier=None,comparator=lambda p,a: not default_right_comp(p,a)):
         super().__init__(result_path,classifier)
 
-        self.res_gen=super().get_classification_res_gen("_wrong.txt")
+        self.res_gen=super().get_classification_res_gen("_cres.txt")
+        self.is_wrong=comparator
 
     def __next__(self):
-        return next(self.res_gen)
+        pred_obj= next(self.res_gen)
+
+        #check to see if actually a right instance
+        while not self.is_wrong(pred_obj.predicted,pred_obj.actual):
+            pred_obj=next(self.res_gen)
+
+        return pred_obj
 
     def __iter__(self):
         return self
-
-    @staticmethod
-    def load_iter_from_file(res_path,classifier=None,pickle_path=settings.PICKLE_DIR):
-        wrong_iter_path=os.path.join(pickle_path,"wrong_res_iter")
-
-        try:
-            wrong_res_iter=unpickle_obj(wrong_iter_path)
-        except FileNotFoundError:
-            classification_res_logger.debug("Not found {}, loading from db".format(wrong_iter_path))
-            wrong_res_iter=[i for i in WrongResultsIter(result_path=res_path,classifier=classifier)]
-            pickle_obj(wrong_res_iter,wrong_iter_path)
-
-        return wrong_res_iter
