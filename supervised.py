@@ -157,10 +157,10 @@ if __name__=="__main__":
     #CLASSIFICATION SETTINGS
     settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
-    settings.result_file_label="no_regional"
+    settings.result_file_label="no_region_kids"
     threshold=4
     ll_ranking=False
-    num_attributes={50000}
+    num_attributes={10000}
 
     train_set_size=50000
     random_pick_test_training=False

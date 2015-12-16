@@ -92,7 +92,7 @@ class Classifier:
         #make dir if not exist
         os.makedirs(folder_path,exist_ok=True)
 
-        output_file="{}/{}_cres.txt".format(folder_path,classifier_name)
+        output_file="{}/{}{}_cres.txt".format(folder_path,classifier_name,"" if learn_settings.result_file_label=="" else "_"+learn_settings.result_file_label)
 
         #emit the csv
         with open(output_file,mode="w") as output_handler:
