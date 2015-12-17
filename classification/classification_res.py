@@ -195,10 +195,10 @@ class WrongResultsIter(ClassificationResultStream):
 
     """
 
-    def __init__(self,result_path,classifier=None,secondary_name="",comparator=lambda p,a: not default_right_comp(p,a)):
+    def __init__(self,result_path,classifier=None,secondary_identifier="",comparator=lambda p,a: not default_right_comp(p,a)):
         super().__init__(result_path,classifier)
 
-        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_name))
+        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier))
         self.is_wrong=comparator
 
     def __next__(self):

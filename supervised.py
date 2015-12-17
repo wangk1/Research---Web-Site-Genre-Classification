@@ -160,7 +160,7 @@ if __name__=="__main__":
     settings.result_file_label=""
     threshold=4
     ll_ranking=False
-    num_attributes={50000}
+    num_attributes={10000}
 
     train_set_size=50000
     random_pick_test_training=False
@@ -179,13 +179,12 @@ if __name__=="__main__":
 
     #CLASSIFIERS
     classifier=classifiers.Classifier()
-    classifiers_list=[#classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
-
-                      classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),]
-                      # classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      # classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
-                      # classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
-                      # classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
+    classifiers_list=[classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
 
     for i in num_attributes:
         settings.num_feats=i
