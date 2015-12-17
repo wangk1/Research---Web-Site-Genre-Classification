@@ -1,0 +1,1159 @@
+ref id,Predicted,Actual
+52866,"['Arts', 'Shopping']",Games
+49552,"['Arts', 'Computers']",Business
+52669,"['Arts', 'Business']",Computers
+52789,"['Arts', 'Business']",Computers
+45211,"['Arts', 'Business', 'Shopping']",Adult
+46425,['Business'],Arts
+48208,"['Arts', 'Sports']",Business
+48234,"['Business', 'Computers']",Sports
+48282,['Health'],Business
+48522,['Business'],Regional
+48731,"['Arts', 'Society']",Business
+49021,['Business'],Science
+49545,"['Computers', 'Science']",Business
+51543,"['Arts', 'Business', 'Shopping']",Computers
+51590,"['Arts', 'Society']",Computers
+51614,"['Arts', 'Society']",Computers
+52280,"['Arts', 'Business', 'Shopping']",Computers
+37350,"['Arts', 'Shopping']",Society
+39656,['Arts'],Sports
+41486,['Arts'],Sports
+43400,"['Reference', 'Society']",Regional
+44105,"['Home', 'Society']",Regional
+44106,"['Arts', 'Computers']",Home
+44131,"['Arts', 'Business']",Home
+44138,"['Arts', 'Business', 'Shopping']",Home
+44145,['Business'],Home
+44161,"['Health', 'Home']",Regional
+44173,"['Arts', 'Business', 'Society']",Home
+44175,"['Arts', 'Business', 'Recreation']",Home
+44190,['Sports'],Kids
+44203,"['Reference', 'Regional', 'Society']",Kids
+44244,"['Arts', 'News']",Kids
+44316,"['Business', 'Regional', 'Shopping']",Recreation
+44327,"['Arts', 'Business', 'Society']",Regional
+44331,"['Business', 'Regional']",Recreation
+44340,"['Arts', 'Home', 'Society']",Science
+44376,['Business'],Recreation
+44399,"['Arts', 'Science']",Recreation
+44401,"['Computers', 'Society']",Recreation
+44413,"['Arts', 'Health', 'Society']",Reference
+44457,"['Arts', 'Business', 'Society']",Reference
+44463,"['Arts', 'Business', 'Health', 'Reference']",Regional
+44487,"['Arts', 'Computers', 'Reference']",Regional
+44496,"['Adult', 'Business', 'Shopping']",Regional
+44499,"['Arts', 'Business', 'Health', 'Shopping']",Regional
+44506,"['Arts', 'News']",Regional
+44583,['Computers'],Science
+44591,"['Arts', 'Business']",Science
+44598,"['Arts', 'Society']",Science
+45148,"['Arts', 'Shopping']",Adult
+45181,"['Arts', 'Shopping']",Adult
+45237,"['Arts', 'Recreation']",Adult
+45758,"['Business', 'Health']",Arts
+45835,['Health'],Arts
+45987,"['Arts', 'Home']",Kids
+46544,['Arts'],Games
+46778,"['Business', 'Computers', 'Society']",Arts
+46781,"['News', 'Society']",Arts
+47100,"['Arts', 'Recreation', 'Sports']",Shopping
+47490,"['Arts', 'Kids']",Recreation
+47575,"['Business', 'Health']",Arts
+47747,['Science'],Business
+47786,"['Arts', 'Computers', 'Sports']",Business
+47818,"['Health', 'Society']",Business
+48050,['Business'],Society
+48120,['Arts'],Business
+48128,['Shopping'],Business
+48528,"['Adult', 'Arts', 'Computers', 'Home', 'Reference', 'Shopping']",Business
+50604,['Adult'],Computers
+50614,"['Business', 'Health', 'News', 'Science']",Computers
+51033,"['Business', 'Games', 'Health', 'News', 'Recreation', 'Reference', 'Shopping']",Computers
+51065,"['Business', 'News', 'Regional', 'Shopping']",Computers
+51361,"['Business', 'Health', 'Reference']",Computers
+57056,"['Business', 'Games', 'Health', 'News', 'Reference', 'Regional']",Recreation
+57207,"['Business', 'Health', 'Reference']",Recreation
+57857,"['Business', 'Games', 'Health', 'News', 'Shopping']",Reference
+58187,"['Business', 'Games', 'Health', 'News', 'Reference', 'Regional', 'Shopping']",Science
+13413,"['Business', 'Shopping']",Computers
+14311,"['Arts', 'Computers']",Games
+15667,['Arts'],Health
+18047,"['Business', 'Home']",Society
+18721,"['Business', 'Kids']",Home
+19170,['Arts'],Kids
+19255,['Health'],Kids
+19361,['Recreation'],Kids
+19390,"['Business', 'Health', 'Science']",Kids
+19526,"['Recreation', 'Reference', 'Regional']",Kids
+19574,"['Recreation', 'Regional']",Kids
+19576,"['Business', 'Recreation', 'Reference', 'Regional']",Kids
+19603,"['Business', 'Kids', 'News', 'Regional']",Sports
+19668,"['Recreation', 'Sports']",Kids
+21035,"['Business', 'News', 'Science']",Society
+21307,"['Business', 'Regional']",News
+21349,"['Arts', 'Business']",News
+21379,"['Recreation', 'Sports']",News
+21403,"['Reference', 'Regional', 'Science']",News
+21480,"['Arts', 'Science']",News
+21534,"['Arts', 'Shopping']",Recreation
+21621,"['Arts', 'Computers']",Recreation
+21712,['Regional'],Recreation
+21946,['Home'],Recreation
+22161,"['Business', 'Computers']",Recreation
+22267,"['Arts', 'News', 'Reference']",Recreation
+22522,"['Business', 'Games', 'Health', 'Reference', 'Regional', 'Science']",Recreation
+22578,['Computers'],Recreation
+22702,"['Business', 'Health', 'Science']",Recreation
+22807,"['Business', 'Science']",Recreation
+23061,"['Games', 'News', 'Reference']",Recreation
+23074,"['Arts', 'Kids']",Recreation
+23086,"['Adult', 'Arts']",Recreation
+23138,"['Arts', 'Computers']",Recreation
+23346,"['Business', 'Recreation']",Society
+23438,"['Arts', 'Health', 'Recreation', 'Reference', 'Science']",Society
+23514,['Reference'],Recreation
+23744,"['Business', 'Health', 'News', 'Recreation', 'Reference']",Society
+23986,"['Business', 'Recreation', 'Science']",Society
+24136,['Sports'],Recreation
+24149,['Society'],Recreation
+24316,['Arts'],Recreation
+24492,"['Business', 'News']",Recreation
+25304,"['Computers', 'News', 'Reference', 'Science']",Society
+25460,"['Home', 'Recreation', 'Science']",Reference
+25480,"['Computers', 'Science', 'Shopping']",Reference
+25593,['Business'],Reference
+25794,"['Health', 'Recreation', 'Science']",Reference
+25905,"['Business', 'Computers']",Reference
+26129,"['Arts', 'Reference']",Shopping
+26285,"['Arts', 'Reference']",Shopping
+26324,"['Arts', 'Recreation']",Reference
+26525,"['News', 'Sports']",Reference
+26539,['Society'],Reference
+26573,"['News', 'Society', 'Sports']",Reference
+26613,"['Kids', 'Sports']",Regional
+26647,['Business'],Regional
+26655,['Business'],Regional
+26660,['Business'],Regional
+26661,"['Business', 'News', 'Society', 'Sports']",Regional
+26667,['Shopping'],Regional
+26692,"['Arts', 'News', 'Science', 'Society']",Regional
+26722,['Health'],Regional
+26724,['Society'],Regional
+26729,"['Health', 'News', 'Science']",Regional
+26749,"['Business', 'Computers']",Regional
+26750,"['Business', 'Home']",Regional
+26754,"['Computers', 'Science']",Regional
+26762,"['Arts', 'Society']",Regional
+26765,['Business'],Regional
+26818,['Recreation'],Regional
+26830,"['Business', 'News']",Regional
+26842,['Health'],Regional
+26861,"['Computers', 'Games', 'Science']",Regional
+26870,"['Computers', 'Science']",Regional
+26884,['Recreation'],Regional
+26921,"['Computers', 'Science', 'Society']",Regional
+26942,"['Recreation', 'Science']",Regional
+26966,"['Computers', 'Reference', 'Science']",Regional
+27046,"['Home', 'Shopping']",Science
+27301,['Recreation'],Science
+27339,"['Arts', 'Recreation']",Science
+27464,['Business'],Science
+27555,['Business'],Science
+27648,"['Health', 'Home']",Science
+27687,"['Games', 'Kids']",Science
+27836,['Society'],Science
+27858,['Health'],Science
+27983,['Business'],Science
+28220,['Computers'],Science
+28398,['Society'],Science
+28419,['News'],Science
+28458,['Arts'],Science
+28766,"['Computers', 'Health', 'Home']",Science
+28786,"['Computers', 'Health', 'Home']",Science
+29028,['Sports'],Science
+29051,"['Business', 'Computers']",Science
+29324,['Business'],Shopping
+29399,"['Computers', 'Science']",Shopping
+29414,"['Arts', 'Recreation']",Shopping
+29426,"['Business', 'News', 'Recreation']",Shopping
+29447,"['Science', 'Society']",Shopping
+29483,['Computers'],Shopping
+29502,"['Business', 'Computers']",Shopping
+29508,"['Computers', 'Science']",Shopping
+29511,"['Business', 'Recreation']",Shopping
+29522,"['News', 'Science']",Shopping
+29544,"['Business', 'Games']",Shopping
+29601,"['Business', 'Recreation', 'Science']",Shopping
+29724,"['Business', 'Home', 'Recreation']",Shopping
+29736,['Recreation'],Shopping
+29752,"['Home', 'News', 'Society']",Shopping
+29838,"['Business', 'Recreation', 'Society']",Shopping
+29989,"['Arts', 'Computers', 'News', 'Society']",Shopping
+30112,['Computers'],Shopping
+30239,"['Business', 'Sports']",Shopping
+30312,"['Computers', 'Society']",Shopping
+30339,"['Business', 'Society']",Shopping
+30467,"['Computers', 'Society', 'Sports']",Shopping
+30471,"['Arts', 'Society', 'Sports']",Shopping
+30732,"['Society', 'Sports']",Shopping
+30799,"['Computers', 'Science', 'Society', 'Sports']",Shopping
+30863,"['Business', 'Computers', 'Sports']",Shopping
+30866,"['Computers', 'Health', 'Society', 'Sports']",Shopping
+30912,"['Business', 'Health', 'Home', 'Society']",Shopping
+30949,"['Home', 'Society', 'Sports']",Shopping
+31222,"['Computers', 'Society', 'Sports']",Shopping
+31250,"['Computers', 'Health']",Shopping
+31256,['Business'],Shopping
+31285,"['Computers', 'Science', 'Society']",Shopping
+31409,"['Computers', 'Society']",Shopping
+31464,['Society'],Shopping
+31497,"['Computers', 'Society']",Shopping
+31514,['Business'],Shopping
+31886,"['Arts', 'Sports']",Shopping
+32052,"['Home', 'Society']",Shopping
+32055,"['Arts', 'Computers', 'Recreation']",Shopping
+32214,"['Business', 'Computers', 'Recreation', 'Society', 'Sports']",Shopping
+32239,"['Computers', 'Recreation', 'Society']",Shopping
+32392,"['Health', 'Kids', 'Society']",Shopping
+32452,"['Arts', 'Computers', 'Recreation', 'Society']",Shopping
+32629,['Business'],Shopping
+32697,"['Kids', 'Society']",Shopping
+32733,['Recreation'],Shopping
+32819,['Sports'],Shopping
+32884,"['Business', 'Computers', 'Recreation', 'Sports']",Shopping
+32979,['Sports'],Shopping
+33064,"['Arts', 'Recreation', 'Society', 'Sports']",Shopping
+33469,"['Computers', 'Games', 'Kids']",Shopping
+33513,"['Arts', 'Computers', 'Games', 'Recreation', 'Society']",Shopping
+34171,"['Recreation', 'Society', 'Sports']",Shopping
+34584,['Shopping'],Society
+34738,['Arts'],Society
+34818,"['Arts', 'Shopping']",Society
+34858,"['Adult', 'Computers']",Society
+34995,['Computers'],Society
+35012,['Computers'],Society
+35722,"['Computers', 'Kids', 'Recreation']",Society
+36032,['Health'],Society
+36322,"['Business', 'News', 'Recreation', 'Sports']",Society
+36328,"['Arts', 'Business', 'Computers', 'Shopping']",Society
+36361,"['Kids', 'Sports']",Society
+36366,['Shopping'],Society
+36643,"['Adult', 'Arts', 'Shopping', 'Sports']",Society
+36657,"['Arts', 'Health', 'News', 'Shopping']",Society
+36665,"['Arts', 'Computers', 'Recreation', 'Sports']",Society
+36668,"['Arts', 'Computers', 'Recreation', 'Sports']",Society
+36687,"['Arts', 'Computers']",Society
+36709,"['News', 'Sports']",Society
+36713,['Arts'],Society
+36753,"['Arts', 'Health']",Society
+36790,"['Kids', 'Recreation', 'Sports']",Society
+36927,"['Arts', 'Computers']",Society
+37036,"['Computers', 'Recreation']",Society
+37201,['News'],Society
+37232,['Shopping'],Society
+37238,"['Arts', 'Sports']",Society
+37288,"['Arts', 'Business', 'Computers']",Society
+37377,"['Arts', 'Kids']",Society
+37604,"['Arts', 'Business', 'Computers', 'Recreation']",Society
+37652,"['Arts', 'Computers', 'Kids', 'Recreation']",Society
+37656,"['Arts', 'Business']",Society
+37700,"['Arts', 'Recreation']",Society
+38153,"['Arts', 'Business', 'Recreation']",Sports
+38209,"['Reference', 'Science', 'Society']",Sports
+39323,"['Arts', 'Business', 'Recreation', 'Reference']",Sports
+39368,"['Arts', 'Business', 'Kids', 'Society']",Sports
+39408,"['Arts', 'Kids', 'News', 'Regional']",Sports
+39457,"['Arts', 'Business', 'Recreation', 'Society']",Sports
+39526,"['Arts', 'Business', 'Recreation', 'Reference']",Sports
+39662,"['Arts', 'Recreation', 'Reference', 'Regional', 'Society']",Sports
+39794,"['Arts', 'Business', 'Recreation']",Sports
+39811,"['Arts', 'Business', 'Kids', 'Recreation']",Sports
+40192,"['Arts', 'Reference', 'Society']",Sports
+40226,"['Arts', 'Business', 'Computers', 'Recreation']",Sports
+40228,"['Arts', 'Business', 'Recreation', 'Regional']",Sports
+40508,"['Arts', 'Business', 'Computers']",Sports
+40975,"['Business', 'Recreation', 'Society']",Sports
+40990,"['Arts', 'Business', 'Recreation']",Sports
+41043,"['Arts', 'Business', 'Kids', 'Recreation', 'Regional']",Sports
+41207,"['Business', 'Health', 'Recreation', 'Society']",Sports
+41289,"['Arts', 'Business', 'Kids', 'Recreation']",Sports
+41311,"['Arts', 'Business', 'Kids', 'Recreation']",Sports
+41331,"['Arts', 'Business', 'Computers', 'Kids', 'Recreation', 'Society']",Sports
+41364,"['Arts', 'Computers']",Sports
+41465,"['Arts', 'News']",Sports
+41474,"['Arts', 'Society']",Sports
+41526,"['Arts', 'Kids', 'Recreation', 'Society']",Sports
+41704,"['Arts', 'Business', 'News', 'Recreation', 'Regional']",Sports
+41746,"['Business', 'Computers']",Sports
+41827,"['Arts', 'Business', 'Recreation']",Sports
+41852,"['Arts', 'Business', 'Kids', 'Recreation', 'Regional']",Sports
+42011,"['Arts', 'Business', 'Kids', 'Recreation']",Sports
+42307,"['Arts', 'Business', 'Kids', 'Recreation']",Sports
+42456,"['Arts', 'Business', 'Recreation', 'Society']",Sports
+42492,"['Arts', 'Business', 'Recreation']",Sports
+42546,"['Arts', 'Business', 'Kids', 'Recreation', 'Regional']",Sports
+42938,"['Arts', 'Health', 'Kids', 'Recreation', 'Regional']",Sports
+43042,"['Arts', 'Recreation', 'Society']",Sports
+43057,"['Arts', 'Business', 'Recreation']",Sports
+43098,"['Business', 'Recreation', 'Regional']",Sports
+43337,"['Arts', 'Recreation', 'Regional', 'Society']",Sports
+43388,"['Arts', 'Business', 'Kids']",Games
+43407,"['Arts', 'Business', 'Computers', 'Society']",Reference
+43453,"['Arts', 'Computers', 'Kids', 'Recreation']",Adult
+43548,['News'],Arts
+43549,"['Business', 'Home', 'News']",Arts
+43552,"['Arts', 'Computers', 'Kids', 'News', 'Recreation']",Regional
+43561,['Arts'],News
+43702,['Business'],Regional
+43714,['Health'],Business
+43734,['Business'],Regional
+43741,['Business'],Regional
+43767,"['Business', 'Computers']",Regional
+43768,['Computers'],Regional
+43781,['Reference'],Computers
+43782,"['Arts', 'Kids']",Computers
+43916,"['Arts', 'Business', 'Computers', 'Kids']",Regional
+43927,"['Arts', 'Business', 'Computers']",Games
+43946,"['Arts', 'Kids', 'Shopping']",Games
+44017,"['Business', 'Computers', 'Health']",Shopping
+44084,"['Arts', 'Business', 'Computers', 'Kids']",Health
+44263,"['Arts', 'Business', 'Computers']",Regional
+44489,"['Arts', 'Computers']",Regional
+44638,['Shopping'],Business
+44685,"['Arts', 'Business', 'Computers']",Society
+44687,"['Arts', 'Computers', 'Shopping']",Society
+44714,"['Business', 'Computers', 'Reference']",Society
+44755,"['Arts', 'Computers', 'Kids']",Society
+45318,"['Computers', 'Health', 'Recreation', 'Shopping']",Adult
+45379,['Recreation'],Adult
+45517,"['Recreation', 'Society']",Arts
+46505,['Games'],Arts
+52976,"['Arts', 'Business', 'Shopping']",Games
+53907,"['Computers', 'Games', 'Kids']",Health
+54194,"['Arts', 'Computers', 'Games', 'Kids']",Health
+54387,"['Arts', 'Computers', 'Games']",Health
+54682,"['Computers', 'Kids']",Health
+54979,"['Arts', 'Business', 'Computers', 'Games']",Health
+55777,"['Computers', 'Health', 'Shopping']",Home
+56607,"['Computers', 'Games', 'Health']",Society
+56647,"['Arts', 'Computers', 'Health', 'Kids']",Society
+56709,"['Arts', 'Computers', 'Games', 'Kids']",News
+56715,"['Computers', 'Health', 'Kids']",News
+56779,"['Arts', 'Computers', 'Games', 'Health', 'Recreation']",News
+56837,"['Arts', 'Computers', 'Games']",News
+56853,"['Computers', 'Games', 'Health']",News
+56930,"['Arts', 'Computers']",News
+56991,"['Arts', 'Computers', 'Games', 'Kids']",Recreation
+1383,"['Arts', 'News']",Regional
+1591,['Business'],Shopping
+1657,"['Arts', 'Business', 'Recreation', 'Reference', 'Science']",Society
+1781,['Recreation'],Sports
+2539,"['Arts', 'Computers']",Adult
+2543,"['Adult', 'Business']",Shopping
+2735,"['Arts', 'Business', 'Recreation']",Adult
+2950,['Reference'],Arts
+2976,['Recreation'],Arts
+3043,"['Arts', 'Reference']",Kids
+3912,['Business'],Arts
+3982,"['Reference', 'Society']",Arts
+3993,"['Business', 'Health']",Arts
+4025,"['Business', 'Recreation']",Arts
+4283,"['Business', 'Computers', 'Health', 'Reference', 'Science']",Arts
+4383,"['Arts', 'Computers', 'Kids', 'Recreation']",Reference
+4463,"['Arts', 'Computers', 'Reference', 'Science']",Kids
+4616,"['Computers', 'Games']",Arts
+4802,"['Arts', 'Computers', 'Health', 'Recreation', 'Reference']",News
+5221,"['Business', 'Computers', 'Reference']",Shopping
+5439,"['Kids', 'Recreation', 'Reference']",Arts
+67,"['Adult', 'Health']",Society
+85,"['Arts', 'Kids', 'Recreation', 'Reference']",Adult
+142,"['Arts', 'Business']",News
+173,"['Arts', 'Games']",Kids
+174,"['Arts', 'Business', 'Health']",Regional
+205,"['Arts', 'News', 'Recreation']",Society
+255,"['Arts', 'Business']",News
+256,"['Business', 'Health', 'Home']",Regional
+262,['Business'],Home
+265,"['Business', 'Reference']",Regional
+318,['Business'],Regional
+352,"['Arts', 'Business', 'Computers', 'News', 'Recreation', 'Regional']",Sports
+362,"['News', 'Recreation', 'Reference', 'Regional']",Computers
+366,['Reference'],Computers
+394,"['Business', 'Recreation', 'Society']",Computers
+430,['Shopping'],Computers
+446,"['Business', 'Computers', 'Games', 'Kids']",Sports
+491,"['Business', 'Computers']",Games
+564,"['Business', 'Health', 'News']",Science
+579,"['Business', 'Reference']",Health
+628,"['Business', 'Computers', 'Regional']",Health
+644,"['News', 'Recreation']",Health
+703,['Home'],Regional
+706,['Home'],Recreation
+716,['Business'],Home
+730,"['Business', 'Recreation']",Home
+741,"['Business', 'News', 'Recreation']",Home
+782,"['Business', 'Society']",Home
+792,"['Business', 'Computers', 'Reference', 'Science']",Home
+804,"['Business', 'Computers', 'Regional']",Home
+822,"['Regional', 'Science']",Kids
+835,"['Computers', 'Science']",Kids
+843,['Science'],Kids
+844,['Business'],Kids
+847,['Shopping'],Recreation
+856,"['Kids', 'Science']",Reference
+862,"['Business', 'Computers', 'Reference', 'Regional']",Kids
+869,"['Business', 'Computers']",Kids
+889,"['Arts', 'Business', 'News', 'Recreation']",Kids
+923,"['Business', 'Reference', 'Regional']",Society
+929,"['Arts', 'Business', 'News', 'Recreation', 'Regional']",Society
+975,"['Business', 'Regional', 'Society']",News
+995,"['News', 'Recreation']",Regional
+1002,"['Arts', 'Business', 'Regional', 'Sports']",News
+1010,"['Business', 'Reference', 'Regional', 'Society']",News
+1026,"['Business', 'Regional']",News
+1034,"['Arts', 'Business', 'Games', 'Recreation']",Home
+1076,"['Business', 'Society']",News
+1167,"['Arts', 'Society']",Recreation
+1213,"['Arts', 'Business', 'Society']",Reference
+1288,"['Business', 'Computers', 'Regional', 'Society']",Reference
+1325,['Computers'],Reference
+1379,['Business'],Regional
+1382,['Regional'],Shopping
+1422,"['Business', 'News', 'Reference', 'Regional', 'Society']",Science
+1454,"['Regional', 'Science']",Reference
+1461,"['Business', 'Health']",Science
+1513,['Arts'],Shopping
+1542,"['Business', 'Recreation']",Shopping
+1584,"['Business', 'Recreation']",Shopping
+1627,"['Arts', 'Recreation', 'Reference']",Society
+1628,"['Health', 'Regional']",Society
+1635,"['Business', 'Recreation', 'Regional', 'Science']",Society
+1638,"['Business', 'Recreation']",Regional
+1717,"['Business', 'Recreation', 'Reference']",Society
+1793,['Recreation'],Sports
+1800,['Business'],Sports
+1823,"['Arts', 'Business', 'Computers']",Sports
+1856,"['Business', 'Recreation', 'Regional', 'Society']",Adult
+1868,['Arts'],Adult
+1906,"['Arts', 'Business', 'Computers', 'News', 'Recreation', 'Reference']",Adult
+1939,"['Arts', 'Computers', 'News', 'Recreation', 'Reference']",Adult
+1976,"['Arts', 'News', 'Reference', 'Regional', 'Society']",Adult
+2036,"['Arts', 'Recreation', 'Regional']",Adult
+2084,"['Business', 'Computers', 'Recreation']",Adult
+2202,"['Business', 'Computers', 'Regional']",Adult
+2296,"['Business', 'Health']",Adult
+2357,"['Business', 'Recreation', 'Regional']",Adult
+2360,"['Arts', 'Business', 'News', 'Recreation', 'Reference']",Adult
+2411,"['Business', 'Computers']",Adult
+2432,"['Arts', 'Business', 'Recreation', 'Regional']",Adult
+2472,"['Business', 'Recreation']",Adult
+2481,['Recreation'],Adult
+2525,['Business'],Adult
+2583,['Shopping'],Adult
+2611,"['Business', 'Shopping']",Adult
+2622,"['Business', 'Computers', 'Shopping']",Adult
+2625,"['Arts', 'Business', 'Recreation']",Adult
+2634,"['Arts', 'Recreation']",Adult
+2647,"['Business', 'Health', 'Recreation', 'Society']",Adult
+2667,"['Business', 'Recreation', 'Society']",Adult
+2678,"['Business', 'News', 'Reference', 'Regional', 'Society']",Science
+2703,['Arts'],Adult
+2857,"['Business', 'Computers', 'Games', 'Recreation']",Arts
+2896,['Reference'],Arts
+2943,['Recreation'],Arts
+3013,"['Kids', 'Recreation', 'Reference']",Arts
+3094,"['Business', 'Recreation', 'Reference', 'Regional']",Kids
+3246,['Arts'],Kids
+3255,"['Health', 'Science']",Arts
+3340,['Games'],Arts
+3398,"['Business', 'Recreation', 'Reference', 'Regional']",Arts
+3435,['Shopping'],Arts
+3493,"['Recreation', 'Society']",Arts
+3494,"['Business', 'Recreation']",Arts
+3522,"['Business', 'Computers', 'Recreation', 'Regional']",Science
+3584,"['Business', 'Health', 'Recreation']",Arts
+3801,"['Computers', 'Reference']",Arts
+3890,['Business'],Arts
+3959,['Health'],Arts
+4235,"['Computers', 'Games', 'Recreation']",Arts
+4384,"['Arts', 'Society']",News
+4693,"['Business', 'Computers', 'Games', 'Recreation']",Arts
+4699,['Shopping'],Arts
+4736,"['Business', 'News']",Arts
+4811,['Home'],Arts
+4840,"['Games', 'Recreation', 'Reference']",Arts
+5223,['Shopping'],Arts
+5242,['Arts'],Kids
+5567,['Recreation'],Arts
+5675,['Computers'],Arts
+5678,"['Business', 'Recreation', 'Science']",Arts
+5723,['Shopping'],Arts
+5756,"['Arts', 'Science']",Reference
+5926,"['Arts', 'Recreation', 'Science']",Kids
+5932,"['Business', 'Computers', 'Sports']",Arts
+5964,['Games'],Arts
+5990,"['Business', 'Recreation']",Arts
+6007,"['Business', 'Science']",News
+6171,"['Recreation', 'Science']",Business
+6235,"['Recreation', 'Science']",Business
+6298,"['News', 'Science']",Business
+6332,['Home'],Business
+6335,"['Recreation', 'Science']",Business
+6421,['Shopping'],Business
+6497,['Shopping'],Business
+6511,['Recreation'],Business
+6570,['Health'],Business
+6614,"['Health', 'Shopping']",Business
+6625,['Science'],Business
+6725,['Shopping'],Business
+6726,['Arts'],Business
+6733,"['Arts', 'Shopping']",Business
+6739,"['Computers', 'Science']",Business
+6935,"['Recreation', 'Regional']",Business
+6944,['Shopping'],Business
+6951,"['Computers', 'Science']",Business
+7119,"['Science', 'Shopping']",Business
+7401,"['Computers', 'Shopping']",Business
+7678,"['Arts', 'Business', 'Recreation']",Science
+7967,"['Science', 'Shopping', 'Society']",Business
+8024,['Business'],Regional
+8030,"['Business', 'Society']",Regional
+8095,"['Recreation', 'Science']",Business
+8110,['Business'],Home
+8144,"['Recreation', 'Science']",Business
+8224,['Health'],Business
+8267,['Business'],Society
+8344,"['Regional', 'Science']",Business
+8358,['Shopping'],Business
+8426,['Business'],Home
+8614,['Shopping'],Business
+8915,"['Business', 'Computers', 'Science', 'Shopping']",Society
+8919,"['Business', 'Computers']",Regional
+9032,['Reference'],Business
+9115,"['Science', 'Shopping', 'Sports']",Business
+9132,"['News', 'Society']",Business
+9420,"['Computers', 'Science']",Business
+9580,"['News', 'Recreation', 'Science']",Business
+9582,"['News', 'Regional']",Business
+9585,"['News', 'Recreation']",Business
+9653,['Computers'],Business
+9725,"['Adult', 'Recreation']",Business
+9769,"['Computers', 'Reference']",Business
+9843,"['Arts', 'Society']",Business
+9845,['Computers'],Business
+9967,"['Adult', 'Recreation', 'Science']",Business
+9991,"['Recreation', 'Science', 'Shopping']",Business
+10062,"['Adult', 'Computers', 'Health']",Business
+10095,['Shopping'],Business
+10233,"['Computers', 'Reference', 'Science']",Business
+10258,['Regional'],Business
+10447,"['Reference', 'Shopping']",Business
+10451,['Computers'],Business
+10637,"['Business', 'Recreation', 'Reference']",Computers
+10642,"['Business', 'Reference', 'Science', 'Society']",Computers
+10722,['Science'],Computers
+10753,"['Business', 'Reference']",Computers
+10841,"['Business', 'Recreation', 'Reference']",Computers
+10889,"['Business', 'Games', 'Recreation', 'Shopping']",Computers
+10928,"['Business', 'Home', 'Regional', 'Society']",Computers
+10963,"['Business', 'Recreation', 'Reference', 'Science']",Computers
+11016,"['Arts', 'Business', 'Recreation', 'Reference']",Computers
+11047,"['Business', 'Recreation', 'Reference']",Computers
+11109,"['Arts', 'Games', 'Health', 'Recreation', 'Reference', 'Society']",Computers
+11145,"['Business', 'Reference', 'Science']",Computers
+11184,"['Reference', 'Science']",Computers
+11195,"['Business', 'Recreation', 'Science']",Computers
+11200,"['Business', 'Reference', 'Science']",Computers
+11207,"['Business', 'Reference', 'Science']",Computers
+11241,"['Business', 'Recreation', 'Reference', 'Regional', 'Science']",Computers
+11344,"['Business', 'Kids', 'Recreation', 'Reference', 'Regional']",Computers
+11554,"['Business', 'Recreation', 'Reference', 'Regional']",Computers
+11619,"['Business', 'Home', 'Recreation', 'Reference']",Computers
+11706,"['Business', 'News', 'Reference', 'Regional', 'Society']",Computers
+11756,"['Arts', 'Business', 'Kids']",Computers
+11892,"['Shopping', 'Society']",Computers
+11911,"['Arts', 'Home', 'Kids']",Computers
+11913,"['Arts', 'Business', 'Kids', 'Recreation']",Computers
+11918,"['Arts', 'Business', 'Home', 'Kids', 'Recreation', 'Reference', 'Regional']",Computers
+11962,"['Business', 'Recreation', 'Reference', 'Society']",Computers
+11991,"['Arts', 'Business', 'Kids', 'Recreation', 'Reference', 'Science']",Computers
+12084,"['Business', 'Recreation', 'Reference', 'Regional', 'Science']",Computers
+12159,['Business'],Computers
+12165,"['Business', 'Games', 'Regional']",Computers
+12181,"['Business', 'Health', 'Regional', 'Shopping']",Computers
+12183,"['Arts', 'Business', 'Kids', 'Reference', 'Regional']",Computers
+12200,"['Business', 'Health', 'Recreation', 'Science']",Computers
+12213,"['Arts', 'News', 'Recreation']",Health
+12215,"['Arts', 'Business', 'News', 'Recreation', 'Reference']",Computers
+12251,"['Business', 'Recreation', 'Reference', 'Regional', 'Science']",Computers
+12284,['Business'],Computers
+12288,"['Business', 'Reference', 'Regional']",Computers
+12374,"['Business', 'Health', 'Recreation']",Computers
+12497,"['Business', 'Recreation', 'Reference', 'Regional', 'Society']",Computers
+12522,['Business'],Computers
+12601,"['Business', 'Reference', 'Regional', 'Science']",Computers
+12698,"['Business', 'News', 'Reference', 'Regional', 'Society']",Computers
+12715,"['Business', 'Recreation', 'Reference', 'Regional']",Computers
+12729,"['Business', 'Recreation', 'Reference', 'Regional', 'Science']",Computers
+12781,"['Business', 'Recreation', 'Reference']",Computers
+12881,['Computers'],Science
+12890,"['Business', 'Computers', 'Recreation']",Science
+12894,"['Business', 'Computers']",Science
+12940,"['Business', 'Recreation', 'Reference', 'Shopping']",Computers
+12967,"['Business', 'Science']",Computers
+13052,"['Business', 'Health', 'Reference', 'Science', 'Society']",Computers
+13113,['Computers'],Regional
+13148,"['Business', 'Recreation', 'Reference', 'Regional']",Computers
+13156,"['Business', 'Recreation', 'Reference', 'Science']",Computers
+13200,"['Business', 'Recreation', 'Reference']",Computers
+13286,"['Arts', 'Games']",Computers
+13288,"['Business', 'Health', 'Regional']",Computers
+13320,"['Arts', 'Recreation']",Computers
+13336,"['Business', 'Recreation', 'Reference', 'Society']",Computers
+13436,"['Recreation', 'Reference', 'Regional']",Computers
+13451,"['Business', 'Health', 'Recreation', 'Reference', 'Science']",Computers
+13536,"['Business', 'Recreation', 'Reference', 'Science']",Computers
+13585,"['Business', 'Kids', 'Recreation']",Games
+13656,"['Business', 'Kids', 'Recreation', 'Reference', 'Science']",Games
+13810,"['Business', 'Kids', 'Recreation', 'Reference']",Games
+13844,"['Business', 'Shopping']",Games
+13858,"['Business', 'Computers', 'Recreation', 'Science']",Games
+13945,"['Business', 'Recreation', 'Regional']",Games
+13980,"['Business', 'Kids', 'Recreation', 'Reference', 'Regional']",Computers
+13990,"['Arts', 'Business', 'News', 'Recreation', 'Reference', 'Science']",Computers
+14030,"['Business', 'Recreation', 'Society']",News
+14033,"['Business', 'Recreation', 'Reference', 'Science', 'Shopping']",News
+14164,"['Arts', 'Business', 'Recreation', 'Society']",Games
+14206,['Business'],Games
+14215,"['Business', 'Recreation', 'Reference', 'Regional', 'Society']",Games
+14293,"['Arts', 'Recreation', 'Reference']",Games
+14310,['Computers'],Games
+14314,"['Business', 'Computers', 'Recreation', 'Reference', 'Science']",Games
+14329,"['Business', 'Games', 'Kids', 'Recreation', 'Reference']",Society
+14340,"['Business', 'Recreation', 'Reference', 'Regional']",Games
+14393,"['Business', 'Recreation', 'Shopping']",Games
+14396,"['Business', 'Recreation', 'Reference', 'Regional']",Games
+14554,"['Arts', 'Health', 'Recreation']",Games
+14635,"['Business', 'Shopping']",Games
+14657,"['Business', 'Computers', 'Recreation', 'Reference']",Games
+14724,"['Arts', 'Business', 'Computers', 'Home', 'Kids', 'Recreation']",Games
+14759,"['Computers', 'Recreation', 'Science']",Games
+14768,"['Business', 'Recreation', 'Society']",Games
+14852,"['Arts', 'News', 'Recreation']",Games
+14861,"['Arts', 'Business', 'Computers', 'Recreation']",Games
+15052,"['Business', 'Computers', 'Recreation']",Games
+15059,"['Business', 'Recreation', 'Reference', 'Regional']",Games
+15194,"['Business', 'Recreation', 'Reference']",Health
+15364,"['Arts', 'Business', 'Recreation', 'Reference']",Health
+15424,"['Business', 'Home']",Health
+15641,"['Arts', 'Recreation', 'Reference']",Health
+15642,"['Arts', 'Home']",Health
+15788,"['Health', 'Kids']",Society
+16066,['Health'],Sports
+16099,"['Business', 'Computers']",Health
+16372,['Health'],Society
+16375,['Kids'],Health
+16488,"['Business', 'Regional', 'Science']",Health
+16589,"['Arts', 'Reference']",Health
+16629,['Arts'],Health
+16782,"['Arts', 'Reference']",Health
+16944,"['Games', 'Reference']",Health
+17214,['Business'],Health
+17268,"['Computers', 'Home']",Health
+17302,"['Business', 'Science']",Health
+17418,"['Games', 'Regional']",Health
+17599,"['Arts', 'Computers', 'Games', 'Regional']",Health
+17937,"['Arts', 'Games', 'Reference']",Health
+18031,['Health'],Science
+18057,['Computers'],Shopping
+18178,"['Arts', 'Games', 'Health', 'Recreation']",Home
+18224,"['Reference', 'Science']",Home
+18229,"['Arts', 'Games', 'Shopping']",Home
+18294,['Business'],Home
+18348,['Home'],Kids
+18476,"['Arts', 'Games', 'Kids', 'Regional']",Home
+18686,['Regional'],Home
+18712,"['Arts', 'Games']",Home
+18717,"['Arts', 'Business', 'Games']",Home
+18885,"['Business', 'Computers', 'Reference']",Home
+18983,['Arts'],Kids
+19001,"['Arts', 'Games', 'Recreation']",Kids
+19032,['Computers'],Kids
+19040,"['Arts', 'Computers', 'Games', 'Home']",Kids
+19058,"['Games', 'Recreation']",Kids
+19067,['News'],Kids
+19094,"['Games', 'Recreation']",Kids
+19117,"['Games', 'Reference', 'Regional']",Kids
+19132,"['Arts', 'Games', 'Recreation', 'Sports']",Kids
+19174,"['Arts', 'Reference', 'Science']",Kids
+19175,"['Arts', 'Games', 'Recreation', 'Reference']",Kids
+19190,['Reference'],Kids
+19193,['Arts'],Kids
+19260,"['Arts', 'Games', 'Regional']",Kids
+19281,"['Games', 'Health']",Kids
+19350,['Reference'],Kids
+19353,"['Arts', 'Business']",Kids
+19354,"['Business', 'Home', 'Recreation']",Kids
+19355,"['Business', 'Reference', 'Regional']",Kids
+19360,"['Arts', 'Games', 'Recreation']",Kids
+19374,"['Arts', 'Recreation']",Kids
+19377,"['Arts', 'News', 'Recreation', 'Reference']",Society
+19406,"['Arts', 'Health']",Kids
+19420,"['Health', 'Recreation']",Kids
+19455,"['Arts', 'Home']",Kids
+19489,"['Arts', 'Games']",Kids
+19516,['Arts'],Kids
+19524,"['Reference', 'Regional']",Science
+19537,['Reference'],Kids
+19554,"['News', 'Science']",Kids
+19558,"['Computers', 'Games', 'Science']",Kids
+19565,['Recreation'],Kids
+19581,"['Health', 'Kids']",Science
+19588,['Sports'],Kids
+19626,"['Arts', 'Recreation', 'Reference', 'Science']",Kids
+19627,"['News', 'Recreation']",Sports
+19639,['Recreation'],Kids
+19642,"['Recreation', 'Shopping']",Kids
+19644,['Arts'],Kids
+19645,"['Games', 'Recreation']",Sports
+19679,"['Business', 'Health']",Kids
+19680,['Recreation'],Kids
+19704,"['Games', 'Recreation', 'Sports']",Kids
+19706,"['Arts', 'News', 'Recreation', 'Reference']",Kids
+19714,['Recreation'],Kids
+19721,"['Adult', 'Society']",Kids
+19722,"['Arts', 'Business', 'Kids', 'Reference', 'Science']",Society
+19728,"['Computers', 'Games']",Kids
+19773,['Reference'],Kids
+19774,['Business'],Kids
+19776,"['Arts', 'Games']",Kids
+19780,"['Games', 'Recreation', 'Regional']",Kids
+19789,"['Health', 'Home']",Kids
+19791,"['Games', 'Health', 'Recreation']",Kids
+19801,"['Health', 'Recreation']",Kids
+19811,"['Recreation', 'Regional']",Kids
+19858,['Recreation'],Kids
+19861,"['Arts', 'Games', 'Home']",Kids
+19862,['Home'],Kids
+19863,['Games'],Kids
+20071,"['Arts', 'Recreation']",News
+20113,"['Arts', 'Reference', 'Regional']",News
+20154,"['Business', 'Computers', 'Shopping']",News
+20182,"['Computers', 'Games']",News
+20214,"['Business', 'Home', 'Shopping']",Regional
+20216,"['Business', 'Science']",Society
+20266,['Computers'],Arts
+20269,"['Business', 'Regional']",Shopping
+20376,"['Arts', 'Health', 'Recreation']",Kids
+20473,['Arts'],News
+20486,"['Arts', 'Shopping', 'Sports']",News
+20490,"['Arts', 'Reference', 'Regional', 'Shopping']",News
+20498,['Computers'],News
+20549,['Games'],Society
+20654,"['Adult', 'Arts', 'Home', 'Recreation']",Health
+20668,['Business'],Health
+20885,['Arts'],News
+20904,"['Business', 'Home']",News
+20915,"['Business', 'Reference']",News
+20933,"['Business', 'Computers', 'Science']",News
+20973,"['Arts', 'Recreation']",News
+20978,['Arts'],News
+20996,"['Arts', 'Kids', 'Recreation']",News
+21022,"['Health', 'Recreation']",News
+21033,"['News', 'Recreation']",Society
+21068,"['Arts', 'Business', 'Health']",News
+21073,['Society'],News
+21099,"['Games', 'Kids']",News
+21103,"['Health', 'Kids']",News
+21105,"['Health', 'Kids']",News
+21131,['Arts'],News
+21150,"['Arts', 'Recreation']",News
+21152,"['Arts', 'Recreation']",News
+21153,"['Arts', 'Kids']",News
+21157,"['Business', 'Computers', 'Health']",News
+21197,"['Arts', 'Computers', 'Recreation']",News
+21223,['Computers'],News
+21228,['Health'],News
+21232,['Business'],News
+21332,['Arts'],News
+21420,"['Kids', 'Recreation']",News
+21545,"['Arts', 'Health', 'Kids']",Recreation
+22542,"['Business', 'Computers', 'Health']",Recreation
+22551,"['Arts', 'Games']",Recreation
+22622,"['Business', 'Shopping']",Recreation
+22688,['Kids'],Recreation
+22771,['Business'],Recreation
+22817,"['Health', 'Recreation']",Shopping
+23147,"['Computers', 'Kids']",Recreation
+23148,"['Computers', 'Kids']",Recreation
+24078,"['Computers', 'Kids']",Recreation
+24298,['Society'],Recreation
+24313,['Adult'],Recreation
+25410,['Society'],Reference
+25443,"['Business', 'Computers']",Reference
+25545,"['Business', 'Kids']",Reference
+25573,"['Business', 'Computers']",Reference
+25603,"['Business', 'Computers', 'Kids', 'Recreation']",Reference
+25688,['Kids'],Reference
+25695,"['Business', 'Computers']",Reference
+25793,"['Arts', 'Kids', 'Recreation']",Reference
+25796,['Kids'],Reference
+25826,"['Kids', 'Recreation']",Reference
+25847,"['Business', 'Computers', 'Science']",Reference
+25853,"['Arts', 'Health', 'Recreation']",Reference
+25909,"['Health', 'Kids', 'Recreation']",Reference
+25935,"['Business', 'Computers', 'Health']",Reference
+25969,"['Business', 'Computers']",Reference
+26100,[],Reference
+26158,"['Computers', 'Kids', 'Recreation']",Reference
+26173,['Computers'],Reference
+26174,['Computers'],Reference
+26243,"['Business', 'Computers', 'Recreation']",Reference
+26289,"['Kids', 'Recreation', 'Reference']",Science
+26332,"['Arts', 'Kids', 'Reference']",Society
+26371,"['Arts', 'Kids']",Reference
+26387,"['Business', 'Kids', 'Recreation']",Reference
+26455,"['Arts', 'Kids', 'Recreation']",Reference
+26478,"['Kids', 'Recreation']",Reference
+26497,"['Computers', 'Kids']",Reference
+26576,"['Kids', 'Recreation']",Reference
+26620,"['Business', 'Kids', 'Sports']",Regional
+26638,['News'],Regional
+26683,"['Business', 'Kids', 'Recreation']",Regional
+26866,"['Arts', 'Recreation']",Regional
+26880,['Regional'],Science
+26901,"['Kids', 'Recreation']",Regional
+26903,"['Business', 'Kids', 'Reference']",Regional
+26907,"['Arts', 'Kids', 'Recreation']",Regional
+26950,"['Kids', 'Recreation']",Regional
+26999,"['Kids', 'Recreation']",Science
+27070,"['Kids', 'Recreation']",Science
+27138,"['Health', 'Kids', 'Recreation']",Science
+27205,"['Kids', 'Recreation', 'Reference']",Society
+28505,['Kids'],Science
+28693,['Kids'],Science
+29264,['Recreation'],Shopping
+30346,['Kids'],Shopping
+32280,['Kids'],Shopping
+32542,['Kids'],Shopping
+32591,['Kids'],Shopping
+32611,['Kids'],Shopping
+33670,['Kids'],Shopping
+33710,[],Shopping
+34142,['Kids'],Shopping
+34316,[],Society
+34785,['Kids'],Society
+34867,['Kids'],Society
+35010,['Kids'],Society
+35684,"['Computers', 'Kids']",Society
+35856,[],Society
+36827,['Kids'],Society
+37848,['Kids'],Society
+39664,['Kids'],Sports
+41617,['Kids'],Sports
+43796,['Kids'],Computers
+44422,"['Business', 'Computers']",Society
+44435,"['Arts', 'Business', 'Kids']",Reference
+44575,['Kids'],Science
+45116,['Kids'],Adult
+45309,['Kids'],Adult
+45343,['Computers'],Health
+45347,['Kids'],Adult
+45391,"['Kids', 'Recreation']",Adult
+45419,['Kids'],Adult
+45501,"['Computers', 'Kids']",Arts
+45669,['Kids'],Arts
+45672,['Kids'],Arts
+45799,['Shopping'],Arts
+45853,['Kids'],Arts
+46014,"['Kids', 'Society']",Arts
+46329,['Kids'],Arts
+46603,['Kids'],Arts
+46617,['Kids'],Arts
+46760,['Kids'],Arts
+46963,['Kids'],Arts
+46999,['Kids'],Arts
+47389,"['Business', 'Computers']",Arts
+47400,['Health'],Arts
+47428,"['Computers', 'Kids']",Arts
+47438,['Sports'],Arts
+47580,"['Computers', 'Kids']",Arts
+47594,['Kids'],Arts
+47816,[],Business
+47948,"['Computers', 'Kids']",Business
+48119,['Kids'],Business
+48425,['Computers'],Business
+48544,['Kids'],Business
+49567,['Kids'],Business
+49614,['Kids'],Business
+49758,['Kids'],Business
+49838,['Kids'],Business
+50459,"['Kids', 'Recreation']",Business
+50643,['Kids'],Computers
+50740,['Kids'],Computers
+51298,['Kids'],Computers
+51630,['Kids'],Computers
+51782,['Kids'],Computers
+53323,['Kids'],Games
+53606,['Kids'],Games
+53787,['Kids'],Health
+54361,"['Kids', 'Recreation']",Health
+54464,['Kids'],Health
+56772,['Kids'],News
+56852,['Kids'],News
+57906,['Kids'],Reference
+58233,['Kids'],Science
+58361,['Kids'],Science
+58375,['Kids'],Science
+59182,['Kids'],Adult
+59200,['Kids'],Arts
+59208,['Kids'],Business
+59246,['Kids'],Games
+57909,['Kids'],Reference
+444,"['Arts', 'Computers', 'Kids', 'Recreation']",Games
+3080,['Kids'],Arts
+10,"['Arts', 'Recreation']",Adult
+44,"['Health', 'Kids']",Adult
+193,['Business'],Arts
+200,['Arts'],Regional
+249,"['Arts', 'Computers']",Business
+294,"['Business', 'Computers', 'Kids']",Regional
+297,['News'],Business
+306,['Shopping'],Business
+307,['Arts'],Business
+349,['Home'],Business
+360,"['Business', 'Computers']",Regional
+436,"['Games', 'Kids']",Regional
+438,"['Arts', 'Kids', 'Recreation']",Games
+725,"['Arts', 'Computers', 'Kids']",Home
+765,"['Home', 'Society']",Science
+816,"['Business', 'Computers']",Kids
+824,['Computers'],Kids
+827,['Science'],Kids
+831,['Society'],Kids
+832,"['Business', 'Computers']",Kids
+851,['Kids'],Science
+852,"['Arts', 'Business', 'Computers']",Kids
+861,"['Business', 'Reference', 'Regional', 'Science']",Kids
+884,"['Regional', 'Shopping', 'Society']",Kids
+885,"['Arts', 'Recreation', 'Regional']",Science
+886,"['Business', 'Society']",Kids
+906,['Computers'],Kids
+966,['Arts'],News
+1097,"['Arts', 'Computers']",Recreation
+1115,"['Arts', 'Business', 'Shopping']",Recreation
+1121,['Regional'],Recreation
+1221,"['Business', 'Reference', 'Science']",Shopping
+1254,"['Business', 'Health', 'Science']",Reference
+1295,['Arts'],Reference
+1320,"['Business', 'Reference', 'Science']",Society
+1374,"['Business', 'Shopping', 'Society']",Regional
+1467,"['Business', 'Society']",Regional
+1468,"['Business', 'Science']",Society
+1527,['Shopping'],Regional
+1633,"['Arts', 'Business']",Society
+1649,"['Business', 'Games']",Society
+1809,"['Arts', 'Recreation', 'Shopping']",Sports
+1885,"['Arts', 'Shopping']",Adult
+2075,"['Business', 'Regional', 'Shopping', 'Society']",Recreation
+2665,"['Business', 'Regional', 'Shopping', 'Society']",Adult
+2749,"['Games', 'Kids', 'Shopping', 'Society', 'Sports']",Arts
+3158,"['Adult', 'Shopping']",Arts
+3402,"['Business', 'Shopping', 'Society']",Arts
+3414,['Adult'],Arts
+3543,"['Shopping', 'Society']",Arts
+3817,"['Business', 'Regional', 'Shopping']",Arts
+4186,"['Business', 'Recreation', 'Shopping']",Arts
+4403,"['Business', 'Regional', 'Shopping']",Arts
+4966,"['Regional', 'Shopping', 'Society']",Arts
+5401,"['Business', 'Shopping']",Arts
+5434,"['Regional', 'Shopping']",Arts
+2,"['Regional', 'Shopping', 'Society']",Adult
+18,"['Business', 'Shopping', 'Society']",Arts
+1610,['Business'],Shopping
+1900,"['Business', 'Shopping', 'Sports']",Adult
+2573,"['Arts', 'Business', 'Shopping']",Adult
+2596,"['Business', 'Shopping']",Adult
+3067,"['Shopping', 'Society']",Arts
+3203,"['Business', 'Shopping', 'Society', 'Sports']",Arts
+3420,"['Business', 'Shopping']",Arts
+3456,['Business'],Arts
+3685,"['Regional', 'Shopping', 'Society', 'Sports']",Arts
+3738,"['Regional', 'Shopping', 'Society']",Arts
+4180,"['Business', 'Shopping', 'Society', 'Sports']",Arts
+4685,"['Business', 'Shopping', 'Society']",Arts
+4806,"['Business', 'Shopping']",Arts
+4850,"['Shopping', 'Society']",Arts
+5913,"['Business', 'Regional', 'Shopping', 'Society', 'Sports']",Recreation
+24939,"['Business', 'Shopping', 'Society', 'Sports']",Recreation
+43793,"['Regional', 'Shopping', 'Society', 'Sports']",Computers
+44731,['Business'],Society
+45038,"['Regional', 'Shopping', 'Society', 'Sports']",Adult
+45890,"['Business', 'Shopping', 'Society', 'Sports']",Arts
+46337,"['Shopping', 'Society', 'Sports']",Arts
+46501,"['Shopping', 'Society', 'Sports']",Arts
+46812,"['Business', 'Regional', 'Shopping', 'Society']",Arts
+46966,"['Shopping', 'Society', 'Sports']",Arts
+46991,"['Shopping', 'Society']",Arts
+47480,"['Regional', 'Shopping', 'Society', 'Sports']",Arts
+48802,['Health'],Business
+48856,"['Business', 'Shopping', 'Society']",Regional
+48965,['Shopping'],Business
+49391,['Business'],Regional
+49570,"['Computers', 'Reference']",Business
+49798,['Society'],Business
+49804,"['Arts', 'Business']",News
+50013,['Arts'],Business
+50028,['Business'],Society
+50155,"['Regional', 'Shopping', 'Society']",Business
+50281,"['Computers', 'Shopping']",Business
+50305,['Computers'],Business
+50335,"['Computers', 'Regional', 'Shopping']",Business
+50487,['Shopping'],Business
+50615,"['Regional', 'Shopping', 'Society']",Computers
+51282,['Society'],Computers
+51384,"['Arts', 'Shopping']",Computers
+51395,"['Games', 'Shopping', 'Sports']",Computers
+51449,"['Arts', 'Recreation', 'Shopping', 'Sports']",Computers
+51566,"['Regional', 'Shopping', 'Society']",Computers
+51776,['Business'],Computers
+51804,"['Arts', 'Shopping', 'Society']",Computers
+51816,"['Arts', 'Computers']",Reference
+51893,"['Business', 'Shopping', 'Society']",Computers
+51917,['Arts'],Computers
+51932,"['Arts', 'Society']",Computers
+52228,"['Business', 'Shopping', 'Society']",Computers
+52285,"['Business', 'Computers']",Science
+52402,"['Health', 'Society']",Computers
+52450,['Business'],Computers
+52578,"['Business', 'Shopping', 'Society']",Computers
+52852,['Shopping'],Games
+52903,['Society'],Games
+52956,"['Regional', 'Shopping', 'Society', 'Sports']",Games
+52993,"['Business', 'Shopping', 'Sports']",Games
+53004,"['Business', 'Shopping', 'Society', 'Sports']",Games
+53014,"['Business', 'Shopping', 'Society', 'Sports']",Games
+53016,"['Shopping', 'Sports']",Games
+53017,"['Business', 'Shopping', 'Society', 'Sports']",Games
+53029,['Sports'],Games
+53037,"['Shopping', 'Society', 'Sports']",Games
+53055,"['Computers', 'Society']",Games
+53185,"['Arts', 'Shopping', 'Society', 'Sports']",Games
+53186,"['Regional', 'Shopping', 'Society', 'Sports']",Games
+53213,"['Recreation', 'Shopping']",Games
+53250,"['Arts', 'Recreation']",Games
+53349,['Society'],Games
+53361,"['Home', 'Recreation']",Games
+53746,['Science'],Health
+53821,"['Business', 'Shopping', 'Society']",Health
+53862,"['Reference', 'Science', 'Society']",Health
+53911,"['Recreation', 'Science', 'Society']",Health
+53923,"['Business', 'Society']",Health
+53984,"['Kids', 'Recreation', 'Science', 'Society']",Health
+54006,"['Recreation', 'Shopping', 'Society']",Health
+54137,"['Recreation', 'Shopping']",Health
+54191,"['Games', 'Recreation', 'Society']",Health
+54213,['Business'],Health
+54343,"['Games', 'Recreation', 'Society']",Health
+54359,"['Games', 'Recreation', 'Science', 'Society']",Health
+54377,"['Health', 'Society']",Science
+54453,"['Business', 'Recreation', 'Shopping']",Health
+54460,"['Business', 'Science', 'Society']",Health
+54601,"['Games', 'Kids']",Health
+54684,"['Games', 'Recreation', 'Science', 'Shopping', 'Society']",Health
+54701,"['Business', 'Reference', 'Science']",Health
+54758,"['Business', 'News', 'Recreation', 'Science', 'Society']",Health
+54767,"['Business', 'Kids', 'Society']",Health
+54878,"['Business', 'Recreation', 'Science', 'Sports']",Health
+55027,"['Science', 'Society']",Health
+55068,"['Business', 'Science', 'Society']",Health
+55187,"['Recreation', 'Society']",Home
+55388,"['Arts', 'Science', 'Society']",Health
+55405,['Society'],Health
+55416,"['Games', 'Recreation', 'Society']",Health
+55423,"['Business', 'Kids', 'Society']",Health
+55451,['Home'],Health
+55482,"['Games', 'Recreation', 'Society']",Health
+55505,"['Business', 'Games', 'Recreation', 'Society']",Home
+55508,"['Computers', 'Recreation', 'Reference', 'Shopping', 'Society']",Home
+55513,"['Arts', 'Games', 'Recreation', 'Society']",Home
+55532,"['Games', 'Recreation', 'Society']",Home
+55585,['Home'],Recreation
+55696,"['Business', 'Shopping', 'Society']",Home
+55702,"['Games', 'News', 'Recreation', 'Science']",Home
+55712,['Health'],Home
+55746,['Home'],Science
+55761,"['Business', 'Science', 'Society']",Home
+55765,"['Recreation', 'Society', 'Sports']",Home
+55789,"['Health', 'Science', 'Society']",Home
+55798,['Recreation'],Home
+55829,"['Games', 'Recreation', 'Shopping', 'Society']",Home
+55841,"['Recreation', 'Regional', 'Sports']",Home
+55865,['Shopping'],Home
+55913,"['Business', 'Recreation', 'Society']",Home
+55923,['Health'],Home
+55969,"['Health', 'Society']",Home
+56000,"['Games', 'Recreation', 'Science', 'Society']",Home
+56004,"['Games', 'Health', 'Society']",Home
+56021,"['Games', 'Recreation', 'Society']",Home
+56056,"['Health', 'Society']",Home
+56059,"['Games', 'Recreation', 'Science', 'Society']",Home
+56062,"['Games', 'Recreation', 'Society']",Home
+56070,['Shopping'],Home
+56090,['Arts'],Kids
+56118,"['Arts', 'Health', 'Recreation', 'Sports']",Kids
+56138,"['Arts', 'Shopping', 'Society']",Kids
+56140,"['Games', 'Recreation', 'Shopping', 'Society']",Kids
+56188,"['Science', 'Society']",Kids
+56190,"['Computers', 'Science', 'Society']",Kids
+56202,"['Games', 'Recreation', 'Society']",Kids
+56204,"['Games', 'Recreation', 'Society']",Kids
+56220,"['Games', 'Recreation', 'Science', 'Society']",Kids
+56261,"['Games', 'Recreation', 'Society']",Kids
+56278,"['Business', 'Recreation', 'Shopping', 'Society']",Kids
+56281,"['Arts', 'Reference', 'Society']",Kids
+56282,"['Arts', 'Recreation', 'Reference', 'Society']",Kids
+56292,"['Arts', 'Society']",Kids
+56298,"['Arts', 'Recreation', 'Society']",Kids
+56725,"['Games', 'Recreation', 'Reference', 'Science', 'Society']",News
+56788,"['Recreation', 'Science', 'Shopping', 'Society']",News
+56808,"['Games', 'Recreation', 'Society']",News
+56828,"['Society', 'Sports']",News
+56856,"['Games', 'Recreation', 'Science', 'Society']",News
+56864,"['Business', 'Society']",News
+56866,"['Arts', 'Society']",News
+56883,"['Recreation', 'Society']",News
+56921,"['Recreation', 'Science', 'Society']",News
+56929,['Shopping'],News
+56949,"['Games', 'Recreation', 'Science', 'Society']",News
+57050,['Society'],Recreation
+57150,"['Business', 'Sports']",Recreation
+57829,"['Recreation', 'Shopping', 'Society']",Reference
+57844,"['Recreation', 'Society', 'Sports']",Reference
+57860,"['Arts', 'Society']",Reference
+57943,"['Computers', 'Games', 'Recreation', 'Science', 'Society']",Reference
+57953,"['Games', 'Recreation', 'Society']",Reference
+57962,"['Business', 'Games', 'Recreation', 'Science', 'Society']",Reference
+57978,"['Games', 'Recreation', 'Science', 'Shopping', 'Society']",Reference
+58042,"['Computers', 'Games', 'Recreation', 'Society']",Reference
+58075,"['Business', 'Recreation', 'Sports']",Regional
+58083,"['Business', 'Recreation']",Regional
+58088,"['Society', 'Sports']",Regional
+58110,['Computers'],Regional
+58218,"['Recreation', 'Society', 'Sports']",Science
+58245,"['Society', 'Sports']",Science
+58257,"['Computers', 'Health', 'Sports']",Science
+58337,"['News', 'Shopping', 'Society']",Science
+58393,"['Adult', 'Health', 'Home', 'News']",Science
+58431,"['Business', 'Recreation', 'Shopping', 'Society']",Science
+58434,"['Home', 'News', 'Society']",Science
+58439,"['Computers', 'Recreation']",Science
+58621,"['Business', 'Home']",Shopping
+58685,"['Games', 'Recreation', 'Science', 'Society']",Shopping
+58717,['Recreation'],Shopping
+58737,"['Games', 'Recreation', 'Science', 'Society']",Shopping
+59193,"['Games', 'Recreation', 'Science', 'Society']",Arts
+47397,"['Computers', 'Society']",Arts
+4238,"['Games', 'Recreation']",Arts
+56838,"['Health', 'Science', 'Society']",News

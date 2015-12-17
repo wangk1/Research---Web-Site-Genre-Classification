@@ -20,8 +20,8 @@ def recall(res_path,classifiers,secondary_identifier):
 
 if __name__ == "__main__":
     res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000"
-    classifiers=["LogisticRegression"]
-    secondary_identifier="no_region_kids"
+    classifiers=["kNN"]
+    secondary_identifier=""
 
     rec=recall(res_path,classifiers,secondary_identifier)
 

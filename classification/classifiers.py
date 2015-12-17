@@ -55,6 +55,8 @@ class Classifier:
                                                                                                train_set.y.shape[0]))
             classifier.fit(train_set.X,train_set.y)
 
+            classifier_logger.info("Fitting done, predicting with test set")
+
             res,res_prob_list=classifier\
                     .predict_multi(test_set.X)
 
@@ -124,7 +126,7 @@ class BaseClassifier:
         self.threshold=threshold
         self.ll_ranking=ll_ranking
 
-    def predict_multi(self, X):
+    def predict_multi(self, X,predictions_per_stack=1500):
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
 
@@ -136,29 +138,38 @@ class BaseClassifier:
 
         if self.ll_ranking:
             #get the best class based on log likelihood
-            predictions=self.predict_proba(X)
-            indexes=np.argsort(predictions)
+            predictions_classes=self.predict_proba(X)
+            indexes=np.argsort(predictions_classes)
             best_value_indexes=indexes[:,-1:].reshape(-1)
             res_classes=[]
-            best_values=predictions[list(range(0,best_value_indexes.shape[0])),best_value_indexes]
+            best_values=predictions_classes[list(range(0,best_value_indexes.shape[0])),best_value_indexes]
 
-            for c,row in enumerate(predictions):
+            for c,row in enumerate(predictions_classes):
                 res_classes.append(self.classes_[[c for c,ll in enumerate(row) if best_values[c]-ll<=self.threshold]])
 
         else:
             assert self.threshold<self.classes_.shape[0]
 
-            predictions=self.predict_proba(X)
-            top_x_indexes=np.argsort(predictions)[:,:-(self.threshold+1):-1]
+            predictions_classes=None
+            for c,r in enumerate(range(0,X.shape[0],predictions_per_stack)):
+                print("On Stack {}".format(c))
 
-            res_classes=self.classes_[top_x_indexes]
+                X_slice=X[r:r+predictions_per_stack if r+predictions_per_stack<X.shape[0] else X.shape[0]]
+                prediction=self.predict_proba(X_slice)
+                top_x_indexes=np.argsort(prediction)[:,:-(self.threshold+1):-1]
+
+                res_classes=self.classes_[top_x_indexes]
+
+                predictions_classes=np.vstack((predictions_classes,res_classes)) if predictions_classes is not None else res_classes
+
+        print("Total number of predictions: {}".format(predictions_classes.shape[0]))
 
         class_to_prob_list=[]
         #construction a list of dictionary of classes to their likelihood values
-        for p_row in predictions:
-            class_to_prob_list.append({c:p for (p,c) in zip(p_row,self.classes_)})
+        #for p_row in predictions:
+            #class_to_prob_list.append({c:p for (p,c) in zip(p_row,self.classes_)})
 
-        return res_classes,class_to_prob_list
+        return predictions_classes,class_to_prob_list
 
 
 class LogisticRegression(LR,BaseClassifier):

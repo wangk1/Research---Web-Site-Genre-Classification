@@ -1,0 +1,4 @@
+Top Level Folder Specifies the Conditions under which training and testing is performed
+
+It is in this format:
+<(attribute type)>_<unsupervised|supervised>_<(attribute selection technique)>_top<number><cls|ll>_<(special note)>_<number of attributes>
