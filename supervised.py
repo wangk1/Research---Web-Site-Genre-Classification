@@ -31,8 +31,8 @@ ignore_genre={
     "url",
     "genres",
     "Kids_and_Teens",
-    "Kids",
-    "Regional"
+    #"Kids",
+    #"Regional"
 }
 
 genre_dict={'Sports': 8757,
@@ -151,27 +151,27 @@ if __name__=="__main__":
     #
     # map_urlAllGram(genre_dict)
 
-    res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res"
-    pickle_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
+    res_dir="classification_res"
+    pickle_dir="pickle_dir"
 
     #CLASSIFICATION SETTINGS
     settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
-    settings.result_file_label="no_region_kids"
+    settings.result_file_label=""
     threshold=4
     ll_ranking=False
-    num_attributes={10000}
+    num_attributes={50000}
 
     train_set_size=50000
     random_pick_test_training=False
 
 
     #ENTIRE DATA SET
-    X=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\X_summary_pickle")
-    y=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle")
+    X=unpickle_obj("pickle_dir\\X_summary_pickle")
+    y=unpickle_obj("pickle_dir\\y_summary_pickle")
     #normalize genres
     y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
-    ref_indexes=unpickle_obj("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\refIndex_summary_pickle")
+    ref_indexes=unpickle_obj("pickle_dir\\refIndex_summary_pickle")
 
     #filter out unwanted genres
     X,y,ref_indexes=filter_genres(X,y,ref_indexes)

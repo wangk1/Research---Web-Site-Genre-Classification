@@ -36,7 +36,7 @@ class Classifier:
     """
     def __init__(self):
         self.csv_indexes=["ref id","Predicted","Actual"] #output csv column labels
-        self.res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\supervised"
+        self.res_dir="classification_res\\supervised"
 
 
     def classify(self,learn_settings,train_set,test_set,classifiers,increment=500):
