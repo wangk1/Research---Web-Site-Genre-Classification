@@ -31,8 +31,8 @@ ignore_genre={
     "url",
     "genres",
     "Kids_and_Teens",
-    #"Kids",
-    #"Regional"
+    "Kids",
+    "Regional"
 }
 
 genre_dict={'Sports': 8757,
@@ -157,7 +157,7 @@ if __name__=="__main__":
     #CLASSIFICATION SETTINGS
     settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
-    settings.result_file_label=""
+    settings.result_file_label="no_region_kids"
     threshold=4
     ll_ranking=False
     num_attributes={10000}
