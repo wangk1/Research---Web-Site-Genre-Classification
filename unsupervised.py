@@ -14,8 +14,8 @@ from util.Logger import Logger
 from util.base_util import normalize_genre_string
 import os
 
-PICKLE_DIR="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
-UNSUPERVISED_DIR="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\unsupervised"
+PICKLE_DIR="pickle_dir"
+UNSUPERVISED_DIR="classification_res\\unsupervised"
 
 def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
     clustering_logger.info("Unsupervised Algorithm training size: {}".format(train_set.X.shape))
