@@ -8,6 +8,8 @@ import collections as coll
 import numpy as np
 import matplotlib.pyplot as plt
 from analytics.graphics import subplot_four_corner,plot_word_frequency
+from sklearn.preprocessing import MultiLabelBinarizer
+from data.util import flatten_training
 
 import sklearn.metrics.pairwise as pw
 
@@ -88,10 +90,17 @@ class Clustering:
 
         assert hasattr(feature_selector,"transform")
 
+
         clustering_logger.info("Pre feature selection: num features: {}".format(data_set.X.shape[1]))
 
         if fit:
+            X,y,ref_id=data_set.X,data_set.y,data_set.ref_indexes
+
+            flatten_training(data_set)
             feature_selector.fit(data_set.X,data_set.y)
+
+            data_set.X,data_set.y,data_set.ref_indexes=X,y,ref_id
+
 
         train_X=feature_selector.transform(data_set.X)
 

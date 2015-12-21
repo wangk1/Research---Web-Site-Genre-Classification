@@ -10,6 +10,7 @@ from unsupervised.clustering import Clustering
 from unsupervised.graph_cut.graph_cut import *
 from sklearn.feature_selection import SelectKBest,chi2
 from util.Logger import Logger
+from sklearn.preprocessing import MultiLabelBinarizer
 
 from util.base_util import normalize_genre_string
 import os
