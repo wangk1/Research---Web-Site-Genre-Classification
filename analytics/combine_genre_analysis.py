@@ -3,11 +3,12 @@ __author__ = 'Kevin'
 import collections as coll
 import operator as op
 import itertools as it
-import analytics.graphics as graphics
 
-from classification.classification_res import RightResultsIter,WrongResultsIter
-from analytics.graphics import plot_word_frequency,save_fig
 from matplotlib import pyplot
+
+import analytics.graphics as graphics
+from analytics.classification_results.res_iterator import RightResultsIter,WrongResultsIter
+from analytics.graphics import plot_word_frequency,save_fig
 
 
 def single_class_mispredition_freq(res_path):

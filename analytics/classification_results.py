@@ -1,10 +1,11 @@
-import itertools
-
 __author__ = 'Kevin'
-import os,re,collections,operator
-from util.Logger import Logger
+import os
+import re
+import collections
+import operator
+
 from analytics.graphics import plot_word_frequency,save_fig
-from classification.classification_res import WrongResultsIter, ClassificationResultInstance
+from analytics.classification_results.res_iterator import WrongResultsIter, ClassificationResultInstance
 
 WrongPrediction=collections.namedtuple("WrongPrediction",("ref_id","actual","predicted","classifier"))
 def get_wrongly_predicted_samples(filepath):

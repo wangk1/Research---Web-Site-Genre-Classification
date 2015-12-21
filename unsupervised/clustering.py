@@ -1,9 +1,13 @@
+from matplotlib.backends.backend_pdf import PdfPages
+
 __author__ = 'Kevin'
 
 
 import os,operator as op
 import collections as coll
-
+import numpy as np
+import matplotlib.pyplot as plt
+from analytics.graphics import subplot_four_corner,plot_word_frequency
 
 import sklearn.metrics.pairwise as pw
 
@@ -95,5 +99,37 @@ class Clustering:
 
         data_set.X=train_X
 
+    def generate_cluster_distribution_graphs(self,res_file,occurence_dict,res_labels):
+        """
+        Generate graphics of each cluster and the genre distribution from the occurence dictionary of genre in each
+            cluste, res_labels for the training set, and save the graph to the res_file
 
+        :param res_file:
+        :param occurence_dict:
+        :param res_labels:
+        :return:
+        """
+        with PdfPages(res_file) as pdf:
+            plt_num=0
+            save_fig=False
+            figure=None
+            for cluster_name,cluster_genre_freq in occurence_dict.items():
 
+                save_fig=True
+                last_plt,figure=subplot_four_corner(plt_num)
+
+                #axis=plt.subplot(1,1,plt_num)
+                num_samples=np.sum(res_labels==cluster_name)
+                print("Total number of samples in cluster {} is {}".format(cluster_name,num_samples))
+
+                plot_word_frequency("cluster {}, num samples: {}".format(cluster_name,num_samples),
+                                    cluster_genre_freq)
+                plt_num+=1
+                if last_plt:
+                    save_fig=False
+                    pdf.savefig(figure)
+                    plt.close()
+
+            if figure is not None and save_fig:
+                pdf.savefig(figure)
+                plt.close()

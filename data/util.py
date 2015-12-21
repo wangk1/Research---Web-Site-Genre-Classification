@@ -6,6 +6,7 @@ import scipy.sparse as sp
 import pickle,itertools
 
 from sklearn.feature_extraction import DictVectorizer
+from util.base_util import normalize_genre_string
 
 from util.Logger import Logger
 
@@ -121,6 +122,19 @@ def flatten_training(train_set):
     train_set.y=np.array(new_y)
     train_set.ref_indexes=np.array(new_ref_id)
 
+def normalizer(y,level=1):
+    """
+    Utility function for automatically normalizing a vector of list or a vector of genres to level @param level.
 
+    Note that this function is not in place, a new object is created
+    :param y:
+    :param level:
+    :return:
+    """
+    if np.issubdtype(y.dtype,np.str):
+        new_y=np.array([normalize_genre_string(i,level) for i in y])
 
+    else:
+        new_y=np.array([list(set(normalize_genre_string(g,level) for g in y_list))  for y_list in y])
 
+    return new_y

@@ -1,7 +1,11 @@
+import itertools
 from data.util import unpickle_obj
 from util.base_util import normalize_genre_string
 from analytics.graphics import add_bar_plot
 from data import bad_genre_set
+from tabulate import tabulate
+from data.util import normalizer
+import numpy as np
 
 import matplotlib.pyplot as plt
 import operator as op
@@ -10,6 +14,33 @@ import collections as coll
 
 __author__ = 'Kevin'
 
+def tabulate_genre_dist(y,normalize_to_level=1):
+    """
+    Takes a vector of lists of genres and tabulate the distribution of each genre in the dataset
+
+    Prints to console a ascii table of the distribution with count and percentage
+
+    :param y:
+    :return:
+    """
+    genre_to_count=coll.Counter()
+
+    y=normalizer(y,normalize_to_level)
+
+    if np.issubdtype(y.dtype,np.str):
+        genre_to_count.update(y)
+        total=y.shape[0]
+
+    else:
+        genre_to_count.update((i for i in itertools.chain(*y)))
+        total=sum((len(i) for i in y))
+
+    headers=["genre","count","percent"]
+
+
+    data=[headers].extend([[k,v,v/total] for k,v in genre_to_count.items()])
+
+    print(tabulate(data,headers="firstrow"))
 
 def num_genre_per_webpage(matrix_path):
     """

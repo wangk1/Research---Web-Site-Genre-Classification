@@ -1,13 +1,11 @@
 import collections
 import os
-import re,operator
+import operator
 
-
-from classification.classification_res import get_classification_res, RightResultsIter,WrongResultsIter,ClassificationResultInstance
+from analytics.classification_results.res_iterator import get_classification_res, RightResultsIter,WrongResultsIter,ClassificationResultInstance
 from db.db_model.mongo_websites_models import URLBow
 from util.base_util import normalize_genre_string
 from util.Logger import Logger
-
 
 __author__ = 'Kevin'
 

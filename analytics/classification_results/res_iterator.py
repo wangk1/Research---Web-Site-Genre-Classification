@@ -158,7 +158,16 @@ def default_right_comp(pred,actual):
     :return:
     """
 
-    return pred[0] in actual
+    return pred in actual
+
+def default_pred_transformer(pred):
+    """
+    Default transformer for predictions, we only want the top prediction to compare with actual.
+
+    :param pred:
+    :return:
+    """
+    return pred[0]
 
 class RightResultsIter(ClassificationResultStream):
     """
@@ -168,17 +177,20 @@ class RightResultsIter(ClassificationResultStream):
 
     """
 
-    def __init__(self,result_path,classifier=None,secondary_identifier="",comparator=default_right_comp):
+    def __init__(self,result_path,classifier=None,secondary_identifier="",comparator=default_right_comp
+                 ,pred_tranformer=default_pred_transformer,actual_transformer=lambda x:x):
         super().__init__(result_path,classifier)
 
         self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier))
         self.is_right=comparator
+        self.pred_transformer=pred_tranformer
+        self.actual_transformer=actual_transformer
 
     def __next__(self):
         pred_obj= next(self.res_gen)
 
         #check to see if actually a right instance
-        while not self.is_right(pred_obj.predicted,pred_obj.actual):
+        while not self.is_right(self.pred_transformer(pred_obj.predicted),self.actual_transformer(pred_obj.actual)):
             pred_obj=next(self.res_gen)
 
         return pred_obj
@@ -195,17 +207,21 @@ class WrongResultsIter(ClassificationResultStream):
 
     """
 
-    def __init__(self,result_path,classifier=None,secondary_identifier="",comparator=lambda p,a: not default_right_comp(p,a)):
+    def __init__(self,result_path,classifier=None,secondary_identifier="",comparator=lambda p,a: not default_right_comp(p,a)
+        ,pred_tranformer=default_pred_transformer,actual_transformer=lambda x:x):
+
         super().__init__(result_path,classifier)
 
         self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier))
         self.is_wrong=comparator
+        self.pred_transformer=pred_tranformer
+        self.actual_transformer=actual_transformer
 
     def __next__(self):
         pred_obj= next(self.res_gen)
 
         #check to see if actually a right instance
-        while not self.is_wrong(pred_obj.predicted,pred_obj.actual):
+        while not self.is_wrong(self.pred_transformer(pred_obj.predicted),self.actual_transformer(pred_obj.actual)):
             pred_obj=next(self.res_gen)
 
         return pred_obj

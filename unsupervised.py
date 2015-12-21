@@ -2,148 +2,140 @@ from sklearn.pipeline import Pipeline
 
 __author__ = 'Kevin'
 
-from matplotlib.backends.backend_pdf import PdfPages
 from data.util import unpickle_obj,pickle_obj
 from data.training_testing import Training,Testing
 from data import LearningSettings
 from sklearn.cluster import KMeans,SpectralClustering,AgglomerativeClustering
 from unsupervised.clustering import Clustering
 from unsupervised.graph_cut.graph_cut import *
-from analytics.graphics import *
 from sklearn.feature_selection import SelectKBest,chi2
-from analytics.graphics import subplot_four_corner
+from util.Logger import Logger
 
 from util.base_util import normalize_genre_string
 import os
 
+PICKLE_DIR="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
+UNSUPERVISED_DIR="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\unsupervised"
 
+def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
+    clustering_logger.info("Unsupervised Algorithm training size: {}".format(train_set.X.shape))
 
-
-
-pickle_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
-def unsupervised(label,train_set,clusterer,clustering_alg):
-    print("Unsupervised Algorithm training size: {}".format(train_set.X.shape))
-
-    for num_cluster in sorted(label.num_clusters,reverse=True):
+    for num_cluster in sorted(settings.num_clusters,reverse=True):
 
         X,y,ref_ids=train_set.to_matrices()
-        nn=clustering_alg(n_clusters=num_cluster)
+        clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
 
-        #nn=SpectralClustering(n_clusters=num_cluster)
-        print("Using {}".format(str(nn)))
+        clustering_logger.info("Using {}".format(str(clustering_alg)))
 
-        res_labels=nn.fit_predict(X)
+        res_labels=clustering_alg.fit_predict(X)
 
-        occurence_dict=Clustering().get_clusters_genre_distribution(y,res_labels)
+        occurence_dict=clusterer.get_clusters_genre_distribution(y,res_labels)
 
-        res_file="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\unsupervised\\{}\\{}\\{} clusters.pdf"\
-            .format(label.clustering_alg,label.res_dir,len(occurence_dict))
+        #ELIMATE CLUSTER LESS THAN 2 pages in size
+        for cluster_name, cluster_genre_count in list(occurence_dict.items()):
+            total_count_in_cluster=sum((count for genre,count in cluster_genre_count.items()))
 
-        res_dir="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\unsupervised\\{}\\{}" \
-                .format(label.clustering_alg,label.res_dir)
+            if total_count_in_cluster < 12:
+                del occurence_dict[cluster_name]
+
+        #the directory to store the results of clustering
+        res_dir=os.path.join(UNSUPERVISED_DIR,settings.clustering_alg,*settings.parent_clusters)
+
+        res_file="{}/{}.pdf".format(res_dir,num_cluster)
 
         os.makedirs(res_dir,exist_ok=True)
 
-        res_path=os.path.join(pickle_dir,label.clustering_alg+(label.res_dir if label.res_dir else "_{}".format(label.res_dir)))
-        pickle_obj(res_labels,res_path)
-        print("Finished pickling the {} results to {}".format(label.clustering_alg,res_path))
+        clusterer.generate_cluster_distribution_graphs(res_file,occurence_dict,res_labels)
+        """
+        inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(clustering_alg.cluster_centers_,X,res_labels)
 
-        with PdfPages(res_file) as pdf:
-            plt_num=0
-            save_fig=False
-            figure=None
-            for cluster_num,cluster_genre_freq in occurence_dict.items():
-                if len(cluster_genre_freq) < 2 or (len(cluster_genre_freq)<3 and all(map(lambda x:x[1]==1,cluster_genre_freq.items()))):
-                    continue
-                save_fig=True
-                last_plt,figure=subplot_four_corner(plt_num)
-
-                #plot it
-                file_name="{}_genre_distribution".format(cluster_num)+".pdf"
-                #axis=plt.subplot(1,1,plt_num)
-                num_samples=np.sum(res_labels==cluster_num)
-                print("Total number of samples in cluster {} is {}".format(cluster_num,num_samples))
-
-                plot_word_frequency("cluster {}, num samples: {}".format(cluster_num,num_samples),
-                                    cluster_genre_freq)
-
-                plt_num+=1
-                if last_plt:
-                    save_fig=False
-                    pdf.savefig(figure)
-                    plt.close()
-
-            if figure is not None and save_fig:
-                pdf.savefig(figure)
-                plt.close()
-
-        inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(nn.cluster_centers_,X,res_labels)
-
-
-
-        print("\n{} {} clusters:".format(label.clustering_alg,num_cluster))
-        print("Avg Inter: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(inter_cluster
+        clustering_logger.info("\n{} {} clusters:".format(settings.clustering_alg,num_cluster))
+        clustering_logger.info("Avg Inter: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(inter_cluster
                                                                ,inter_cluster_count)]))
-        print("Inter count: {}".format([c[1] for c in inter_cluster_count]))
-        print("Avg Intra: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(intra_cluster
+        clustering_logger.info("Inter count: {}".format([c[1] for c in inter_cluster_count]))
+        clustering_logger.info("Avg Intra: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(intra_cluster
                                                                ,intra_cluster_count)]))
-        print("Intra count: {}".format([c[1] for c in intra_cluster_count]))
+        clustering_logger.info("Intra count: {}".format([c[1] for c in intra_cluster_count]))
+        """
+        #do a dfs on clusters bigger than the prescribed size
+        if settings.break_up_clusters:
+            breakup_candidate=[]
 
-def cluster_analysis(res_dir):
-    pass
+            for i in range(0,num_cluster):
+                if np.sum(res_labels==i)>=settings.max_cluster_size:
+                    breakup_candidate.append(i)
+
+            X_path=os.path.join(res_dir,"X")
+            y_path=os.path.join(res_dir,"y")
+            ref_indexes_path=os.path.join(res_dir,"ref_indexes")
+
+            clustering_logger.info("Pickling X,y,ref_index to conserve memory")
+            pickle_obj(train_set.X,X_path)
+            pickle_obj(train_set.y,y_path)
+            pickle_obj(train_set.ref_indexes,ref_indexes_path)
+
+            for cluster_name in breakup_candidate:
+                clustering_logger.info("Breaking up cluster {} of size greater than {}".format(cluster_name,settings.max_cluster_size))
+
+                settings.parent_clusters.append("{}_{}".format(num_cluster,cluster_name))
+
+                selector=(res_labels==cluster_name)
+
+                train_set.X=train_set.X[selector]
+                train_set.y=train_set.y[selector]
+                train_set.ref_indexes=train_set.ref_indexes[selector]
+
+                unsupervised(settings,train_set,clusterer,clustering_alg_cls)
+
+                settings.parent_clusters.pop()
+
+                train_set.X_path=unpickle_obj(train_set.X)
+                train_set.y_path=unpickle_obj(train_set.y)
+                train_set.ref_indexes=unpickle_obj(ref_indexes_path)
 
 
 if __name__=="__main__":
+    clustering_logger=Logger()
+    """
+    Unsupervised Clustering bootstrap
+    """
+
     mapping={"short_genres":"short_genre","index":"ref_index","bow":"attr_map"}
 
     #s=SourceMapper(URLBow.objects(),mapping)
-    X_pickle_path=os.path.join(pickle_dir,"X_summary_pickle")
-    y_pickle_path=os.path.join(pickle_dir,"y_summary_pickle")
-    ref_index_pickle_path=os.path.join(pickle_dir,"refIndex_summary_pickle")
+    X_pickle_path=os.path.join(PICKLE_DIR,"X_summary_pickle")
+    y_pickle_path=os.path.join(PICKLE_DIR,"y_summary_pickle")
+    ref_index_pickle_path=os.path.join(PICKLE_DIR,"refIndex_summary_pickle")
 
     mapping={"short_genres":"short_genre","index":"ref_index","bow":"attr_map"}
 
     #SETTING UP LABEL
-    label=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_feats=10000)
-    label.res_dir="cluster_9"
-    #label.res_dir=""
+    settings=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_feats=10000)
+    settings.parent_clusters=[] #used to record a tree of parent clusters for the current cluster
 
-    label.clustering_alg="kNN"
+    settings.clustering_alg="kNN"
     clustering_alg=KMeans
-    label.num_clusters=list({20,18,16,14,12,10,9,8,7,6,5,4,3})
-    #label.num_clusters=list({9})
-
-
-
-    #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),50000)
+    settings.num_clusters=list({10})
+    settings.max_cluster_size=10000 #the cluster will be further broken up if it is greater than this size
+    settings.break_up_clusters=True
 
     #LOAD DATA
-    train_set=Training(label,pickle_dir=pickle_dir)
+    #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),50000)
+
+    train_set=Training(settings,pickle_dir=PICKLE_DIR)
     train_set.load_training()
 
     #FEATURE SELECTION
     best_k_attr=10000
     feature_selector=Pipeline([("chi2",SelectKBest(chi2,best_k_attr))])
 
-    print("Choosing best {} features".format(best_k_attr))
+    clustering_logger.info("Choosing best {} features".format(best_k_attr))
 
-    print("Normalizing to LV1")
+    clustering_logger.debug("Normalizing to LV1")
     #NORMALIZING THE Y
-    train_set.y=[[normalize_genre_string(g,1) for g in r] for r in (row for row in train_set.y)]
+    train_set.y=np.array([[normalize_genre_string(g,1) for g in r] for r in (row for row in train_set.y)])
 
     clusterer=Clustering()
     clusterer.feature_selection(train_set,feature_selector,fit=True)
 
-    #MODIFY X AND Y
-    #get subcluster 0
-
-    cluster_assign=unpickle_obj(os.path.join(pickle_dir,label.clustering_alg))
-    selector=(cluster_assign==0)
-
-
-    train_set.X=train_set.X[selector]
-    train_set.y=np.array(train_set.y)[selector]
-    train_set.ref_indexes=train_set.ref_indexes[selector]
-
-
-    unsupervised(train_set=train_set,label=label,clusterer=clusterer,clustering_alg=clustering_alg)
+    unsupervised(train_set=train_set, settings=settings,clusterer=clusterer, clustering_alg_cls=clustering_alg)
