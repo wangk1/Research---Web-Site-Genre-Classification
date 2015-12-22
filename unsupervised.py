@@ -85,8 +85,8 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
                 settings.parent_clusters.pop()
 
-                train_set.X_path=unpickle_obj(X_path)
-                train_set.y_path=unpickle_obj(y_path)
+                train_set.X=unpickle_obj(X_path)
+                train_set.y=unpickle_obj(y_path)
                 train_set.ref_indexes=unpickle_obj(ref_indexes_path)
 
             #remove the cache files
