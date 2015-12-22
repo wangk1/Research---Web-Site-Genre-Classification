@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from analytics.graphics import subplot_four_corner,plot_word_frequency
 from sklearn.preprocessing import MultiLabelBinarizer
 from data.util import flatten_training
+from tabulate import tabulate
 
 import sklearn.metrics.pairwise as pw
 
@@ -142,3 +143,32 @@ class Clustering:
             if figure is not None and save_fig:
                 pdf.savefig(figure)
                 plt.close()
+
+
+    def output_cluster_closeness(self,file,inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count):
+        """
+        Output the cluster closeness metrics to a file
+
+        :param inter_cluster:
+        :param inter_cluster_count:
+        :param intra_cluster:
+        :param intra_cluster_count:
+        :return:
+        """
+        #sort everything
+        inter_cluster=sorted(inter_cluster,key=op.itemgetter(0))
+        inter_cluster_count=sorted(inter_cluster_count,key=op.itemgetter(0))
+        intra_cluster_count=sorted(intra_cluster_count,key=op.itemgetter(0))
+        intra_cluster=sorted(intra_cluster,key=op.itemgetter(0))
+
+        headers=[""]+[op.itemgetter(0)(c) for c in  inter_cluster]
+        table_content=[
+            ["Avg Intra"]+[str(round(c[1]/(t[1] == 0 or t[1]),2)) for c,t in zip(intra_cluster,intra_cluster_count)],
+            ["Intra Count"]+[c[1] for c in intra_cluster_count],
+            ["Avg Inter"]+[str(round(c[1]/(t[1] == 0 or t[1]),2)) for c,t in zip(inter_cluster,inter_cluster_count)],
+            ["Inter Count"]+[str(c[1]) for c in inter_cluster_count]
+
+        ]
+
+        with open(file,mode="w") as file_handler:
+            file_handler.write(tabulate(table_content,headers=headers))

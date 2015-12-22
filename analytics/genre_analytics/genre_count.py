@@ -38,7 +38,8 @@ def tabulate_genre_dist(y,normalize_to_level=1):
     headers=["genre","count","percent"]
 
 
-    data=[headers].extend([[k,v,v/total] for k,v in genre_to_count.items()])
+    data=[headers]
+    data.extend([[k,v,round(v/total,2)] for k,v in genre_to_count.items()])
 
     print(tabulate(data,headers="firstrow"))
 

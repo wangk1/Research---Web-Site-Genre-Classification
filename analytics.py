@@ -9,6 +9,8 @@ from db.db_model.mongo_websites_models import TrainSetBow
 
 from analytics.dmoz_alexa_similarity import dmoz_alexa_similarity
 from analytics.genre_analytics.genre_count import num_genre_per_webpage
+from data.util import unpickle_obj
+from analytics.genre_analytics.genre_count import tabulate_genre_dist
 
 def calculate_top_percent():
     import db.db_collections.mongo_collections as coll, operator
@@ -47,7 +49,12 @@ if __name__=="__main__":
     path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top1cls_10000"
     outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
 
-    y_path=""
+    y_path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle"
+
+    y=unpickle_obj(y_path)
+
+    tabulate_genre_dist(y)
+
     #num_genre_per_webpage("C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\y_summary_pickle")
 
 
@@ -63,30 +70,7 @@ if __name__=="__main__":
 
     #mutual_information_similarity("genre_similarity.txt")
 
-    """
-    with open("C:/Users/Kevin/Desktop/GitHub/Research/Webscraper/top_30_stats.txt") as file:
-        #read each line from file
-        dict_occurence={}
-        prev_title=""
-        for line in file:
-            if line.startswith("Generating statistics for short genre"):
-                #create new file
-                if not prev_title=="":
-                    plt=graphics.plot_word_frequency(prev_title,dict_occurence)
-                    graphics.save("freq_count/{}.pdf".format(prev_title.replace("/","_").replace("\n","")),plt)
-                prev_title=line.split(" ")[-1]
 
-                dict_occurence={}
-
-            else:
-                words=line.split(" ")
-
-                dict_occurence[words[0]]=int(words[2])
-
-        #dump last one
-        plt=graphics.plot_word_frequency(prev_title,dict_occurence)
-        graphics.save("freq_count/{}.pdf".format(prev_title.replace("/","_").replace("\n","")),plt)
-    """
 
 
 

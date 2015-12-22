@@ -47,17 +47,12 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         os.makedirs(res_dir,exist_ok=True)
 
         clusterer.generate_cluster_distribution_graphs(res_file,occurence_dict,res_labels)
-        """
-        inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(clustering_alg.cluster_centers_,X,res_labels)
 
-        clustering_logger.info("\n{} {} clusters:".format(settings.clustering_alg,num_cluster))
-        clustering_logger.info("Avg Inter: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(inter_cluster
-                                                               ,inter_cluster_count)]))
-        clustering_logger.info("Inter count: {}".format([c[1] for c in inter_cluster_count]))
-        clustering_logger.info("Avg Intra: {}".format([c[1]/(t[1] == 0 or t[1]) for c,t in zip(intra_cluster
-                                                               ,intra_cluster_count)]))
-        clustering_logger.info("Intra count: {}".format([c[1] for c in intra_cluster_count]))
-        """
+        #output closeness metrics
+        inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(clustering_alg.cluster_centers_,X,res_labels)
+        clusterer.output_cluster_closeness("{}/{}.txt".format(res_dir,num_cluster),inter_cluster,
+                                           inter_cluster_count,intra_cluster,intra_cluster_count)
+
         #do a dfs on clusters bigger than the prescribed size
         if settings.break_up_clusters:
             breakup_candidate=[]
@@ -90,9 +85,14 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
                 settings.parent_clusters.pop()
 
-                train_set.X_path=unpickle_obj(train_set.X)
-                train_set.y_path=unpickle_obj(train_set.y)
+                train_set.X_path=unpickle_obj(X_path)
+                train_set.y_path=unpickle_obj(y_path)
                 train_set.ref_indexes=unpickle_obj(ref_indexes_path)
+
+            #remove the cache files
+            os.remove(ref_indexes_path)
+            os.remove(X_path)
+            os.remove(y_path)
 
 
 if __name__=="__main__":

@@ -1,3 +1,5 @@
+import itertools
+
 __author__ = 'Kevin'
 from sklearn.feature_selection import SelectKBest,chi2 as chi_sq
 from scipy.sparse.linalg import svds
@@ -7,6 +9,7 @@ from util.text_preprocessor import preprocess
 from .word_based import BagOfWords
 from data.util import load_train_matrix
 from util.Logger import Logger
+from util.base_util import normalize_genre_string
 
 feature_logger=Logger()
 
@@ -32,6 +35,26 @@ def feature_selection(train_set,test_set,feature_selector,fit=True):
         test_set.X=feature_selector.transform(test_set.X)
         feature_logger.info("Post feature selection Test set: num features: {}".format(test_set.X.shape[1]))
 
+class SingleClassFeatureSelector:
+    """
+
+
+    """
+    def __init__(self,transformers):
+
+        self.transform=transformers
+
+
+    def transform(self,X,y):
+
+
+        #Get all the classes first
+        genre_set=set(itertools.chain(*([normalize_genre_string(g,1) for g in g_list] for g_list in y)))
+
+        for g in genre_set:
+            genre_matches=[g in g_list for g_list in y]
+
+        pass
 class SparseSVD:
 
     def __init__(self,k):
