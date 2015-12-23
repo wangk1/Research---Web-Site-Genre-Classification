@@ -125,7 +125,7 @@ if __name__=="__main__":
     settings.num_clusters=list({10})
     settings.max_cluster_size=10000 #the cluster will be further broken up if it is greater than this size
     settings.break_up_clusters=True
-    settings.spectre_clustering_limit=20000 # if the cluster is less than 20K in size, use spectre clustering instead
+    settings.spectre_clustering_limit=15000 # if the cluster is less than 15K in size, use spectre clustering instead
 
     #LOAD DATA
     #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),50000)
