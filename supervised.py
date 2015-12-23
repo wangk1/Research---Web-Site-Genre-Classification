@@ -21,6 +21,7 @@ from data.training_testing import Training,Testing,randomized_training_testing
 from data import LearningSettings
 from data.util import unpickle_obj,flatten_training
 from util.base_util import normalize_genre_string
+from classification_attribute.feature_selection import PerClassFeatureSelector
 
 ignore_genre={
     "World",
@@ -155,7 +156,7 @@ if __name__=="__main__":
     pickle_dir="pickle_dir"
 
     #CLASSIFICATION SETTINGS
-    settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
+    settings=LearningSettings(type="supervised",dim_reduction="chi_sq_single_class",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
     settings.result_file_label="no_region_kids"
     threshold=4
@@ -186,9 +187,10 @@ if __name__=="__main__":
                       classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
 
+
+
     for i in num_attributes:
         settings.num_feats=i
-        feature_selector=Pipeline([("chi2",SelectKBest(chi2,i))])
 
         #LOAD TRAINING AND TESTING
         #randomly pick from the entire set
@@ -200,6 +202,10 @@ if __name__=="__main__":
 
             test_set=Testing(settings,pickle_dir=settings.pickle_dir)
             test_set.load_testing()
+
+        #count number of classes there are
+        num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_set.y))))
+        feature_selector=PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
 
         #flatten training
         flatten_training(train_set)

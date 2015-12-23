@@ -24,9 +24,15 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
     for num_cluster in sorted(settings.num_clusters,reverse=True):
 
         X,y,ref_ids=train_set.to_matrices()
-        clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
 
-        clustering_logger.info("Using {}".format(str(clustering_alg)))
+        additional_notes=""
+        if train_set.X.shape[0]<=settings.spectre_clustering_limit:
+            clustering_alg=SpectralClustering(n_clusters=num_cluster)
+            additional_notes="_spectral"
+        else:
+            clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
+
+        clustering_logger.info("Using {}".format(str(clustering_alg+additional_notes)))
 
         res_labels=clustering_alg.fit_predict(X)
 
@@ -42,7 +48,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         #the directory to store the results of clustering
         res_dir=os.path.join(UNSUPERVISED_DIR,settings.clustering_alg,*settings.parent_clusters)
 
-        res_file="{}/{}.pdf".format(res_dir,num_cluster)
+        res_file="{}/{}.pdf".format(res_dir,str(num_cluster))
 
         os.makedirs(res_dir,exist_ok=True)
 
@@ -114,11 +120,12 @@ if __name__=="__main__":
     settings=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_feats=10000)
     settings.parent_clusters=[] #used to record a tree of parent clusters for the current cluster
 
-    settings.clustering_alg="kNN"
+    settings.clustering_alg="kNN_spectre"
     clustering_alg=KMeans
     settings.num_clusters=list({10})
     settings.max_cluster_size=10000 #the cluster will be further broken up if it is greater than this size
     settings.break_up_clusters=True
+    settings.spectre_clustering_limit=20000 # if the cluster is less than 20K in size, use spectre clustering instead
 
     #LOAD DATA
     #generate_random_sample(unpickle_obj(X_pickle_path),unpickle_obj(y_pickle_path),unpickle_obj(ref_index_pickle_path),50000)

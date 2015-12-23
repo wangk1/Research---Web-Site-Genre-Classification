@@ -50,7 +50,7 @@ def precision(res_path,classifiers,secondary_identifier):
     return precision
 
 if __name__ == "__main__":
-    res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000"
+    res_path="classification_res\\supervised\\supervised_summary_chi_sq_single_class_10000"
     classifiers=["LogisticRegression"]
     secondary_identifier="no_region_kids"
 
