@@ -55,9 +55,10 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         clusterer.generate_cluster_distribution_graphs(res_file,occurence_dict,res_labels)
 
         #output closeness metrics
-        inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(clustering_alg.cluster_centers_,X,res_labels)
-        clusterer.output_cluster_closeness("{}/{}.txt".format(res_dir,num_cluster),inter_cluster,
-                                           inter_cluster_count,intra_cluster,intra_cluster_count)
+        if additional_notes=="":
+            inter_cluster,inter_cluster_count,intra_cluster,intra_cluster_count=Clustering().cluster_closeness(clustering_alg.cluster_centers_,X,res_labels)
+            clusterer.output_cluster_closeness("{}/{}.txt".format(res_dir,num_cluster),inter_cluster,
+                                               inter_cluster_count,intra_cluster,intra_cluster_count)
 
         #do a dfs on clusters bigger than the prescribed size
         if settings.break_up_clusters:
