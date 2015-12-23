@@ -32,7 +32,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         else:
             clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
 
-        clustering_logger.info("Using {}".format(str(clustering_alg+additional_notes)))
+        clustering_logger.info("Using {}".format(str(clustering_alg)+additional_notes))
 
         res_labels=clustering_alg.fit_predict(X)
 
