@@ -53,12 +53,19 @@ def randomized_training_testing(settings,X,y,ref_index,num,do_pickle=True):
 
     pickle_dir=settings.pickle_dir
 
-    train_X_path=os.path.join(pickle_dir,"{}_trainX_{}_pickle".format(settings.type,settings.feature_selection))
-    train_y_path=os.path.join(pickle_dir,"{}_trainy_{}_pickle".format(settings.type,settings.feature_selection))
-    train_ref_index_path=os.path.join(pickle_dir,"{}_trainRefIndex_{}_pickle".format(settings.type,settings.feature_selection))
-    test_X_path=os.path.join(pickle_dir,"{}_testX_{}_pickle".format(settings.type,settings.feature_selection))
-    test_y_path=os.path.join(pickle_dir,"{}_testy_{}_pickle".format(settings.type,settings.feature_selection))
-    test_ref_index_path=os.path.join(pickle_dir,"{}_testRefIndex_{}_pickle".format(settings.type,settings.feature_selection))
+    secondary_label="_"+settings.result_file_label if settings.result_file_label else settings.result_file_label
+    train_X_path=os.path.join(pickle_dir,"{}{}_trainX_{}_pickle".format(settings.type,secondary_label
+                                                                         ,settings.feature_selection))
+    train_y_path=os.path.join(pickle_dir,"{}{}_trainy_{}_pickle".format(settings.type,secondary_label
+                                                                         ,settings.feature_selection))
+    train_ref_index_path=os.path.join(pickle_dir,"{}{}_trainRefIndex_{}_pickle".format(settings.type,secondary_label
+                                                                                        ,settings.feature_selection))
+    test_X_path=os.path.join(pickle_dir,"{}{}_testX_{}_pickle".format(settings.type,secondary_label
+                                                                       ,settings.feature_selection))
+    test_y_path=os.path.join(pickle_dir,"{}{}_testy_{}_pickle".format(settings.type,secondary_label
+                                                                       ,settings.feature_selection))
+    test_ref_index_path=os.path.join(pickle_dir,"{}{}_testRefIndex_{}_pickle".format(settings.type,secondary_label
+                                                                                      ,settings.feature_selection))
 
     train_X,train_y,train_ref_index,test_X,test_y,test_ref_index=_pick_random_samples(X,y,ref_index,num)
 
@@ -309,7 +316,7 @@ class Training(BaseData):
         return self
 
     def load_training(self,stack_per_sample=3000,maybe_load_vectorizer_from_pickle=True,
-                      maybe_load_training_from_pickle=True,pickle_training=True):
+                      maybe_load_training_from_pickle=True,pickle_training=True,secondary_label=""):
         """
         Load the training set with attr_map dictionary attribute and return a scipy sparse matrix of the data fitted
             with the vocab and their labels
@@ -326,9 +333,14 @@ class Training(BaseData):
 
         data_logger.info("Loading training set for {}".format(self.label))
 
-        trainX_pickle_path=self.pickle_dir+"/{}_trainX_{}_pickle".format(self.label.type,self.label.feature_selection)
-        trainy_pickle_path=self.pickle_dir+"/{}_trainy_{}_pickle".format(self.label.type,self.label.feature_selection)
-        ref_id_pickle_path=self.pickle_dir+"/{}_trainRefIndex_{}_pickle".format(self.label.type,self.label.feature_selection)
+        path_elements=[self.label.type,secondary_label,"trainX",self.label.feature_selection,"pickle"]
+        trainX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+
+        path_elements[2]="trainy"
+        trainy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+
+        path_elements[2]="trainRefIndex"
+        ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
         self._load_from_source(stack_per_sample=stack_per_sample,
                   pickle_X_path=trainX_pickle_path,
@@ -358,7 +370,8 @@ class Testing(BaseData):
         self.vocab_vectorizer=vocab_vectorizer
 
 
-    def load_testing(self,stack_per_sample=3000,pickle_testing=True,maybe_load_testing_from_pickle=True):
+    def load_testing(self,stack_per_sample=3000,pickle_testing=True,maybe_load_testing_from_pickle=True
+                     ,secondary_label=""):
         """
         Load the training set with attr_map dictionary attribute and return a scipy sparse matrix of the data fitted
             with the vocab and their labels
@@ -369,9 +382,14 @@ class Testing(BaseData):
 
         data_logger.info("Loading testing set for {}".format(self.label))
 
-        testX_pickle_path=self.pickle_dir+"/{}_testX_{}_pickle".format(self.label.type,self.label.feature_selection)
-        testy_pickle_path=self.pickle_dir+"/{}_testy_{}_pickle".format(self.label.type,self.label.feature_selection)
-        ref_id_pickle_path=self.pickle_dir+"/{}_testRefIndex_{}_pickle".format(self.label.type,self.label.feature_selection)
+        path_elements=[self.label.type,secondary_label,"testX",self.label.feature_selection,"pickle"]
+        testX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+
+        path_elements[2]="testy"
+        testy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+
+        path_elements[2]="trainRefIndex"
+        ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
         self._load_from_source(stack_per_sample=stack_per_sample,
                   pickle_X_path=testX_pickle_path,

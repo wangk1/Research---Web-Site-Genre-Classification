@@ -23,20 +23,6 @@ from data.util import unpickle_obj,flatten_training
 from util.base_util import normalize_genre_string
 from classification_attribute.feature_selection import PerClassFeatureSelector
 
-ignore_genre={
-    "World",
-    "id",
-    "desc",
-    "page",
-    "parent",
-    "url",
-    "genres",
-    "Kids_and_Teens",
-    "Kids",
-    "Regional",
-    "Home",
-    "News"
-}
 
 genre_dict={'Sports': 8757,
             'Business': 8553,
@@ -128,6 +114,22 @@ def map_urlFullText(genre_dict):
                               ,test_set_nums,genre_dict.keys()
                               ,train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow)
 
+#genres to filter out with filter genre methods
+ignore_genre={
+    "World",
+    "id",
+    "desc",
+    "page",
+    "parent",
+    "url",
+    "genres",
+    "Kids_and_Teens",
+    "Kids",
+    "Regional",
+    "Home",
+    "News"
+}
+
 def filter_genres(X,y,ref_indexes):
     """
     Cleans up the label set, remove those in the ignore list from the websites.
@@ -166,7 +168,7 @@ if __name__=="__main__":
     num_attributes={10000}
 
     train_set_size=50000
-    random_pick_test_training=False
+    random_pick_test_training=True
 
 
     #LOAD AND PREPROCESS DATA SETS
@@ -200,10 +202,10 @@ if __name__=="__main__":
             train_set,test_set=randomized_training_testing(settings,X,y,ref_indexes,train_set_size)
         else:
             train_set=Training(settings,pickle_dir=settings.pickle_dir)
-            train_set.load_training()
+            train_set.load_training(secondary_label=settings.result_file_label)
 
             test_set=Testing(settings,pickle_dir=settings.pickle_dir)
-            test_set.load_testing()
+            test_set.load_testing(secondary_label=settings.result_file_label)
 
         #FEATURE SELECTION,FLATTEN TRAINIGN
         #count number of classes there are
@@ -213,7 +215,7 @@ if __name__=="__main__":
 
         #flatten training
         flatten_training(train_set)
-        
+
         feature_selection(train_set,test_set,feature_selector,fit=True)
 
         #CLASSIFICATION
