@@ -33,7 +33,9 @@ ignore_genre={
     "genres",
     "Kids_and_Teens",
     "Kids",
-    "Regional"
+    "Regional",
+    "Home",
+    "News"
 }
 
 genre_dict={'Sports': 8757,
@@ -156,9 +158,9 @@ if __name__=="__main__":
     pickle_dir="pickle_dir"
 
     #CLASSIFICATION SETTINGS
-    settings=LearningSettings(type="supervised",dim_reduction="chi_sq_single_class",num_feats=0,feature_selection="summary",
+    settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
-    settings.result_file_label="no_region_kids"
+    settings.result_file_label="no_region_kids_home_news"
     threshold=4
     ll_ranking=False
     num_attributes={10000}
@@ -167,7 +169,7 @@ if __name__=="__main__":
     random_pick_test_training=False
 
 
-    #ENTIRE DATA SET
+    #LOAD AND PREPROCESS DATA SETS
     X=unpickle_obj("pickle_dir\\X_summary_pickle")
     y=unpickle_obj("pickle_dir\\y_summary_pickle")
     #normalize genres
@@ -203,14 +205,15 @@ if __name__=="__main__":
             test_set=Testing(settings,pickle_dir=settings.pickle_dir)
             test_set.load_testing()
 
+        #FEATURE SELECTION,FLATTEN TRAINIGN
         #count number of classes there are
         num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_set.y))))
-        feature_selector=PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
+        feature_selector=SelectKBest(chi2,i)
+        #PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
 
         #flatten training
         flatten_training(train_set)
-
-        #FEATURE SELECTION
+        
         feature_selection(train_set,test_set,feature_selector,fit=True)
 
         #CLASSIFICATION

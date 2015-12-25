@@ -50,16 +50,16 @@ def precision(res_path,classifiers,secondary_identifier):
     return precision
 
 if __name__ == "__main__":
-    res_path="classification_res\\supervised\\supervised_summary_chi_sq_single_class_10000"
+    res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000"
     classifiers=["LogisticRegression"]
     secondary_identifier="no_region_kids"
-
+    """
     right_res_iter=RightResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)
     wrong_res_iter=WrongResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)
 
     coreccurence_matrix(right_res_iter,wrong_res_iter)
 """
-    rec=precision(res_path,classifiers,secondary_identifier)
+    rec=recall(res_path,classifiers,secondary_identifier)
 
     for rec_obj in rec:
         s="{}"
@@ -72,4 +72,3 @@ if __name__ == "__main__":
     print(len([i for i in RightResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)]))
     print(len([i for i in RightResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)]+
               [j for j in WrongResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)]))
-"""
