@@ -168,7 +168,7 @@ if __name__=="__main__":
     num_attributes={10000}
 
     train_set_size=50000
-    random_pick_test_training=True
+    random_pick_test_training=False
 
 
     #LOAD AND PREPROCESS DATA SETS
