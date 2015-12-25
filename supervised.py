@@ -184,7 +184,7 @@ if __name__=="__main__":
 
     #CLASSIFIERS
     classifier=classifiers.Classifier()
-    classifiers_list=[classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking),
+    classifiers_list=[classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
                       classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
