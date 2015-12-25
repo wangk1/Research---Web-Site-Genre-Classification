@@ -333,13 +333,19 @@ class Training(BaseData):
 
         data_logger.info("Loading training set for {}".format(self.label))
 
-        path_elements=[self.label.type,secondary_label,"trainX",self.label.feature_selection,"pickle"]
+        data_set_train_index=2
+        if secondary_label:
+            path_elements=[self.label.type,secondary_label,"trainX",self.label.feature_selection,"pickle"]
+        else:
+            path_elements=[self.label.type,"trainX",self.label.feature_selection,"pickle"]
+            data_set_train_index=1
+
         trainX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
-        path_elements[2]="trainy"
+        path_elements[data_set_train_index]="trainy"
         trainy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
-        path_elements[2]="trainRefIndex"
+        path_elements[data_set_train_index]="trainRefIndex"
         ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
         self._load_from_source(stack_per_sample=stack_per_sample,
@@ -382,13 +388,19 @@ class Testing(BaseData):
 
         data_logger.info("Loading testing set for {}".format(self.label))
 
-        path_elements=[self.label.type,secondary_label,"testX",self.label.feature_selection,"pickle"]
+        data_set_train_index=2
+        if secondary_label:
+            path_elements=[self.label.type,secondary_label,"trainX",self.label.feature_selection,"pickle"]
+        else:
+            data_set_train_index=1
+            path_elements=[self.label.type,"trainX",self.label.feature_selection,"pickle"]
+
         testX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
-        path_elements[2]="testy"
+        path_elements[data_set_train_index]="testy"
         testy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
-        path_elements[2]="trainRefIndex"
+        path_elements[data_set_train_index]="trainRefIndex"
         ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
         self._load_from_source(stack_per_sample=stack_per_sample,

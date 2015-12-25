@@ -172,3 +172,16 @@ class Clustering:
 
         with open(file,mode="w") as file_handler:
             file_handler.write(tabulate(table_content,headers=headers))
+
+    def output_pages_in_cluster(self,path,ref_indexes):
+        """
+
+
+        :param num_clusters:
+        :param cluster_name:
+        :param ref_indexes:
+        :return:
+        """
+        with open("{}_pages".format(path)) as file_handle:
+            for ref_id in ref_indexes:
+                file_handle.write("{}\n".format(ref_id))

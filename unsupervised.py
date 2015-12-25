@@ -10,7 +10,6 @@ from unsupervised.clustering import Clustering
 from unsupervised.graph_cut.graph_cut import *
 from sklearn.feature_selection import SelectKBest,chi2
 from util.Logger import Logger
-from sklearn.preprocessing import MultiLabelBinarizer
 
 from util.base_util import normalize_genre_string
 import os
@@ -38,15 +37,21 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
         occurence_dict=clusterer.get_clusters_genre_distribution(y,res_labels)
 
+        #the directory to store the results of clustering
+        res_dir=os.path.join(UNSUPERVISED_DIR,settings.clustering_alg,*settings.parent_clusters)
+
+
         #ELIMATE CLUSTER LESS THAN 2 pages in size
         for cluster_name, cluster_genre_count in list(occurence_dict.items()):
             total_count_in_cluster=sum((count for genre,count in cluster_genre_count.items()))
 
             if total_count_in_cluster < 12:
                 del occurence_dict[cluster_name]
+            else:
+                path=os.path.join(res_dir,"{}_{}_pages".format(num_cluster,cluster_name))
+                #OUTPUT the pages in the current cluster
+                clusterer.output_pages_in_cluster(path,train_set.ref_indexes[res_labels==cluster_name])
 
-        #the directory to store the results of clustering
-        res_dir=os.path.join(UNSUPERVISED_DIR,settings.clustering_alg,*settings.parent_clusters)
 
         res_file="{}/{}.pdf".format(res_dir,str(num_cluster))
 
