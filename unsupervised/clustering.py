@@ -182,6 +182,6 @@ class Clustering:
         :param ref_indexes:
         :return:
         """
-        with open("{}_pages".format(path)) as file_handle:
+        with open("{}".format(path),mode="w") as file_handle:
             for ref_id in ref_indexes:
                 file_handle.write("{}\n".format(ref_id))
