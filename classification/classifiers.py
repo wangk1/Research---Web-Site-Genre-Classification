@@ -9,7 +9,7 @@ import scipy.sparse as sp
 from sklearn.linear_model.logistic import LogisticRegression as LR
 from sklearn.neighbors import KNeighborsClassifier as kN
 from sklearn.naive_bayes import MultinomialNB as MB
-from sklearn.ensemble import RandomForestClassifier as RF
+from sklearn.ensemble import RandomForestClassifier as RF, AdaBoostClassifier as AC
 from sklearn.tree import DecisionTreeClassifier as DT
 from sklearn.svm import SVC as SV
 
@@ -183,6 +183,10 @@ class kNN(kN,BaseClassifier):
         kN.__init__(self,**kwargs)
         BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
 
+class Ada(AC,BaseClassifier):
+    def __init__(self,threshold=1,ll_ranking=False,**kwargs):
+        AC.__init__(self,**kwargs)
+        BaseClassifier.__init__(self,threshold=threshold,ll_ranking=ll_ranking)
 
 class mNB(MB,BaseClassifier):
     def __init__(self,threshold=1,ll_ranking=False,**kwargs):
