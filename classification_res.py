@@ -51,7 +51,7 @@ def precision(res_path,classifiers,secondary_identifier):
 
 if __name__ == "__main__":
     res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000"
-    classifiers=["kNN"]
+    classifiers=["LogisticRegression"]
     secondary_identifier="no_region_kids_home_news"
     """
     right_res_iter=RightResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)

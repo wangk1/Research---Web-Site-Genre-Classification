@@ -160,7 +160,7 @@ if __name__=="__main__":
     pickle_dir="pickle_dir"
 
     #CLASSIFICATION SETTINGS
-    settings=LearningSettings(type="supervised",dim_reduction="chi_sq",num_feats=0,feature_selection="summary",
+    settings=LearningSettings(type="supervised",dim_reduction="chi_sq_single_genre",num_feats=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
     settings.result_file_label="no_region_kids_home_news"
     threshold=4
@@ -184,7 +184,7 @@ if __name__=="__main__":
 
     #CLASSIFIERS
     classifier=classifiers.Classifier()
-    classifiers_list=[classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
+    classifiers_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
                       classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
@@ -211,8 +211,8 @@ if __name__=="__main__":
         #FEATURE SELECTION,FLATTEN TRAINIGN
         #count number of classes there are
         num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_set.y))))
-        feature_selector=SelectKBest(chi2,i)
-        #PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
+        #feature_selector=SelectKBest(chi2,i)
+        feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
 
         #flatten training
         flatten_training(train_set)

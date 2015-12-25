@@ -62,10 +62,10 @@ class PerClassFeatureSelector:
 
             genre_matches=[g == normalize_genre_string(g_1,1) for g_1 in y]
 
-            X_match=X[np.array(genre_matches)]
-            y_match=y[np.array(genre_matches)]
+            #X_match=X[np.array(genre_matches)]
+            #y_match=y[np.array(genre_matches)]
 
-            transformer_obj.fit(X_match,y_match)
+            transformer_obj.fit(X,genre_matches)
             transformer_list.append((g,transformer_obj))
 
         #now train the actual transformer
