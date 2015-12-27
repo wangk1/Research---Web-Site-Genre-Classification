@@ -41,7 +41,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
         #the directory to store the results of clustering
         res_dir=os.path.join(UNSUPERVISED_DIR,settings.clustering_alg,*settings.parent_clusters)
-
+        os.makedirs(res_dir,exist_ok=True)
 
         #ELIMATE CLUSTER LESS THAN 2 pages in size
         for cluster_name, cluster_genre_count in list(occurence_dict.items()):
@@ -57,7 +57,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
         res_file="{}/{}.pdf".format(res_dir,str(num_cluster))
 
-        os.makedirs(res_dir,exist_ok=True)
+
 
         clusterer.generate_cluster_distribution_graphs(res_file,occurence_dict,res_labels)
 
