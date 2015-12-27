@@ -75,6 +75,7 @@ class URLToGenre(DynamicDocument):
     url=StringField(unique=True,required=True)
     genres=ReferenceField(GenreMetaData)
     original=BooleanField(required=True,default=False)
+    ref_index=IntField(required=False,default=-2)
 
     #the following are optional fields that may exist
     parent=ListField()

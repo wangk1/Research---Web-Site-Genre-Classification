@@ -2,8 +2,13 @@ __author__ = 'Kevin'
 import itertools
 
 from analytics.classification_results.res_iterator import RightResultsIter,WrongResultsIter
+from misc_scripts.assign_ref_index import assign_ref_index_to_each_url
 
 if __name__=="__main__":
+
+    assign_ref_index_to_each_url()
+
+    """
     path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top4cls_10000"
     #path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_100_chi_truncated_lsa"
     classifier="LogisticRegression"
@@ -20,4 +25,4 @@ if __name__=="__main__":
 
     print("{},{}".format(correct,wrong))
 
-
+"""
