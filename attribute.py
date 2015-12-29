@@ -64,18 +64,19 @@ def url_ngram_queue():
 
         ngram=url_model.transform(url)
 
-        URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
+        all_gram_obj=URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
                                                                             for genre in url_to_genre_obj.genre]).save()
-        # for genre in url_to_genre_obj.genre:
-        #     del genre
-        #
-        # if hasattr(url_to_genre_obj,"genre_data") :
-        #     for genre in url_to_genre_obj.genre_data.genres:
-        #         del genre.genre
-        #
-        #     del url_to_genre_obj.genre_data
-        #
-        # del url_to_genre_obj
+        for genre in url_to_genre_obj.genre:
+            del genre
+
+        if hasattr(url_to_genre_obj,"genre_data") :
+            for genre in url_to_genre_obj.genre_data.genres:
+                del genre.genre
+
+            del url_to_genre_obj.genre_data
+
+        del url_to_genre_obj
+        del all_gram_obj
 
 
 
