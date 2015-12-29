@@ -56,7 +56,9 @@ def url_ngram_queue():
 
     url_model=URLTransformer()
 
-    for url_to_genre_obj in URLToGenre.objects:
+    for c,url_to_genre_obj in enumerate(URLToGenre.objects):
+        c%1000==0 and print("Doen with {}".format(c))
+
         ref_index=url_to_genre_obj.ref_index
         url=url_to_genre_obj.url
 
