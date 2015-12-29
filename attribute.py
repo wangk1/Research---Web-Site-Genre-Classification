@@ -79,8 +79,8 @@ def url_ngram_queue():
         del all_gram_obj
 
 def field_test():
-    for obj in Queue_full_page.objects:
-        print(obj)
+    for c,obj in enumerate(Queue_full_page.objects):
+        c%1000==0 and print("{} done".format(c))
 
 
 if __name__=="__main__":
