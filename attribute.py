@@ -78,9 +78,13 @@ def url_ngram_queue():
         del url_to_genre_obj
         del all_gram_obj
 
+def field_test():
+    for obj in Queue_full_page.objects:
+        print(obj)
 
 
 if __name__=="__main__":
-    url_ngram_queue()
+    field_test()
+    #url_ngram_queue()
     #DBQueue(Queue_full_page,"url_ngram_queue").create_queue(URLToGenre.objects(original=True))
     #full_page_bow()
