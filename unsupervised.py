@@ -25,13 +25,12 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         X,y,ref_ids=train_set.to_matrices()
 
         additional_notes=""
-        """
+
         if train_set.X.shape[0]<=settings.spectre_clustering_limit:
-            clustering_alg=SpectralClustering(n_clusters=num_cluster)
-            additional_notes="_spectral"
-        else
-        """
-        clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
+            clustering_alg=AgglomerativeClustering(n_clusters=num_cluster)
+            additional_notes="_agglomerative"
+        else:
+            clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
 
         clustering_logger.info("Using {}".format(str(clustering_alg)+additional_notes))
 
@@ -128,7 +127,7 @@ if __name__=="__main__":
     settings=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_feats=10000)
     settings.parent_clusters=[] #used to record a tree of parent clusters for the current cluster
 
-    settings.clustering_alg="kNN"
+    settings.clustering_alg="kNN_agglomerative"
     clustering_alg=KMeans
     settings.num_clusters=list({10})
     settings.max_cluster_size=10000 #the cluster will be further broken up if it is greater than this size
