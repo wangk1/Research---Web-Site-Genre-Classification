@@ -186,7 +186,7 @@ class MultiClassifier(BaseClassifier):
             classifier.fit(X[num],y)
 
 
-    def predict_multi(self):
+    def predict_multi(self,X):
         pass
 
 class LogisticRegression(LR,BaseClassifier):

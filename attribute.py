@@ -70,6 +70,9 @@ def url_ngram_queue():
             del genre
 
         if hasattr(url_to_genre_obj,"genre_data") :
+            for genre in url_to_genre_obj.genre_data.genres:
+                del genre.genre
+
             del url_to_genre_obj.genre_data
 
         del url_to_genre_obj
