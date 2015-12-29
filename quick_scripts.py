@@ -2,11 +2,12 @@ __author__ = 'Kevin'
 import itertools
 
 from analytics.classification_results.res_iterator import RightResultsIter,WrongResultsIter
-from misc_scripts.assign_ref_index import assign_ref_index_to_each_url
+from misc_scripts.assign_ref_index import assign_ref_index_to_each_url,reassign_ref_index_to_url_ngram
 
 if __name__=="__main__":
+    reassign_ref_index_to_url_ngram()
 
-    assign_ref_index_to_each_url()
+    #assign_ref_index_to_each_url()
 
     """
     path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top4cls_10000"

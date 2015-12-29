@@ -171,6 +171,23 @@ class BaseClassifier:
 
         return predictions_classes,class_to_prob_list
 
+class MultiClassifier(BaseClassifier):
+    """
+    Represents combination of multiple classifiers
+
+    """
+    def __init__(self,classifiers):
+        self.classifiers=classifiers
+
+    def fit(self,X,y):
+        for num,classifier in enumerate(self.classifiers):
+            classifier_logger.info("Fitting with {} on dataset {}".format(classifier,num))
+
+            classifier.fit(X[num],y)
+
+
+    def predict_multi(self):
+        pass
 
 class LogisticRegression(LR,BaseClassifier):
     def __init__(self,threshold=1,ll_ranking=False,**kwargs):

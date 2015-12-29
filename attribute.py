@@ -51,21 +51,27 @@ def url_ngram_queue():
 
     :return:
     """
-    queue=DBQueue(Queue_full_page,"url_ngram_queue")
-    ngram_model=NGrams()
+    #clearing db
+    URLAllGram.objects().delete()
+
     url_model=URLTransformer()
 
-    for number in range(queue.get_location(),Queue_full_page.objects.count()):
-        queue_obj=Queue_full_page.objects.get(number=number)
+    for url_to_genre_obj in URLToGenre.objects:
+        ref_index=url_to_genre_obj.ref_index
+        url=url_to_genre_obj.url
 
-        url_obj=URLToGenre.objects.get(url=queue_obj.url)
+        ngram=url_model.transform(url)
 
-        ngram=url_model.transform(url_obj.url)
+        URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
+                                                                            for genre in url_to_genre_obj.genre]).save()
+        for genre in url_to_genre_obj.genre:
+            del genre
 
-        URLAllGram(ngram=ngram,ngram_index=number,short_genres=[normalize_genre_string(genre.genre,2)
-                                                                            for genre in url_obj.genre]).save()
+        if hasattr(url_to_genre_obj,"genre_data") :
+            del url_to_genre_obj.genre_data
 
-        queue.increment_location()
+        del url_to_genre_obj
+
 
 
 if __name__=="__main__":

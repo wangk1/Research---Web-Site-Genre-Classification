@@ -116,4 +116,4 @@ TOP_X_CATEGORIES=6
 Pickling
 
 """
-PICKLE_DIR="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir"
+PICKLE_DIR="pickle_dir"

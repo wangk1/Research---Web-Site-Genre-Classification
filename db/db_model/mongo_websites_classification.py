@@ -69,13 +69,13 @@ class URLBow_fulltxt(Document):
 
 class URLAllGram(Document):
     short_genres=ListField(StringField(required=True))
-    ngram= DictField(field=IntField(),required=True)
-    ngram_index=IntField(required=True)
+    attr_map= DictField(field=IntField(),required=True)
+    ref_index=IntField(required=True)
 
     meta={'collection':'URLAllGram',
           'indexes':[
               'short_genres',
-              "ngram_index"
+              "ref_index"
 
           ],
           "db_alias":"Websites_classification"

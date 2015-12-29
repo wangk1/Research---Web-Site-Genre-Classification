@@ -83,7 +83,8 @@ class URLToGenre(DynamicDocument):
 
     meta={'collection':'URLToGenre',
           'indexes':[
-              'url'
+              'url',
+              'ref_index'
 
           ]}
 
