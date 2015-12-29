@@ -171,22 +171,45 @@ class BaseClassifier:
 
         return predictions_classes,class_to_prob_list
 
-class MultiClassifier(BaseClassifier):
+class MultiClassifier:
     """
     Represents combination of multiple classifiers
 
     """
-    def __init__(self,classifiers):
+    def __init__(self,classifiers,weights=[]):
         self.classifiers=classifiers
+        self.weights=weights
 
-    def fit(self,X,y):
+    def fit(self,train_X,train_y):
+        """
+        Fit the training set to each classifier.
+
+        :param train_X: A list or iterable of training X for each classifier
+        :param train_y: A numpy array or similar of labels. Note that there is only 1 label set for all train_X's
+        :return:
+        """
+        assert len(train_X)==len(self.classifiers)
+
         for num,classifier in enumerate(self.classifiers):
             classifier_logger.info("Fitting with {} on dataset {}".format(classifier,num))
 
-            classifier.fit(X[num],y)
+            classifier.fit(train_X[num],train_y)
 
 
-    def predict_multi(self,X):
+    def predict_multi(self,test_X):
+        """
+        Predict the individual test label with their respective classifier
+
+        :param test_X:
+        :return:
+        """
+        assert len(test_X) == len(self.classifiers)
+
+        predictions=[]
+        for classifier in self.classifiers:
+            predictions.append(classifier.predict_multi(test_X))
+
+
         pass
 
 class LogisticRegression(LR,BaseClassifier):
