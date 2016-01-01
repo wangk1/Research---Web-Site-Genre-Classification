@@ -32,12 +32,14 @@ def feature_selection(train_set,test_set,feature_selector,fit=True):
         if fit:
             feature_selector.fit(train_set.X,train_set.y)
 
-        train_set.X=feature_selector.transform(train_set.X)
+        X=feature_selector.transform(train_set.X)
 
         feature_logger.info("Post feature selection Train set: num features: {}".format(train_set.X.shape[1]))
 
-        test_set.X=feature_selector.transform(test_set.X)
+        test_X=feature_selector.transform(test_set.X)
         feature_logger.info("Post feature selection Test set: num features: {}".format(test_set.X.shape[1]))
+
+        return X,test_X
 
 class PerClassFeatureSelector:
     """

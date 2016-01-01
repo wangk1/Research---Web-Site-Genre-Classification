@@ -57,7 +57,7 @@ def url_ngram_queue():
     url_model=URLTransformer()
 
     for c,url_to_genre_obj in enumerate(URLToGenre.objects(original=True)):
-        c%1000==0 and print("Doen with {}".format(c))
+        c%1000==0 and print("Done with {}".format(c))
 
         ref_index=url_to_genre_obj.ref_index
         url=url_to_genre_obj.url
@@ -84,7 +84,7 @@ def field_test():
 
 
 if __name__=="__main__":
-    field_test()
+    url_ngram_queue()
     #url_ngram_queue()
     #DBQueue(Queue_full_page,"url_ngram_queue").create_queue(URLToGenre.objects(original=True))
     #full_page_bow()

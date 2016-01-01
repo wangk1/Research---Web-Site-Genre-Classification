@@ -171,9 +171,9 @@ class CategoricalBOW(Document):
 
 class URLBow(Document):
     url=StringField(required=True,unique=True)
-    bow=MapField(field=IntField(), default={})
+    attr_map=MapField(field=IntField(), default={})
     short_genres=ListField(StringField(),default=[])
-    index=IntField()
+    ref_index=IntField()
 
     meta={'collection':'URLBow',
           'indexes':[

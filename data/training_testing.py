@@ -4,6 +4,7 @@ from .util import *
 from util.Logger import Logger
 from data import LearningSettings
 
+
 __author__ = 'Kevin'
 
 
@@ -17,7 +18,7 @@ Label Convention
 
 """
 
-def _pick_random_samples(X,y,ref_index,num):
+def _pick_random_samples(Xs,y,ref_index,num):
     """
     Pickle random X,y,ref_index. Used to pick random number from X and y
 
@@ -31,14 +32,14 @@ def _pick_random_samples(X,y,ref_index,num):
 
     non_choices=list(set(range(0,len(ref_index)))-set(choices))
 
-    return X[choices],y[choices],ref_index[choices],X[non_choices],y[non_choices],ref_index[non_choices]
+    return [X[choices] for X in Xs],y[choices],ref_index[choices],[X[non_choices] for X in Xs],y[non_choices],ref_index[non_choices]
 
-def randomized_training_testing(settings,X,y,ref_index,num,do_pickle=True):
+def randomized_training_testing_sets(settings,Xs,y,ref_index,num,do_pickle=True):
     """
     Randomly choose from a super set of data and split it into a training set of size num. The remainder will become
         the Test set. Uses _pick_random_samples
 
-    :param settings:
+    :param setting:
     :param X:
     :param y:
     :param ref_index:
@@ -48,44 +49,55 @@ def randomized_training_testing(settings,X,y,ref_index,num,do_pickle=True):
 
     selector=np.not_equal(ref_index,None)
     ref_index=ref_index[selector]
-    X=X[selector]
+    Xs=[X[selector] for X in Xs]
     y=y[selector]
 
-    pickle_dir=settings.pickle_dir
+    train_Xs,train_y,train_ref_index,test_Xs,test_y,test_ref_index=_pick_random_samples(Xs,y,ref_index,num)
 
-    secondary_label="_"+settings.result_file_label if settings.result_file_label else settings.result_file_label
-    train_X_path=os.path.join(pickle_dir,"{}{}_trainX_{}_pickle".format(settings.type,secondary_label
-                                                                         ,settings.feature_selection))
-    train_y_path=os.path.join(pickle_dir,"{}{}_trainy_{}_pickle".format(settings.type,secondary_label
-                                                                         ,settings.feature_selection))
-    train_ref_index_path=os.path.join(pickle_dir,"{}{}_trainRefIndex_{}_pickle".format(settings.type,secondary_label
-                                                                                        ,settings.feature_selection))
-    test_X_path=os.path.join(pickle_dir,"{}{}_testX_{}_pickle".format(settings.type,secondary_label
-                                                                       ,settings.feature_selection))
-    test_y_path=os.path.join(pickle_dir,"{}{}_testy_{}_pickle".format(settings.type,secondary_label
-                                                                       ,settings.feature_selection))
-    test_ref_index_path=os.path.join(pickle_dir,"{}{}_testRefIndex_{}_pickle".format(settings.type,secondary_label
-                                                                                      ,settings.feature_selection))
-
-    train_X,train_y,train_ref_index,test_X,test_y,test_ref_index=_pick_random_samples(X,y,ref_index,num)
-
+    train_objs=[]
+    test_objs=[]
     if do_pickle:
-        pickle_obj(train_X,train_X_path)
-        pickle_obj(train_y,train_y_path)
-        pickle_obj(train_ref_index,train_ref_index_path)
+        for c,setting in enumerate(settings):
+            train_X=train_Xs[c]
+            test_X=test_Xs[c]
 
-        pickle_obj(test_X,test_X_path)
-        pickle_obj(test_y,test_y_path)
-        pickle_obj(test_ref_index,test_ref_index_path)
+            _pickle_training_testing(setting,train_X,train_y,train_ref_index,test_X,test_y,test_ref_index)
 
-    training_obj=Training(label=settings,pickle_dir=pickle_dir)
-    training_obj.set_data(train_X,train_y,train_ref_index)
+            training_obj=Training(label=setting,pickle_dir=setting.pickle_dir)
+            training_obj.set_data(train_X,train_y,train_ref_index)
 
-    testing_obj=Testing(label=settings,pickle_dir=pickle_dir)
-    testing_obj.set_data(test_X,test_y,test_ref_index)
+            testing_obj=Testing(label=setting,pickle_dir=setting.pickle_dir)
+            testing_obj.set_data(test_X,test_y,test_ref_index)
 
-    return training_obj,testing_obj
+            train_objs.append(training_obj)
+            test_objs.append(testing_obj)
 
+    return train_objs,test_objs
+
+def _pickle_training_testing(setting,train_X,train_y,train_ref_index,test_X,test_y,test_ref_index):
+    dir_path=os.path.join(setting.pickle_dir,setting.feature_selection)
+    os.makedirs(dir_path,exist_ok=True)
+
+    secondary_label="_"+setting.result_file_label if setting.result_file_label else setting.result_file_label
+    train_X_path=os.path.join(dir_path,"{}{}_trainX_{}_pickle".format(setting.type,secondary_label
+                                                                         ,setting.feature_selection))
+    train_y_path=os.path.join(dir_path,"{}{}_trainy_{}_pickle".format(setting.type,secondary_label
+                                                                         ,setting.feature_selection))
+    train_ref_index_path=os.path.join(dir_path,"{}{}_trainRefIndex_{}_pickle".format(setting.type,secondary_label
+                                                                                        ,setting.feature_selection))
+    test_X_path=os.path.join(dir_path,"{}{}_testX_{}_pickle".format(setting.type,secondary_label
+                                                                       ,setting.feature_selection))
+    test_y_path=os.path.join(dir_path,"{}{}_testy_{}_pickle".format(setting.type,secondary_label
+                                                                       ,setting.feature_selection))
+    test_ref_index_path=os.path.join(dir_path,"{}{}_testRefIndex_{}_pickle".format(setting.type,secondary_label
+                                                                                      ,setting.feature_selection))
+    pickle_obj(train_X,train_X_path)
+    pickle_obj(train_y,train_y_path)
+    pickle_obj(train_ref_index,train_ref_index_path)
+
+    pickle_obj(test_X,test_X_path)
+    pickle_obj(test_y,test_y_path)
+    pickle_obj(test_ref_index,test_ref_index_path)
 
 
 class BaseData:
@@ -391,10 +403,10 @@ class Testing(BaseData):
 
         data_set_train_index=2
         if secondary_label:
-            path_elements=[self.label.type,secondary_label,"trainX",self.label.feature_selection,"pickle"]
+            path_elements=[self.label.type,secondary_label,"testX",self.label.feature_selection,"pickle"]
         else:
             data_set_train_index=1
-            path_elements=[self.label.type,"trainX",self.label.feature_selection,"pickle"]
+            path_elements=[self.label.type,"testX",self.label.feature_selection,"pickle"]
 
         testX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
 
@@ -414,3 +426,21 @@ class Testing(BaseData):
 
         return self
 
+class MultiData:
+
+    def __init__(self,Xs,ys,ref_index):
+        self.Xs_=Xs
+        self.ys_=ys
+        self.ref_index_=ref_index
+
+    @property
+    def X(self):
+        return self.Xs_
+
+    @property
+    def y(self):
+        return self.ys_
+
+    @property
+    def ref_indexes(self):
+        return self.ref_index_

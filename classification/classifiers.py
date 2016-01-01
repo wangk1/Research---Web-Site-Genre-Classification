@@ -4,6 +4,7 @@ import os
 
 import numpy as np
 import pandas as pd
+import collections as coll
 from sklearn.feature_extraction import DictVectorizer
 import scipy.sparse as sp
 from sklearn.linear_model.logistic import LogisticRegression as LR
@@ -39,33 +40,7 @@ class Classifier:
         self.res_dir="classification_res\\supervised"
 
 
-    def classify(self,learn_settings,train_set,test_set,classifiers,increment=500):
-        """
-        Classify with test_X and generate result files for each classifier set
 
-        :param classifiers: set of additional classifier to test with in addition to self.classifier classifiers
-        :return:
-        """
-        for classifier in classifiers:
-
-            classifier_name=re.search(r"(?<=')(.*)(?=')",str(type(classifier))).group(1).split(".")[-1]
-
-            classifier_logger.info("Classifying with {} with {} training and {} labels".format(classifier_name,
-                                                                                               train_set.X.shape[0],
-                                                                                               train_set.y.shape[0]))
-            classifier.fit(train_set.X,train_set.y)
-
-            classifier_logger.info("Fitting done, predicting with test set")
-
-            res,res_prob_list=classifier\
-                    .predict_multi(test_set.X)
-
-            print("Done, printing Results for {}".format(classifier_name))
-            self.print_res(learn_settings,
-                  y=test_set.y,
-                  predictions=res,
-                  ref_indexes=test_set.ref_indexes,
-                  classifier_name=classifier_name)
 
                 # #write out the probability
                 # with open("ll_prob_1",mode="a") as ll_file:
@@ -89,12 +64,14 @@ class Classifier:
         :param ref_indexes:
         :return:
         """
-        folder_path="{}/{}".format(self.res_dir,learn_settings.label)
+        label="_".join([setting.label for setting in learn_settings] if isinstance(learn_settings,coll.Iterable) else learn_settings.label)
+
+        folder_path="{}/{}".format(self.res_dir,label)
 
         #make dir if not exist
         os.makedirs(folder_path,exist_ok=True)
 
-        output_file="{}/{}{}_cres.txt".format(folder_path,classifier_name,"" if learn_settings.result_file_label=="" else "_"+learn_settings.result_file_label)
+        output_file="{}/{}{}_cres.txt".format(folder_path,classifier_name,"" if learn_settings[0].result_file_label=="" else "_"+learn_settings[0].result_file_label)
 
         #emit the csv
         with open(output_file,mode="w") as output_handler:
@@ -126,7 +103,16 @@ class BaseClassifier:
         self.threshold=threshold
         self.ll_ranking=ll_ranking
 
-    def predict_multi(self, X,predictions_per_stack=1500):
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return re.search(r"(?<=')(.*)(?=')",str(type(self))).group(1).split(".")[-1]
+
+    def predict_proba(self,X):
+        raise NotImplementedError("Not implemented")
+
+    def predict_multi(self, X,predictions_per_stack=1500,return_prediction_prob=False):
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
 
@@ -134,7 +120,9 @@ class BaseClassifier:
         :param top_k:
         :return:
         """
-
+        prediction_res=None
+        predictions_probs=None
+        predictions_classes=None
 
         if self.ll_ranking:
             #get the best class based on log likelihood
@@ -148,37 +136,47 @@ class BaseClassifier:
                 res_classes.append(self.classes_[[c for c,ll in enumerate(row) if best_values[c]-ll<=self.threshold]])
 
         else:
-            assert self.threshold<self.classes_.shape[0]
 
-            predictions_classes=None
+
             for c,r in enumerate(range(0,X.shape[0],predictions_per_stack)):
                 print("On Stack {}".format(c))
 
                 X_slice=X[r:r+predictions_per_stack if r+predictions_per_stack<X.shape[0] else X.shape[0]]
-                prediction=self.predict_proba(X_slice)
-                top_x_indexes=np.argsort(prediction)[:,:-(self.threshold+1):-1]
+                prediction_prob=self.predict_proba(X_slice)
 
-                res_classes=self.classes_[top_x_indexes]
+                if return_prediction_prob:
+                    predictions_probs=np.vstack((predictions_probs,prediction_prob)) \
+                        if predictions_probs is not None else prediction_prob
 
-                predictions_classes=np.vstack((predictions_classes,res_classes)) if predictions_classes is not None else res_classes
 
-        print("Total number of predictions: {}".format(predictions_classes.shape[0]))
+                else:
+                    top_x_indexes=np.argsort(prediction_prob)[:,:-(self.threshold+1):-1]
 
-        class_to_prob_list=[]
-        #construction a list of dictionary of classes to their likelihood values
-        #for p_row in predictions:
-            #class_to_prob_list.append({c:p for (p,c) in zip(p_row,self.classes_)})
+                    res_classes=self.classes_[top_x_indexes]
+                    predictions_classes=np.vstack((predictions_classes,res_classes)) if predictions_classes is not None else res_classes
 
-        return predictions_classes,class_to_prob_list
+            prediction_res=predictions_classes if not return_prediction_prob else predictions_probs
 
-class MultiClassifier:
+        print("Total number of predictions: {}".format(prediction_res.shape[0]))
+
+        return prediction_res
+
+class MultiClassifier(BaseClassifier):
     """
     Represents combination of multiple classifiers
 
     """
-    def __init__(self,classifiers,weights=[]):
+    def __init__(self,classifiers,weights=None,**kwargs):
+        super().__init__(**kwargs)
         self.classifiers=classifiers
         self.weights=weights
+        self.classes_=None
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return ",".join((str(c) for c in self.classifiers))
 
     def fit(self,train_X,train_y):
         """
@@ -195,22 +193,52 @@ class MultiClassifier:
 
             classifier.fit(train_X[num],train_y)
 
+        self.classes_=self.classifiers[0].classes_
 
-    def predict_multi(self,test_X):
+
+    def predict_proba(self,test_Xs):
         """
         Predict the individual test label with their respective classifier
 
-        :param test_X:
+        :param test_Xs:
         :return:
         """
-        assert len(test_X) == len(self.classifiers)
-
-        predictions=[]
-        for classifier in self.classifiers:
-            predictions.append(classifier.predict_multi(test_X))
+        assert len(test_Xs) == len(self.classifiers)
 
 
-        pass
+        self.classes_=self.classifiers[0].classes_
+        prediction_probs=self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
+
+        for classifier,test_X in zip(self.classifiers[1:],test_Xs[1:]):
+            assert classifier.classes_==self.classes_
+
+            prediction_probs+=classifier.predict_multi(test_X,return_prediction_prob=True)
+
+        return prediction_probs
+
+    def predict_multi(self,X):
+
+        """
+        Alternative predict function for logistic regression, returns the top predictions for test instances
+
+        :param X:
+        :param top_k:
+        :return:
+        """
+        predictions_classes=None
+        predictions_probs=self.predict_proba(X)
+
+        if self.ll_ranking:
+            #get the best class based on log likelihood
+            raise NotImplementedError("LL Ranking not implemented")
+
+        else:
+            top_x_indexes=np.argsort(predictions_probs)[:,:-(self.threshold+1):-1]
+
+            predictions_classes=self.classes_[top_x_indexes]
+
+
+        return predictions_classes
 
 class LogisticRegression(LR,BaseClassifier):
     def __init__(self,threshold=1,ll_ranking=False,**kwargs):

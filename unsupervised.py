@@ -29,6 +29,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
         if train_set.X.shape[0]<=settings.spectre_clustering_limit:
             clustering_alg=AgglomerativeClustering(n_clusters=num_cluster)
             additional_notes="_agglomerative"
+            X=X.toarray()
         else:
             clustering_alg=clustering_alg_cls(n_clusters=num_cluster)
 

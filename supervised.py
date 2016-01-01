@@ -1,4 +1,6 @@
+import functools
 import itertools
+import re
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, chi2
@@ -17,12 +19,17 @@ from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 import classification.classifiers as classifiers
-from data.training_testing import Training,Testing,randomized_training_testing
+from data.training_testing import Training,Testing,randomized_training_testing_sets,MultiData
 from data import LearningSettings
 from data.util import unpickle_obj,flatten_training
 from util.base_util import normalize_genre_string
 from classification_attribute.feature_selection import PerClassFeatureSelector
+from util.genre import filter_genres
+from util.Logger import Logger
+from classification.classifiers import MultiClassifier
+from data.X_y import match_sets_based_on_ref_id
 
+supervised_logger=Logger()
 
 genre_dict={'Sports': 8757,
             'Business': 8553,
@@ -130,25 +137,70 @@ ignore_genre={
     "News"
 }
 
-def filter_genres(X,y,ref_indexes):
-    """
-    Cleans up the label set, remove those in the ignore list from the websites.
 
-    :param X:
+
+def classify(classifier_util,learn_settings,train_set,test_set,classifier,increment=500):
+        """
+        Classify with test_X and generate result files for each classifier set
+
+        :param classifiers: set of additional classifier to test with in addition to self.classifier classifiers
+        :return:
+        """
+
+
+        classifier_name=str(classifier)
+
+
+        supervised_logger.info("Classifying with {}".format(classifier_name))
+        classifier.fit(train_set.X,train_set.y)
+
+        supervised_logger.info("Fitting done, predicting with test set")
+
+        res=classifier\
+                .predict_multi(test_set.X)
+
+        print("Done, printing Results for {}".format(classifier_name))
+        classifier_util.print_res(learn_settings,
+              y=test_set.y,
+              predictions=res,
+              ref_indexes=test_set.ref_indexes,
+              classifier_name=classifier_name)
+
+def load_training_testing(Xs,y,ref_index,settings,train_set_size,random_pick_test_training):
+    """
+    Load training and testing set or randomly pick then from Xs,y,and ref_index.
+
+    :param Xs:
     :param y:
-    :param ref_indexes:
-    :return:
+    :param ref_index:
+    :param settings:
+    :param train_set_size:
+    :return: List of train_set and test_set objs
     """
-    removal_count={g:0 for g in ignore_genre}
+    if not (hasattr(y,"shape") and hasattr(ref_index,"shape")):
+        raise AttributeError("Only 1 set of common y(label) and ref index accepted for all Xs")
 
-    for index,g_list in enumerate(y):
-        y[index]=list(set(g_list)-ignore_genre)
+    if random_pick_test_training:
+        train_sets,test_sets=randomized_training_testing_sets(settings,Xs,y,ref_index,train_set_size)
+    else:
+        train_sets=[]
+        test_sets=[]
 
-    keep_index=np.array([i!=[] for i in y])
+        for setting in settings:
+            train_set=Training(setting,pickle_dir=setting.pickle_dir)
+            train_set.load_training(secondary_label=setting.result_file_label)
 
-    print("Eliminated {} webpages".format(y.shape[0]-sum(keep_index)))
+            test_set=Testing(setting,pickle_dir=setting.pickle_dir)
+            test_set.load_testing(secondary_label=setting.result_file_label)
 
-    return X[keep_index],y[keep_index],ref_indexes[keep_index]
+            train_sets.append(train_set)
+            test_sets.append(test_set)
+
+    #flatten training
+    for train_set in train_sets:
+        flatten_training(train_set)
+
+    return train_sets,test_sets
 
 
 if __name__=="__main__":
@@ -159,32 +211,82 @@ if __name__=="__main__":
     res_dir="classification_res"
     pickle_dir="pickle_dir"
 
-    #CLASSIFICATION SETTINGS
-    settings=LearningSettings(type="supervised",dim_reduction="chi_sq_single_genre",num_feats=0,feature_selection="summary",
+    """
+    CLASSIFICATION SETTINGS
+    """
+    setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
-    settings.result_file_label="no_region_kids_home_news"
-    threshold=4
-    ll_ranking=False
-    num_attributes={10000}
 
+    #setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
+    #                          pickle_dir=pickle_dir,res_dir=res_dir)
+    settings=[setting,
+              #setting2
+              ]
+
+    for setting in settings:
+        setting.result_file_label="no_region_kids_home_news"
+        setting.threshold=4
+        setting.ll_ranking=False
+        setting.num_attributes=10000
+
+    #GLOBAL SETTINGS
     train_set_size=50000
     random_pick_test_training=False
 
+    """
+    LOAD DATA, preprocess
+    """
+    #WARNING: REF INDEX for each individual X set must match row to row
+    Xs=[]
+    ys=[]
+    ref_indexes_unmatched=[]
 
-    #LOAD AND PREPROCESS DATA SETS
-    X=unpickle_obj("pickle_dir\\X_summary_pickle")
-    y=unpickle_obj("pickle_dir\\y_summary_pickle")
-    #normalize genres
-    y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
-    ref_indexes=unpickle_obj("pickle_dir\\refIndex_summary_pickle")
+    for setting in settings:
+        supervised_logger.info("Loading data for {}".format(setting))
+        X=unpickle_obj("pickle_dir\\{}\\X_{}_pickle".format(setting.feature_selection,setting.feature_selection))
+        ref_index=unpickle_obj("pickle_dir\\{}\\refIndex_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+        y=unpickle_obj("pickle_dir\\{}\\y_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+        y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
 
-    #filter out unwanted genres
-    X,y,ref_indexes=filter_genres(X,y,ref_indexes)
+        #filter out unwanted genres
+        X_filtered,y_filtered,ref_index_filtered=filter_genres(X,y,ref_index,ignore_genre)
+        ref_indexes_unmatched.append(ref_index_filtered)
+        Xs.append(X_filtered)
+        ys.append(y_filtered)
+
+    #match refids
+    supervised_logger.info("Making ref indexes match for the data sets")
+    Xs,ys,ref_indexes=match_sets_based_on_ref_id(Xs,ys,ref_indexes_unmatched)
+
+    #make sure ref indexes match
+    match=True
+    prev_index=ref_indexes_unmatched[0]
+    for ref_index in ref_indexes_unmatched[1:]:
+        match=(prev_index==ref_index).all()
+        prev_index=ref_index
+
+    if not match:
+        raise AttributeError("The matrices's reference indexes do not match, proceeding will resulting in wrong mapping"
+                             "between instances")
+
+    """
+    TRAINING AND TESTING SETS LOADING, NO FEATURE EXTRACT and DIMENSIONALITY REDUCTION YET
 
 
-    #CLASSIFIERS
+    """
+    supervised_logger.info("Generating or loading training samples")
+    train_sets,test_sets=load_training_testing(Xs,ys[0],ref_indexes[0],settings,train_set_size,random_pick_test_training)
+
+
+    """
+    INITIALIZE CLASSIFIERS
+    """
     classifier=classifiers.Classifier()
-    classifiers_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
+
+    for setting in settings:
+        threshold=setting.threshold
+        ll_ranking=setting.ll_ranking
+        setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
                       classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
@@ -194,32 +296,45 @@ if __name__=="__main__":
 
 
 
-    for i in num_attributes:
-        settings.num_feats=i
+    """
+    FEATURE SELECTION and EXTRACTION
+    """
 
-        #LOAD TRAINING AND TESTING
-        #randomly pick from the entire set
-        if random_pick_test_training:
-            train_set,test_set=randomized_training_testing(settings,X,y,ref_indexes,train_set_size)
-        else:
-            train_set=Training(settings,pickle_dir=settings.pickle_dir)
-            train_set.load_training(secondary_label=settings.result_file_label)
 
-            test_set=Testing(settings,pickle_dir=settings.pickle_dir)
-            test_set.load_testing(secondary_label=settings.result_file_label)
+    for index,setting in enumerate(settings):
+        num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
 
-        #FEATURE SELECTION,FLATTEN TRAINIGN
-        #count number of classes there are
-        num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_set.y))))
-        #feature_selector=SelectKBest(chi2,i)
-        feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,i//num_genres)])
+        feature_selector=SelectKBest(chi2,setting.num_attributes)
+        #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
 
-        #flatten training
-        flatten_training(train_set)
+        train_set=train_sets[index]
+        test_set=test_sets[index]
 
-        feature_selection(train_set,test_set,feature_selector,fit=True)
+        supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
+        train_set.X,test_set.X=feature_selection(train_set,test_set,feature_selector,fit=True)
+
+    train_Xs=[train_set.X for train_set in train_sets]
+    train_y=train_sets[0].y
+    train_ref_indexes=train_sets[0].ref_indexes
+
+    train_set=MultiData(train_Xs,train_y,train_ref_indexes)
+
+    test_Xs=[test_set.X for test_set in test_sets]
+    test_y=test_sets[0].y
+    test_ref_indexes=test_sets[0].ref_indexes
+
+    test_set=MultiData(test_Xs,test_y,test_ref_indexes)
+
+    """
+    CLASSIFICATION
+    """
+
+    for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
+        multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
 
         #CLASSIFICATION
-        classifier=classifiers.Classifier()
-        classifier.classify(settings,train_set,test_set,classifiers_list)
+        classifier_util=classifiers.Classifier()
+        classify(classifier_util,settings,train_set,test_set,multi_classifier)
+
+
 

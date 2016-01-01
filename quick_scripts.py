@@ -2,10 +2,10 @@ __author__ = 'Kevin'
 import itertools
 
 from analytics.classification_results.res_iterator import RightResultsIter,WrongResultsIter
-from misc_scripts.assign_ref_index import assign_ref_index_to_each_url,reassign_ref_index_to_url_ngram
+from misc_scripts.assign_ref_index import global_ref_id
 
 if __name__=="__main__":
-    reassign_ref_index_to_url_ngram()
+    global_ref_id()
 
     #assign_ref_index_to_each_url()
 
