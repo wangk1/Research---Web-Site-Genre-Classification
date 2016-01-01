@@ -16,7 +16,7 @@ def global_ref_id():
     """
     urls=set()
     largest_ref_index=0
-    for c,url_summary_obj in enumerate(URLBow.objects):
+    for c,url_summary_obj in enumerate(URLBow.objects.no_cache()):
         c%1000==0 and print("Done with {}".format(c))
         url=url_summary_obj.url
         urls.add(url)
@@ -32,9 +32,11 @@ def global_ref_id():
         URLToGenre.objects(url=url).update(ref_index=ref_index)
 
     print("Done with normal ones, just finishing off the rest of URLTOGenre")
-    for url_to_genre_obj in URLToGenre.objects:
+    for c,url_to_genre_obj in enumerate(URLToGenre.objects.no_cache()):
         if url_to_genre_obj.url in urls:
             continue
+
+        c%1000==0 and print("Done with {}".format(c))
 
         largest_ref_index+=1
         url_to_genre_obj.update(ref_index=largest_ref_index)
