@@ -77,6 +77,7 @@ class URLAllGram(Document):
               'short_genres',
               "ref_index"
 
+
           ],
           "db_alias":"Websites_classification"
           }

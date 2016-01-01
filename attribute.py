@@ -56,7 +56,7 @@ def create_url_ngram():
 
     url_model=URLTransformer()
 
-    for c,url_to_genre_obj in enumerate(URLToGenre.objects(original=True)):
+    for c,url_to_genre_obj in enumerate(URLToGenre.objects(original=True).no_cache()):
         c%1000==0 and print("Done with {}".format(c))
 
         ref_index=url_to_genre_obj.ref_index
@@ -64,19 +64,9 @@ def create_url_ngram():
 
         ngram=url_model.transform(url)
 
-        all_gram_obj=URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
+        URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
                                                                             for genre in url_to_genre_obj.genre]).save()
-        for genre in url_to_genre_obj.genre:
-            del genre
 
-        if hasattr(url_to_genre_obj,"genre_data") :
-            for genre in url_to_genre_obj.genre_data.genres:
-                del genre.genre
-
-            del url_to_genre_obj.genre_data
-
-        del url_to_genre_obj
-        del all_gram_obj
 
 def field_test():
     for c,obj in enumerate(Queue_full_page.objects):
