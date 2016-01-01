@@ -64,8 +64,8 @@ def create_url_ngram():
 
         ngram=url_model.transform(url)
 
-        URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
-                                                                            for genre in url_bow_obj.genre]).save()
+        URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=list(set([normalize_genre_string(genre,1)
+                                                                            for genre in url_bow_obj.short_genres]))).save()
 
 
 def field_test():
