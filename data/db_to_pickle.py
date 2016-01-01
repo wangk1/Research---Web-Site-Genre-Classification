@@ -39,14 +39,14 @@ def db_to_pickle(src_db,secondary_path=""):
 
     print("Fitting vocabulary")
     vectorizer=DictVectorizer()
-    vectorizer.fit(vocabulary_dict)
+    vectorizer.fit([vocabulary_dict])
 
     print("Transforming")
     stack=500
     X_stack=[]
     y_stack=[]
     ref_index=[]
-    for c,all_gram_obj in enumerate(src_db.objects):
+    for c,all_gram_obj in enumerate(src_db.objects.no_cache()):
         c%10000==0 and print(c)
 
         X_stack.append(all_gram_obj.attr_map)
