@@ -4,7 +4,7 @@ __author__ = 'Kevin'
 from classification_attribute.feature_selection import BagOfWords
 from classification_attribute.word_based import NGrams
 from db.db_model.mongo_queue_models import Queue_full_page
-from db.db_model.mongo_websites_models import URLToGenre
+from db.db_model.mongo_websites_models import URLToGenre,URLBow
 from db.db_model.mongo_websites_classification import URLBow_fulltxt,URLAllGram
 from db import DBQueue
 from util.base_util import normalize_genre_string,unreplace_dot_url
@@ -56,16 +56,16 @@ def create_url_ngram():
 
     url_model=URLTransformer()
 
-    for c,url_to_genre_obj in enumerate(URLToGenre.objects(original=True).no_cache()):
+    for c,url_bow_obj in enumerate(URLBow.objects.no_cache()):
         c%1000==0 and print("Done with {}".format(c))
 
-        ref_index=url_to_genre_obj.ref_index
-        url=url_to_genre_obj.url
+        ref_index=url_bow_obj.ref_index
+        url=url_bow_obj.url
 
         ngram=url_model.transform(url)
 
         URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=[normalize_genre_string(genre.genre,1)
-                                                                            for genre in url_to_genre_obj.genre]).save()
+                                                                            for genre in url_bow_obj.genre]).save()
 
 
 def field_test():
