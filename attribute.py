@@ -45,7 +45,7 @@ def full_page_bow():
         queue.increment_location()
 
 
-def url_ngram_queue():
+def create_url_ngram():
     """
     Create ngram database of all the urls in the URLToGenre database that has original flag set to true
 
@@ -84,7 +84,7 @@ def field_test():
 
 
 if __name__=="__main__":
-    url_ngram_queue()
+    create_url_ngram()
     #url_ngram_queue()
     #DBQueue(Queue_full_page,"url_ngram_queue").create_queue(URLToGenre.objects(original=True))
     #full_page_bow()

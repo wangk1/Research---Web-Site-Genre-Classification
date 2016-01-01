@@ -14,10 +14,22 @@ def global_ref_id():
 
     :return:
     """
-    for url_summary_obj in URLBow.objects:
+    urls=set()
+    largest_ref_index=0
+    for c,url_summary_obj in enumerate(URLBow.objects):
+        c%1000==0 and print("Done with {}".format(c))
         url=url_summary_obj.url
+        urls.add(url)
         ref_index=url_summary_obj.ref_index
+        if ref_index > largest_ref_index:
+            largest_ref_index=ref_index
 
         URLToGenre.objects(url=url).update(ref_index=ref_index)
 
+    print("Done with normal ones, just finishing off the rest of URLTOGenre")
+    for url_to_genre_obj in URLToGenre.objects:
+        if url_to_genre_obj.url in urls:
+            continue
 
+        largest_ref_index+=1
+        url_to_genre_obj.update(ref_index=largest_ref_index)
