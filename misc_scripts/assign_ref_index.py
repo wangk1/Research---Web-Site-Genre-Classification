@@ -21,6 +21,11 @@ def global_ref_id():
         url=url_summary_obj.url
         urls.add(url)
         ref_index=url_summary_obj.ref_index
+
+        if ref_index is None:
+            ref_index=largest_ref_index+1
+            url_summary_obj.update(ref_index=ref_index)
+
         if ref_index > largest_ref_index:
             largest_ref_index=ref_index
 
