@@ -1,7 +1,7 @@
 __author__ = 'Kevin'
 from data.util import unpickle_obj
 import numpy as np
-
+from warnings import warn
 
 def load_X_y(path_X,path_y):
     return unpickle_obj(path_X), unpickle_obj(path_y)
@@ -24,6 +24,11 @@ def match_sets_based_on_ref_id(Xs,ys,ref_ids):
         for index in range(0,len(ref_ids)):
             if index==smallest_index:
                 continue
+
+            #make sure no repeats
+            if len(ref_ids[index]) != len(set(ref_ids[index])):
+                warn("Repeat of ref ids detected in data set {}".format(index))
+
             c_ref_ids=ref_ids[index]
             c_X=Xs[index]
             c_y=ys[index]

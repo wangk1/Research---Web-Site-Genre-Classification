@@ -63,9 +63,9 @@ def db_to_pickle(src_db,secondary_path=""):
 
     os.makedirs(dir_path,exist_ok=True)
 
-    X_path=os.path.join(dir_path,"X_url_pickle")
-    y_path=os.path.join(dir_path,"y_url_pickle")
-    ref_path=os.path.join(dir_path,"refIndex_url_pickle")
+    X_path=os.path.join(dir_path,"X_{}_pickle".format(secondary_path))
+    y_path=os.path.join(dir_path,"y_{}_pickle".format(secondary_path))
+    ref_path=os.path.join(dir_path,"refIndex_{}_pickle".format(secondary_path))
 
     pickle_obj(X,X_path)
     pickle_obj(y,y_path)

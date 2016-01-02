@@ -217,10 +217,10 @@ if __name__=="__main__":
     setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
                               pickle_dir=pickle_dir,res_dir=res_dir)
 
-    #setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
-    #                          pickle_dir=pickle_dir,res_dir=res_dir)
+    setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
+                             pickle_dir=pickle_dir,res_dir=res_dir)
     settings=[setting,
-              #setting2
+              setting2
               ]
 
     for setting in settings:
