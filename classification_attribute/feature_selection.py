@@ -22,7 +22,7 @@ def feature_selection(train_set,test_set,feature_selector,fit=True):
         Perform feature selection, applied to the whole dataset. Must be done before loading testing sets
 
         :param feat_selector: The feature selector
-        :return:
+        :return: train_X,test_X both with reduced features
         """
 
         assert hasattr(feature_selector,"transform")
@@ -34,10 +34,10 @@ def feature_selection(train_set,test_set,feature_selector,fit=True):
 
         X=feature_selector.transform(train_set.X)
 
-        feature_logger.info("Post feature selection Train set: num features: {}".format(train_set.X.shape[1]))
+        feature_logger.info("Post feature selection Train set: num features: {}".format(X.shape[1]))
 
         test_X=feature_selector.transform(test_set.X)
-        feature_logger.info("Post feature selection Test set: num features: {}".format(test_set.X.shape[1]))
+        feature_logger.info("Post feature selection Test set: num features: {}".format(test_X.shape[1]))
 
         return X,test_X
 

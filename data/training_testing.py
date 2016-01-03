@@ -3,7 +3,9 @@ from .util import *
 
 from util.Logger import Logger
 from data import LearningSettings
+from warnings import warn
 
+from data.X_y import load_X_y_refIndex
 
 __author__ = 'Kevin'
 
@@ -127,7 +129,7 @@ class BaseData:
 
         self._X=None
         self._y=None
-        self._ref_indexes=None
+        self._ref_index=None
 
         self.vocab_vectorizer=vocab_vectorizer
         self.genre_mapping=genre_mapping
@@ -149,7 +151,7 @@ class BaseData:
         :param pickle:
         :return:
         """
-
+        warn.warn("Load from Source have been deprecated")
         assert hasattr(self,"source")
 
         loaded=False
@@ -158,7 +160,7 @@ class BaseData:
             try:
                 self._X=unpickle_obj(pickle_X_path)
                 self._y=unpickle_obj(pickle_y_path)
-                self._ref_indexes=unpickle_obj(pickle_ref_id_path)
+                self._ref_index=unpickle_obj(pickle_ref_id_path)
                 loaded=True
                 data_logger.info("Successfully loaded samples from pickle")
             except FileNotFoundError:
@@ -193,13 +195,14 @@ class BaseData:
                 del matrix_cache
 
             self._y=np.asarray(labels)
-            self._ref_indexes=np.asarray(ref_indexes)
+            self._ref_index=np.asarray(ref_indexes)
 
             #pickle if so
             if pickle:
                 self.save_to_pickle(pickle_X_path,pickle_y_path,pickle_ref_id_path)
 
         data_logger.info("Final set size: {}".format(self._X.shape[0]))
+
 
     def save_to_pickle(self,pickle_X_path,pickle_y_path,pickle_ref_id_path):
         """
@@ -214,7 +217,7 @@ class BaseData:
         data_logger.info("Pickling {} set".format(self.type))
         pickle_obj(self._X,pickle_X_path)
         pickle_obj(self._y,pickle_y_path)
-        pickle_obj(self._ref_indexes,pickle_ref_id_path)
+        pickle_obj(self._ref_index,pickle_ref_id_path)
         data_logger.info("Successfully save {} samples from pickle".format(self.type))
 
 
@@ -229,10 +232,10 @@ class BaseData:
         """
         X=self._X
         y=self._y
-        ref_indexes=self._ref_indexes
+        ref_indexes=self._ref_index
 
         if self.choose_ids:
-            choices=np.apply_along_axis(lambda e:e in self.choose_ids,0,self._ref_indexes)
+            choices=np.apply_along_axis(lambda e:e in self.choose_ids,0,self._ref_index)
 
             X=X[choices]
             y=y[choices]
@@ -244,7 +247,7 @@ class BaseData:
     def set_data(self,X,y,ref_id):
         self.X=X
         self.y=y
-        self.ref_indexes=ref_id
+        self.ref_index=ref_id
 
     @property
     def shape(self):
@@ -268,12 +271,12 @@ class BaseData:
         self._y=y
 
     @property
-    def ref_indexes(self):
-        return self._ref_indexes
+    def ref_index(self):
+        return self._ref_index
 
-    @ref_indexes.setter
-    def ref_indexes(self,r_i):
-        self._ref_indexes=r_i
+    @ref_index.setter
+    def ref_index(self,r_i):
+        self._ref_index=r_i
 
 class Training(BaseData):
     def __init__(self,label,*,train_set_source=None,pickle_dir,genre_mapping=None,choose_ids=None):
@@ -341,9 +344,6 @@ class Training(BaseData):
         if self._X is not None:
             data_logger.info("Reloading training samples")
 
-        # if self.vocab_vectorizer is None:
-        #     self.fit_vocab(load_vectorizer_from_file=maybe_load_vectorizer_from_pickle)
-
         data_logger.info("Loading training set for {}".format(self.label))
 
         data_set_train_index=2
@@ -353,20 +353,16 @@ class Training(BaseData):
             path_elements=[self.label.type,"trainX",self.label.feature_selection,"pickle"]
             data_set_train_index=1
 
-        trainX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        dir=os.path.join(self.pickle_dir,self.label.feature_selection)
+        trainX_pickle_path=dir+"/{}".format("_".join(path_elements))
 
         path_elements[data_set_train_index]="trainy"
-        trainy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        trainy_pickle_path=dir+"/{}".format("_".join(path_elements))
 
         path_elements[data_set_train_index]="trainRefIndex"
-        ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        ref_id_pickle_path=dir+"/{}".format("_".join(path_elements))
 
-        self._load_from_source(stack_per_sample=stack_per_sample,
-                  pickle_X_path=trainX_pickle_path,
-                  pickle_y_path=trainy_pickle_path,
-                  pickle_ref_id_path=ref_id_pickle_path,
-                  maybe_load_from_pickle=maybe_load_training_from_pickle,
-                  pickle=pickle_training)
+        self._X,self._y,self._ref_index=load_X_y_refIndex(trainX_pickle_path,trainy_pickle_path,ref_id_pickle_path)
 
         return self
 
@@ -389,11 +385,9 @@ class Testing(BaseData):
         self.vocab_vectorizer=vocab_vectorizer
 
 
-    def load_testing(self,stack_per_sample=3000,pickle_testing=True,maybe_load_testing_from_pickle=True
-                     ,secondary_label=""):
+    def load_testing(self,secondary_label=""):
         """
-        Load the training set with attr_map dictionary attribute and return a scipy sparse matrix of the data fitted
-            with the vocab and their labels
+        Load the training set in the pickle dir
 
         :returns: train_X: the data matrix. train_y: the train set labels
 
@@ -408,21 +402,16 @@ class Testing(BaseData):
             data_set_train_index=1
             path_elements=[self.label.type,"testX",self.label.feature_selection,"pickle"]
 
-        testX_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        dir=os.path.join(self.pickle_dir,self.label.feature_selection)
+        testX_pickle_path=dir+"/{}".format("_".join(path_elements))
 
         path_elements[data_set_train_index]="testy"
-        testy_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        testy_pickle_path=dir+"/{}".format("_".join(path_elements))
 
         path_elements[data_set_train_index]="trainRefIndex"
-        ref_id_pickle_path=self.pickle_dir+"/{}".format("_".join(path_elements))
+        ref_id_pickle_path=dir+"/{}".format("_".join(path_elements))
 
-        self._load_from_source(stack_per_sample=stack_per_sample,
-                  pickle_X_path=testX_pickle_path,
-                  pickle_y_path=testy_pickle_path,
-                  pickle_ref_id_path=ref_id_pickle_path,
-                  maybe_load_from_pickle=maybe_load_testing_from_pickle,
-
-                  pickle=pickle_testing)
+        self._X,self._y,self._ref_index=load_X_y_refIndex(testX_pickle_path,testy_pickle_path,ref_id_pickle_path)
 
         return self
 
@@ -442,5 +431,5 @@ class MultiData:
         return self.ys_
 
     @property
-    def ref_indexes(self):
+    def ref_index(self):
         return self.ref_index_

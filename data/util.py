@@ -113,14 +113,14 @@ def flatten_training(train_set):
     new_ref_id=[]
 
     for index,g_list in enumerate(train_set.y):
-        new_ref_id.extend((len(g_list))*[train_set.ref_indexes[index]])
+        new_ref_id.extend((len(g_list))*[train_set.ref_index[index]])
         new_x_index.extend([index]*len(g_list))
         new_y.extend(g_list)
 
     #now project out
     train_set.X=train_set.X[new_x_index]
     train_set.y=np.array(new_y)
-    train_set.ref_indexes=np.array(new_ref_id)
+    train_set.ref_index=np.array(new_ref_id)
 
 def normalizer(y,level=1):
     """

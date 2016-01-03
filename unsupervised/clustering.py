@@ -95,12 +95,12 @@ class Clustering:
         clustering_logger.info("Pre feature selection: num features: {}".format(data_set.X.shape[1]))
 
         if fit:
-            X,y,ref_id=data_set.X,data_set.y,data_set.ref_indexes
+            X,y,ref_id=data_set.X,data_set.y,data_set.ref_index
 
             flatten_training(data_set)
             feature_selector.fit(data_set.X,data_set.y)
 
-            data_set.X,data_set.y,data_set.ref_indexes=X,y,ref_id
+            data_set.X,data_set.y,data_set.ref_index=X,y,ref_id
 
 
         train_X=feature_selector.transform(data_set.X)

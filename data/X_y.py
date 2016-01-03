@@ -1,10 +1,29 @@
+import os
+
 __author__ = 'Kevin'
 from data.util import unpickle_obj
 import numpy as np
 from warnings import warn
+import settings,itertools as it
 
 def load_X_y(path_X,path_y):
     return unpickle_obj(path_X), unpickle_obj(path_y)
+
+def load_X_y_refIndex(path_X,path_y,path_refId):
+    """
+    Load X,y, and refIndex from their respective pickle directory.
+
+    :param feature_type:
+    :param pickle_dir:
+    :return:
+    """
+
+    X=unpickle_obj(path_X)
+    y=unpickle_obj(path_y)
+    ref_id=unpickle_obj(path_refId)
+
+    return X,y,ref_id
+
 
 def match_sets_based_on_ref_id(Xs,ys,ref_ids):
     """
@@ -27,7 +46,7 @@ def match_sets_based_on_ref_id(Xs,ys,ref_ids):
 
             #make sure no repeats
             if len(ref_ids[index]) != len(set(ref_ids[index])):
-                warn("Repeat of ref ids detected in data set {}".format(index))
+                raise AttributeError("Repeat of ref ids detected in data set {}".format(index))
 
             c_ref_ids=ref_ids[index]
             c_X=Xs[index]
@@ -44,8 +63,10 @@ def match_sets_based_on_ref_id(Xs,ys,ref_ids):
             #now remap each index
             remapped_index=np.vectorize(lambda x:ref_ids_to_index_loc[x])(c_ref_ids)
 
-            Xs[index]=c_X[remapped_index]
-            ys[index]=c_y[remapped_index]
-            ref_ids[index]=c_ref_ids[remapped_index]
+            new_index=remapped_index.argsort()
+
+            Xs[index]=c_X[new_index]
+            ys[index]=c_y[new_index]
+            ref_ids[index]=c_ref_ids[new_index]
 
     return Xs,ys,ref_ids

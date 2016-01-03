@@ -210,7 +210,7 @@ class MultiClassifier(BaseClassifier):
         prediction_probs=self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
 
         for classifier,test_X in zip(self.classifiers[1:],test_Xs[1:]):
-            assert classifier.classes_==self.classes_
+            assert (classifier.classes_==self.classes_).all()
 
             prediction_probs+=classifier.predict_multi(test_X,return_prediction_prob=True)
 

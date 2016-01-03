@@ -163,25 +163,23 @@ def classify(classifier_util,learn_settings,train_set,test_set,classifier,increm
         classifier_util.print_res(learn_settings,
               y=test_set.y,
               predictions=res,
-              ref_indexes=test_set.ref_indexes,
+              ref_indexes=test_set.ref_index,
               classifier_name=classifier_name)
 
-def load_training_testing(Xs,y,ref_index,settings,train_set_size,random_pick_test_training):
+def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training):
     """
     Load training and testing set or randomly pick then from Xs,y,and ref_index.
 
     :param Xs:
-    :param y:
-    :param ref_index:
+    :param ys:
+    :param ref_indexes:
     :param settings:
     :param train_set_size:
     :return: List of train_set and test_set objs
     """
-    if not (hasattr(y,"shape") and hasattr(ref_index,"shape")):
-        raise AttributeError("Only 1 set of common y(label) and ref index accepted for all Xs")
 
     if random_pick_test_training:
-        train_sets,test_sets=randomized_training_testing_sets(settings,Xs,y,ref_index,train_set_size)
+        train_sets,test_sets=randomized_training_testing_sets(settings,Xs,ys[0],ref_indexes[0],train_set_size)
     else:
         train_sets=[]
         test_sets=[]
@@ -199,6 +197,23 @@ def load_training_testing(Xs,y,ref_index,settings,train_set_size,random_pick_tes
     #flatten training
     for train_set in train_sets:
         flatten_training(train_set)
+
+    #make sure the sets match
+    supervised_logger.info("Checking the sets match")
+    ys=[train_set.y for train_set in train_sets]
+    ref_indexes=[train_set.ref_index for train_set in train_sets]
+
+    test_ys=[test_set.y for test_set in test_sets]
+    test_ref_indexes=[test_set.ref_index for test_set in test_sets]
+
+    for c,elem in enumerate((ys,ref_indexes,test_ys,test_ref_indexes)):
+
+        prev=elem[0]
+        match=True
+        for e in elem[1:]:
+            match=match and (e==prev).all()
+        if not match:
+            raise AttributeError("NOT MATCH FOR {} ELEMENT".format(c))
 
     return train_sets,test_sets
 
@@ -236,38 +251,41 @@ if __name__=="__main__":
     """
     LOAD DATA, preprocess
     """
+
     #WARNING: REF INDEX for each individual X set must match row to row
     Xs=[]
     ys=[]
     ref_indexes_unmatched=[]
+    ref_indexes=[]
+    if random_pick_test_training:
 
-    for setting in settings:
-        supervised_logger.info("Loading data for {}".format(setting))
-        X=unpickle_obj("pickle_dir\\{}\\X_{}_pickle".format(setting.feature_selection,setting.feature_selection))
-        ref_index=unpickle_obj("pickle_dir\\{}\\refIndex_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
-        y=unpickle_obj("pickle_dir\\{}\\y_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
-        y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
+        for setting in settings:
+            supervised_logger.info("Loading data for {}".format(setting))
+            X=unpickle_obj("pickle_dir\\{}\\X_{}_pickle".format(setting.feature_selection,setting.feature_selection))
+            ref_index=unpickle_obj("pickle_dir\\{}\\refIndex_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+            y=unpickle_obj("pickle_dir\\{}\\y_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+            y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
 
-        #filter out unwanted genres
-        X_filtered,y_filtered,ref_index_filtered=filter_genres(X,y,ref_index,ignore_genre)
-        ref_indexes_unmatched.append(ref_index_filtered)
-        Xs.append(X_filtered)
-        ys.append(y_filtered)
+            #filter out unwanted genres
+            X_filtered,y_filtered,ref_index_filtered=filter_genres(X,y,ref_index,ignore_genre)
+            ref_indexes_unmatched.append(ref_index_filtered)
+            Xs.append(X_filtered)
+            ys.append(y_filtered)
 
-    #match refids
-    supervised_logger.info("Making ref indexes match for the data sets")
-    Xs,ys,ref_indexes=match_sets_based_on_ref_id(Xs,ys,ref_indexes_unmatched)
+        #match refids
+        supervised_logger.info("Making ref indexes match for the data sets")
+        Xs,ys,ref_indexes=match_sets_based_on_ref_id(Xs,ys,ref_indexes_unmatched)
 
-    #make sure ref indexes match
-    match=True
-    prev_index=ref_indexes_unmatched[0]
-    for ref_index in ref_indexes_unmatched[1:]:
-        match=(prev_index==ref_index).all()
-        prev_index=ref_index
+        #make sure ref indexes match
+        match=True
+        prev_index=ref_indexes_unmatched[0]
+        for ref_index in ref_indexes_unmatched[1:]:
+            match=(prev_index==ref_index).all()
+            prev_index=ref_index
 
-    if not match:
-        raise AttributeError("The matrices's reference indexes do not match, proceeding will resulting in wrong mapping"
-                             "between instances")
+        if not match:
+            raise AttributeError("The matrices's reference indexes do not match, proceeding will resulting in wrong mapping"
+                                 "between instances")
 
     """
     TRAINING AND TESTING SETS LOADING, NO FEATURE EXTRACT and DIMENSIONALITY REDUCTION YET
@@ -275,7 +293,7 @@ if __name__=="__main__":
 
     """
     supervised_logger.info("Generating or loading training samples")
-    train_sets,test_sets=load_training_testing(Xs,ys[0],ref_indexes[0],settings,train_set_size,random_pick_test_training)
+    train_sets,test_sets=load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training)
 
 
     """
@@ -315,13 +333,13 @@ if __name__=="__main__":
 
     train_Xs=[train_set.X for train_set in train_sets]
     train_y=train_sets[0].y
-    train_ref_indexes=train_sets[0].ref_indexes
+    train_ref_indexes=train_sets[0].ref_index
 
     train_set=MultiData(train_Xs,train_y,train_ref_indexes)
 
     test_Xs=[test_set.X for test_set in test_sets]
     test_y=test_sets[0].y
-    test_ref_indexes=test_sets[0].ref_indexes
+    test_ref_indexes=test_sets[0].ref_index
 
     test_set=MultiData(test_Xs,test_y,test_ref_indexes)
 

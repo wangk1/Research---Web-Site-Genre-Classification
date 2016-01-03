@@ -52,7 +52,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
             else:
                 path=os.path.join(res_dir,"{}_{}_pages".format(num_cluster,cluster_name))
                 #OUTPUT the pages in the current cluster
-                clusterer.output_pages_in_cluster(path,train_set.ref_indexes[res_labels==cluster_name])
+                clusterer.output_pages_in_cluster(path,train_set.ref_index[res_labels==cluster_name])
 
 
         res_file="{}/{}.pdf".format(res_dir,str(num_cluster))
@@ -82,7 +82,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
             clustering_logger.info("Pickling X,y,ref_index to conserve memory")
             pickle_obj(train_set.X,X_path)
             pickle_obj(train_set.y,y_path)
-            pickle_obj(train_set.ref_indexes,ref_indexes_path)
+            pickle_obj(train_set.ref_index,ref_indexes_path)
 
             for cluster_name in breakup_candidate:
                 clustering_logger.info("Breaking up cluster {} of size greater than {}".format(cluster_name,settings.max_cluster_size))
@@ -93,7 +93,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
                 train_set.X=train_set.X[selector]
                 train_set.y=train_set.y[selector]
-                train_set.ref_indexes=train_set.ref_indexes[selector]
+                train_set.ref_index=train_set.ref_index[selector]
 
                 unsupervised(settings,train_set,clusterer,clustering_alg_cls)
 
@@ -101,7 +101,7 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
 
                 train_set.X=unpickle_obj(X_path)
                 train_set.y=unpickle_obj(y_path)
-                train_set.ref_indexes=unpickle_obj(ref_indexes_path)
+                train_set.ref_index=unpickle_obj(ref_indexes_path)
 
             #remove the cache files
             os.remove(ref_indexes_path)

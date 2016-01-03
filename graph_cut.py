@@ -33,7 +33,7 @@ if __name__=="__main__":
     train_set.y=np.array([list(set(normalize_genre_string(genre,1) for genre in g_list)) for g_list in train_set.y])
     train_set.X=chi_squared_feature_select(train_set.X,train_set.y,k_best=10000)
 
-    params=GraphCutParams(X=train_set.X,y=train_set.y,ref_id=train_set._ref_indexes,
+    params=GraphCutParams(X=train_set.X,y=train_set.y,ref_id=train_set._ref_index,
                    k_closest_neighbors=4,vocab_size=train_set._X.shape[1],num_clusters=3)
 
     alpha_beta_swap(params)
