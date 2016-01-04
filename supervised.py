@@ -219,12 +219,11 @@ def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_
 
 
 if __name__=="__main__":
-    #test_set_nums,genre_dict=pick_random_test(genre_dict)
-    #
-    # map_urlAllGram(genre_dict)
-
-    res_dir="classification_res"
+    #GLOBAL SETTINGS
+    train_set_size=50000
+    random_pick_test_training=False
     pickle_dir="pickle_dir"
+    res_dir="classification_res"
 
     """
     CLASSIFICATION SETTINGS
@@ -235,18 +234,14 @@ if __name__=="__main__":
     setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
                              pickle_dir=pickle_dir,res_dir=res_dir)
     settings=[setting,
-              setting2
+              #setting2
               ]
 
     for setting in settings:
         setting.result_file_label="no_region_kids_home_news"
         setting.threshold=4
         setting.ll_ranking=False
-        setting.num_attributes=10000
-
-    #GLOBAL SETTINGS
-    train_set_size=50000
-    random_pick_test_training=False
+        setting.num_attributes={10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000}
 
     """
     LOAD DATA, preprocess
@@ -305,12 +300,13 @@ if __name__=="__main__":
         threshold=setting.threshold
         ll_ranking=setting.ll_ranking
         setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
-                      classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)]
+                      #classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
+                                 ]
 
 
 
@@ -322,7 +318,7 @@ if __name__=="__main__":
     for index,setting in enumerate(settings):
         num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
 
-        feature_selector=SelectKBest(chi2,setting.num_attributes)
+        feature_selector=SelectKBest(chi2,setting.num_attribute)
         #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
 
         train_set=train_sets[index]
@@ -347,12 +343,16 @@ if __name__=="__main__":
     CLASSIFICATION
     """
 
-    for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
-        multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
+    for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
+        for c,setting in enumerate(settings):
+            setting.num_attribute=num_attrs[c]
 
-        #CLASSIFICATION
-        classifier_util=classifiers.Classifier()
-        classify(classifier_util,settings,train_set,test_set,multi_classifier)
+        for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
+            multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
+
+            #CLASSIFICATION
+            classifier_util=classifiers.Classifier()
+            classify(classifier_util,settings,train_set,test_set,multi_classifier)
 
 
 
