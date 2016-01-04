@@ -313,39 +313,39 @@ if __name__=="__main__":
     """
     FEATURE SELECTION and EXTRACTION
     """
-
-
-    for index,setting in enumerate(settings):
-        num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
-
-        feature_selector=SelectKBest(chi2,setting.num_attribute)
-        #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
-
-        train_set=train_sets[index]
-        test_set=test_sets[index]
-
-        supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
-        train_set.X,test_set.X=feature_selection(train_set,test_set,feature_selector,fit=True)
-
-    train_Xs=[train_set.X for train_set in train_sets]
-    train_y=train_sets[0].y
-    train_ref_indexes=train_sets[0].ref_index
-
-    train_set=MultiData(train_Xs,train_y,train_ref_indexes)
-
-    test_Xs=[test_set.X for test_set in test_sets]
-    test_y=test_sets[0].y
-    test_ref_indexes=test_sets[0].ref_index
-
-    test_set=MultiData(test_Xs,test_y,test_ref_indexes)
-
-    """
-    CLASSIFICATION
-    """
-
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
-        for c,setting in enumerate(settings):
-            setting.num_attribute=num_attrs[c]
+        train_Xs=[]
+        train_y=train_sets[0].y
+        train_ref_indexes=train_sets[0].ref_index
+
+        test_Xs=[]
+        test_y=test_sets[0].y
+        test_ref_indexes=test_sets[0].ref_index
+
+        for index,setting in enumerate(settings):
+            setting.num_attribute=num_attrs[index]
+
+            num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
+
+            feature_selector=SelectKBest(chi2,setting.num_attribute)
+            #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
+
+            train_set=train_sets[index]
+            test_set=test_sets[index]
+
+            supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
+            train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
+
+            train_Xs.append(train_X)
+            test_Xs.append(test_X)
+
+        train_set=MultiData(train_Xs,train_y,train_ref_indexes)
+
+        test_set=MultiData(test_Xs,test_y,test_ref_indexes)
+
+        """
+        CLASSIFICATION
+        """
 
         for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
             multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
