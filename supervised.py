@@ -224,7 +224,7 @@ if __name__=="__main__":
     #GLOBAL SETTINGS
 
     global_settings=namedtuple("GlobalSettings",
-                               ("weights","train_set_size","res_dir","pickle_dir","random_pick_test_training")
+                               ("classifier_weights","train_set_size","res_dir","pickle_dir","random_pick_test_training","learning_rate")
                                ) (
         classifier_weights=[1,1],
         learning_rate=0.2,
@@ -236,7 +236,7 @@ if __name__=="__main__":
 
     )
 
-    supervised_logger.info("Using the weights: {}".format(global_settings.weights))
+    supervised_logger.info("Using the weights: {}".format(global_settings.classifier_weights))
 
     """
     CLASSIFICATION SETTINGS
@@ -365,7 +365,7 @@ if __name__=="__main__":
 
             #CLASSIFICATION
             classifier_util=classifiers.Classifier()
-            classify(classifier_util,settings,train_set,test_set,multi_classifier,global_settings.weights)
+            classify(classifier_util,settings,train_set,test_set,multi_classifier,global_settings.classifier_weights)
 
 
 
