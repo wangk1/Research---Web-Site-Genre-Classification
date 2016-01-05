@@ -121,7 +121,7 @@ class ClassificationResultStream:
 
         return prediction_objs
 
-    def get_classification_res_gen(self,suffix="_cres.txt"):
+    def get_classification_res_gen(self,suffix="cres.txt"):
         """
         Generator that generates the next classification result entry.
 
@@ -135,10 +135,10 @@ class ClassificationResultStream:
         #in case we only chose some classifiers
         if self.classifiers is not None:
             res_files=(f for f in os.listdir(abs_result_path)
-                         if f.endswith(suffix) and any(f.startswith(c) for c in self.classifiers))
+                         if any(f=="_".join((c,suffix)) for c in self.classifiers))
 
         else:
-            res_files=(f for f in os.listdir(abs_result_path) if f.endswith(suffix))
+            res_files=(f for f in os.listdir(abs_result_path) if f=="_".join((self.classifiers[0],suffix)))
 
         for res_file in res_files:
             for res_obj in self.get_classification_res(os.path.join(abs_result_path,res_file)):
@@ -181,7 +181,7 @@ class RightResultsIter(ClassificationResultStream):
                  ,pred_tranformer=default_pred_transformer,actual_transformer=lambda x:x):
         super().__init__(result_path,classifier)
 
-        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier))
+        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier) if secondary_identifier else "cres.txt")
         self.is_right=comparator
         self.pred_transformer=pred_tranformer
         self.actual_transformer=actual_transformer
@@ -212,7 +212,7 @@ class WrongResultsIter(ClassificationResultStream):
 
         super().__init__(result_path,classifier)
 
-        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier))
+        self.res_gen=super().get_classification_res_gen("{}_cres.txt".format(secondary_identifier) if secondary_identifier else "cres.txt")
         self.is_wrong=comparator
         self.pred_transformer=pred_tranformer
         self.actual_transformer=actual_transformer

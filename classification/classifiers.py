@@ -79,7 +79,18 @@ class Classifier:
             for l in range(0,y.shape[0]):
                 output_handler.write("{},{},{}\n".format(ref_indexes[l],list(predictions[l]),list(y[l])))
 
+    def calculate_accuracy(self,label,predictions,comparator=lambda l,p: p in l):
+        """
+        Calculate accuracy of prediction
 
+        :param label:
+        :param predictions:
+        :param comparator:
+        :return:
+        """
+        res=np.vectorize(comparator)(label,predictions)
+
+        return res/label.shape[0]
 
     def feature_selection(self,feat_selector):
         """
@@ -161,16 +172,17 @@ class BaseClassifier:
 
         return prediction_res
 
-class MultiClassifier(BaseClassifier):
+class MultiClassifier:
     """
     Represents combination of multiple classifiers
 
     """
     def __init__(self,classifiers,weights=None,**kwargs):
-        super().__init__(**kwargs)
         self.classifiers=classifiers
         self.weights=weights
         self.classes_=None
+        self.threshold=kwargs["threshold"]
+        self.ll_ranking=kwargs["ll_ranking"]
 
     def __repr__(self):
         return self.__str__()
@@ -196,7 +208,7 @@ class MultiClassifier(BaseClassifier):
         self.classes_=self.classifiers[0].classes_
 
 
-    def predict_proba(self,test_Xs):
+    def predict_proba(self,test_Xs,classifier_weights):
         """
         Predict the individual test label with their respective classifier
 
@@ -209,14 +221,14 @@ class MultiClassifier(BaseClassifier):
         self.classes_=self.classifiers[0].classes_
         prediction_probs=self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
 
-        for classifier,test_X in zip(self.classifiers[1:],test_Xs[1:]):
+        for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:])):
             assert (classifier.classes_==self.classes_).all()
 
-            prediction_probs+=classifier.predict_multi(test_X,return_prediction_prob=True)
+            prediction_probs+=classifier_weights[c]*classifier.predict_multi(test_X,return_prediction_prob=True)
 
         return prediction_probs
 
-    def predict_multi(self,X):
+    def predict_multi(self,X,classifier_weights):
 
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
@@ -226,7 +238,7 @@ class MultiClassifier(BaseClassifier):
         :return:
         """
         predictions_classes=None
-        predictions_probs=self.predict_proba(X)
+        predictions_probs=self.predict_proba(X,classifier_weights)
 
         if self.ll_ranking:
             #get the best class based on log likelihood

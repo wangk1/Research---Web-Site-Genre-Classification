@@ -139,7 +139,7 @@ ignore_genre={
 
 
 
-def classify(classifier_util,learn_settings,train_set,test_set,classifier,increment=500):
+def classify(classifier_util,learn_settings,train_set,test_set,classifier,classifier_weights,increment=500):
         """
         Classify with test_X and generate result files for each classifier set
 
@@ -157,7 +157,7 @@ def classify(classifier_util,learn_settings,train_set,test_set,classifier,increm
         supervised_logger.info("Fitting done, predicting with test set")
 
         res=classifier\
-                .predict_multi(test_set.X)
+                .predict_multi(test_set.X,classifier_weights=classifier_weights)
 
         print("Done, printing Results for {}".format(classifier_name))
         classifier_util.print_res(learn_settings,
@@ -165,6 +165,8 @@ def classify(classifier_util,learn_settings,train_set,test_set,classifier,increm
               predictions=res,
               ref_indexes=test_set.ref_index,
               classifier_name=classifier_name)
+
+        return classifier_util.calculate_accuracy(test_set.y,res)
 
 def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training):
     """
@@ -220,21 +222,32 @@ def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_
 
 if __name__=="__main__":
     #GLOBAL SETTINGS
-    train_set_size=50000
-    random_pick_test_training=False
-    pickle_dir="pickle_dir"
-    res_dir="classification_res"
+
+    global_settings=namedtuple("GlobalSettings",
+                               ("weights","train_set_size","res_dir","pickle_dir","random_pick_test_training")
+                               ) (
+        classifier_weights=[1,1],
+        learning_rate=0.2,
+        train_set_size=50000,
+        res_dir="classification_res",
+        pickle_dir="pickle_dir",
+        random_pick_test_training=False,
+
+
+    )
+
+    supervised_logger.info("Using the weights: {}".format(global_settings.weights))
 
     """
     CLASSIFICATION SETTINGS
     """
-    setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
-                              pickle_dir=pickle_dir,res_dir=res_dir)
+    #setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
+    #                          pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
 
     setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
-                             pickle_dir=pickle_dir,res_dir=res_dir)
-    settings=[setting,
-              #setting2
+                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
+    settings=[#setting,
+              setting2
               ]
 
     for setting in settings:
@@ -252,7 +265,7 @@ if __name__=="__main__":
     ys=[]
     ref_indexes_unmatched=[]
     ref_indexes=[]
-    if random_pick_test_training:
+    if global_settings.random_pick_test_training:
 
         for setting in settings:
             supervised_logger.info("Loading data for {}".format(setting))
@@ -288,7 +301,7 @@ if __name__=="__main__":
 
     """
     supervised_logger.info("Generating or loading training samples")
-    train_sets,test_sets=load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training)
+    train_sets,test_sets=load_training_testing(Xs,ys,ref_indexes,settings,global_settings.train_set_size,global_settings.random_pick_test_training)
 
 
     """
@@ -352,7 +365,7 @@ if __name__=="__main__":
 
             #CLASSIFICATION
             classifier_util=classifiers.Classifier()
-            classify(classifier_util,settings,train_set,test_set,multi_classifier)
+            classify(classifier_util,settings,train_set,test_set,multi_classifier,global_settings.weights)
 
 
 
