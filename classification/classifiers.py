@@ -21,6 +21,10 @@ __author__ = 'Kevin'
 
 classifier_logger=Logger()
 
+
+
+
+
 class Classifier:
     """
     Important formats:
@@ -88,9 +92,8 @@ class Classifier:
         :param comparator:
         :return:
         """
-        res=np.vectorize(comparator)(label,predictions)
 
-        return res/label.shape[0]
+        return round(sum((comparator(l,predictions[c]) for c,l in enumerate(label)))/label.shape[0],3)
 
     def feature_selection(self,feat_selector):
         """
@@ -219,9 +222,9 @@ class MultiClassifier:
 
 
         self.classes_=self.classifiers[0].classes_
-        prediction_probs=self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
+        prediction_probs=classifier_weights[0]*self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
 
-        for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:])):
+        for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:]),1):
             assert (classifier.classes_==self.classes_).all()
 
             prediction_probs+=classifier_weights[c]*classifier.predict_multi(test_X,return_prediction_prob=True)

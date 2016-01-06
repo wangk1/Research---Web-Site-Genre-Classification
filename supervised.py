@@ -28,6 +28,8 @@ from util.genre import filter_genres
 from util.Logger import Logger
 from classification.classifiers import MultiClassifier
 from data.X_y import match_sets_based_on_ref_id
+from classification.classification import classify
+import operator as op
 
 supervised_logger=Logger()
 
@@ -92,25 +94,13 @@ def generate_training_testing(source,test_set_indexes,genres,*,train_coll_cls,te
 
         index_tracker[source_obj.short_genre]+=1
 
-def get_all_gram_genres():
-    genres_iter=(set(util.normalize_genre_string(g,1) for g in allgram_obj.short_genres) for allgram_obj in URLAllGram.objects)
 
-    return itertools.chain(*genres_iter)
 
 def get_full_text_genres():
     genres_iter=(set(util.normalize_genre_string(g,1) for g in url_bow_obj.short_genres) for url_bow_obj in URLBow_fulltxt.objects)
 
     return itertools.chain(*genres_iter)
 
-def map_urlAllGram(genre_dict):
-
-    mapped_obj=(ClassificationSource(url_allgram_obj.ngram_index,url_allgram_obj.ngram,
-                                                    util.normalize_genre_string(url_allgram_obj.short_genres[0],1))
-                                    for url_allgram_obj in URLAllGram.objects)
-
-    generate_training_testing( mapped_obj
-                              ,test_set_nums,genre_dict.keys()
-                              ,train_coll_cls=TrainSet_urlAllGram,test_coll_cls=TestSet_urlAllGram)
 
 def map_urlFullText(genre_dict):
 
@@ -139,34 +129,7 @@ ignore_genre={
 
 
 
-def classify(classifier_util,learn_settings,train_set,test_set,classifier,classifier_weights,increment=500):
-        """
-        Classify with test_X and generate result files for each classifier set
 
-        :param classifiers: set of additional classifier to test with in addition to self.classifier classifiers
-        :return:
-        """
-
-
-        classifier_name=str(classifier)
-
-
-        supervised_logger.info("Classifying with {}".format(classifier_name))
-        classifier.fit(train_set.X,train_set.y)
-
-        supervised_logger.info("Fitting done, predicting with test set")
-
-        res=classifier\
-                .predict_multi(test_set.X,classifier_weights=classifier_weights)
-
-        print("Done, printing Results for {}".format(classifier_name))
-        classifier_util.print_res(learn_settings,
-              y=test_set.y,
-              predictions=res,
-              ref_indexes=test_set.ref_index,
-              classifier_name=classifier_name)
-
-        return classifier_util.calculate_accuracy(test_set.y,res)
 
 def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training):
     """
@@ -224,37 +187,48 @@ if __name__=="__main__":
     #GLOBAL SETTINGS
 
     global_settings=namedtuple("GlobalSettings",
-                               ("classifier_weights","train_set_size","res_dir","pickle_dir","random_pick_test_training","learning_rate")
+                               ("train_set_size","res_dir","pickle_dir","random_pick_test_training","learning_rate","print_res")
                                ) (
-        classifier_weights=[1,1],
         learning_rate=0.2,
         train_set_size=50000,
         res_dir="classification_res",
         pickle_dir="pickle_dir",
         random_pick_test_training=False,
+        print_res=False,
+
 
 
     )
 
-    supervised_logger.info("Using the weights: {}".format(global_settings.classifier_weights))
+
 
     """
     CLASSIFICATION SETTINGS
     """
-    #setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
-    #                          pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
+    setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
+                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
 
     setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-    settings=[#setting,
+    settings=[setting,
               setting2
               ]
+
+    weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
+        num_classifiers=len(settings),
+        weights_range=(0,2),
+        stepping=0.2,
+
+    )
+
+    supervised_logger.info("Number of Weights: {}".format(weights.num_classifiers))
 
     for setting in settings:
         setting.result_file_label="no_region_kids_home_news"
         setting.threshold=4
         setting.ll_ranking=False
-        setting.num_attributes={10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000}
+        setting.num_attributes={50#,10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
+                                }
 
     """
     LOAD DATA, preprocess
@@ -322,50 +296,62 @@ if __name__=="__main__":
                                  ]
 
 
-
     """
-    FEATURE SELECTION and EXTRACTION
+    CLASSIFICATION_WEIGHTS
     """
-    for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
-        train_Xs=[]
-        train_y=train_sets[0].y
-        train_ref_indexes=train_sets[0].ref_index
+    start_weight,end_weight=weights.weights_range
+    stepping=weights.stepping
+    all_weights=itertools.product(*itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers))
 
-        test_Xs=[]
-        test_y=test_sets[0].y
-        test_ref_indexes=test_sets[0].ref_index
-
-        for index,setting in enumerate(settings):
-            setting.num_attribute=num_attrs[index]
-
-            num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
-
-            feature_selector=SelectKBest(chi2,setting.num_attribute)
-            #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
-
-            train_set=train_sets[index]
-            test_set=test_sets[index]
-
-            supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
-            train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
-
-            train_Xs.append(train_X)
-            test_Xs.append(test_X)
-
-        train_set=MultiData(train_Xs,train_y,train_ref_indexes)
-
-        test_set=MultiData(test_Xs,test_y,test_ref_indexes)
+    best_accuracy=("clsfier",0,("weights_tuple"))
+    for curr_weights in all_weights:
+        supervised_logger.info("Using the weights {}".format(curr_weights))
 
         """
-        CLASSIFICATION
+        FEATURE SELECTION and EXTRACTION
         """
+        for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
+            train_Xs=[]
+            train_y=train_sets[0].y
+            train_ref_indexes=train_sets[0].ref_index
 
-        for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
-            multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
+            test_Xs=[]
+            test_y=test_sets[0].y
+            test_ref_indexes=test_sets[0].ref_index
 
-            #CLASSIFICATION
-            classifier_util=classifiers.Classifier()
-            classify(classifier_util,settings,train_set,test_set,multi_classifier,global_settings.classifier_weights)
+            for index,setting in enumerate(settings):
+                setting.num_attribute=num_attrs[index]
 
+                num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
+
+                feature_selector=SelectKBest(chi2,setting.num_attribute)
+                #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
+
+                train_set=train_sets[index]
+                test_set=test_sets[index]
+
+                supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
+                train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
+
+                train_Xs.append(train_X)
+                test_Xs.append(test_X)
+
+                supervised_logger.info("Ending Dimension for train: {}".format(train_X.shape))
+                supervised_logger.info("Ending Dimension for test: {}".format(test_X.shape))
+
+            train_set=MultiData(train_Xs,train_y,train_ref_indexes)
+
+            test_set=MultiData(test_Xs,test_y,test_ref_indexes)
+
+            """
+            CLASSIFICATION
+            """
+            classifier_name_to_accuracy=classify(settings,train_set,test_set,curr_weights,global_settings.print_res)
+
+            best_curr_weight_acc=max(classifier_name_to_accuracy.items(),key=op.itemgetter(1))+tuple([curr_weights])
+            best_accuracy=max(best_curr_weight_acc,best_accuracy,key=op.itemgetter(1))
+
+
+    supervised_logger.info("Best accuracy achieved at: {}".format(best_accuracy))
 
 
