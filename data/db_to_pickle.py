@@ -21,7 +21,7 @@ def db_to_pickle(src_db,secondary_path=""):
         attr_map: dictionary of attribute to count
         short_genres: Genres for each attr_map, aka its label(s)
 
-    Store in PICKLE_DIR/$secondary_path
+    Store in PICKLE_DIR/$secondary_path/
     :return: X,y,ref_index
         y is nx1 where n is number of labels. It is an np array of lists where list are all the genres an instance may
             have.
@@ -66,7 +66,9 @@ def db_to_pickle(src_db,secondary_path=""):
     X_path=os.path.join(dir_path,"X_{}_pickle".format(secondary_path))
     y_path=os.path.join(dir_path,"y_{}_pickle".format(secondary_path))
     ref_path=os.path.join(dir_path,"refIndex_{}_pickle".format(secondary_path))
+    vectorizer_path=os.path.join(dir_path,"vocab_vectorizer_{}_pickle".format(secondary_path))
 
     pickle_obj(X,X_path)
     pickle_obj(y,y_path)
     pickle_obj(ref_index,ref_path)
+    pickle_obj(vectorizer,vectorizer_path)

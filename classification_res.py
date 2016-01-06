@@ -1,3 +1,5 @@
+import sys
+
 __author__ = 'Kevin'
 import collections as coll
 import operator as op
@@ -49,13 +51,33 @@ def precision(res_path,classifiers,secondary_identifier):
 
     return precision
 
+def get_best_accuracy(num_attrs,res_path):
+    best=(0,0)
+    for num_attr in num_attrs:
+        rel_path=res_path.format(num_attr)
+
+        num_right=len([i for i in RightResultsIter(result_path=rel_path,classifier=classifiers, secondary_identifier=secondary_identifier)])
+
+        if num_right>best[0]:
+            best=(num_right,num_attr)
+
+    print("Best performance is at {}".format(best))
+
+
 if __name__ == "__main__":
-    res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000_supervised_url_chi_sq_10000"
-    #res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000"
-    classifiers=["RandomForest,LogisticRegression"]
-    #classifiers=["LogisticRegression"]
+    #res_path="classification_res\\supervised\\supervised_summary_chi_sq_10000_supervised_url_chi_sq_10000"
+    res_path="classification_res\\supervised\\supervised_url_chi_sq_{}"
+    num_attrs={10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000}
+
+
+    #classifiers=["RandomForest,LogisticRegression"]
+    classifiers=["LogisticRegression"]
 
     secondary_identifier="no_region_kids_home_news"
+
+    get_best_accuracy(num_attrs,res_path)
+
+    sys.exit(0)
     """
     right_res_iter=RightResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)
     wrong_res_iter=WrongResultsIter(result_path=res_path,classifier=classifiers, secondary_identifier=secondary_identifier)

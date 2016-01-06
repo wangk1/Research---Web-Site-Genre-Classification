@@ -12,8 +12,9 @@ from sklearn.feature_selection import SelectKBest,chi2
 from util.Logger import Logger
 
 from util.base_util import normalize_genre_string
-import os
+import os,sys
 
+unsupervised_logger=Logger(sys.modules[__name__])
 PICKLE_DIR="pickle_dir"
 UNSUPERVISED_DIR="classification_res\\unsupervised"
 
@@ -108,6 +109,18 @@ def unsupervised(settings,train_set,clusterer,clustering_alg_cls):
             os.remove(X_path)
             os.remove(y_path)
 
+def lda(lda,train_set,n_top_words):
+    """
+    Conduct lda with the train_set
+    """
+
+    lda.fit(train_set.X)
+    vocab=None
+
+    topic_word=lda.topic_word_
+    for i, topic_dist in enumerate(topic_word):
+        topic_words = np.array(vocab)[np.argsort(topic_dist)][:-n_top_words:-1]
+        print('Topic {}: {}'.format(i, ' '.join(topic_words)))
 
 if __name__=="__main__":
     clustering_logger=Logger()
