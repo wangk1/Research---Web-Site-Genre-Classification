@@ -7,4 +7,4 @@ from db.db_model.mongo_websites_models import URLBow
 
 if __name__=="__main__":
     db_to_pickle(URLAllGram,"url")
-    db_to_pickle(URLBow,"summary")
+    #db_to_pickle(URLBow,"summary")

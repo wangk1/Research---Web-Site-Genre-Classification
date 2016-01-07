@@ -227,7 +227,7 @@ if __name__=="__main__":
         setting.result_file_label="no_region_kids_home_news"
         setting.threshold=4
         setting.ll_ranking=False
-        setting.num_attributes={50#,10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
+        setting.num_attributes={10000,#20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
 
     """
