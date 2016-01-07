@@ -187,6 +187,9 @@ class MultiClassifier:
         self.threshold=kwargs["threshold"]
         self.ll_ranking=kwargs["ll_ranking"]
 
+        #cache the previous result, makes setting different weights fast
+        self.prev_cache=None
+
     def __repr__(self):
         return self.__str__()
 
@@ -211,7 +214,7 @@ class MultiClassifier:
         self.classes_=self.classifiers[0].classes_
 
 
-    def predict_proba(self,test_Xs,classifier_weights):
+    def predict_proba(self,test_Xs,classifier_weights,use_prev_prob):
         """
         Predict the individual test label with their respective classifier
 
@@ -220,18 +223,36 @@ class MultiClassifier:
         """
         assert len(test_Xs) == len(self.classifiers)
 
-
         self.classes_=self.classifiers[0].classes_
-        prediction_probs=classifier_weights[0]*self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True)
+        if use_prev_prob:
+            print("Using Previous Predicted Probabiliyt")
 
-        for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:]),1):
-            assert (classifier.classes_==self.classes_).all()
+            prediction_probs=classifier_weights[0]*self.prev_cache[0]
 
-            prediction_probs+=classifier_weights[c]*classifier.predict_multi(test_X,return_prediction_prob=True)
+            for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:]),1):
+                assert (classifier.classes_==self.classes_).all()
+
+                prediction_probs+=classifier_weights[c]*self.prev_cache[c]
+
+        else:
+            print("Not Using Previous Predicted Probability")
+
+            self.prev_cache=[]
+
+            self.prev_cache.append(self.classifiers[0].predict_multi(test_Xs[0],return_prediction_prob=True))
+            prediction_probs=classifier_weights[0]*self.prev_cache[0]
+
+
+            for c,(classifier,test_X) in enumerate(zip(self.classifiers[1:],test_Xs[1:]),1):
+                assert (classifier.classes_==self.classes_).all()
+
+                self.prev_cache.append(classifier.predict_multi(test_X,return_prediction_prob=True))
+                prediction_probs+=classifier_weights[c]*self.prev_cache[c]
+
 
         return prediction_probs
 
-    def predict_multi(self,X,classifier_weights):
+    def predict_multi(self,X,classifier_weights,use_prev_prob=False):
 
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
@@ -240,8 +261,7 @@ class MultiClassifier:
         :param top_k:
         :return:
         """
-        predictions_classes=None
-        predictions_probs=self.predict_proba(X,classifier_weights)
+        predictions_probs=self.predict_proba(X,classifier_weights,use_prev_prob)
 
         if self.ll_ranking:
             #get the best class based on log likelihood

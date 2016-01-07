@@ -13,7 +13,7 @@ from util.Logger import Logger
 
 from util.base_util import normalize_genre_string
 import os,sys
-
+from lda import LDA
 unsupervised_logger=Logger(sys.modules[__name__])
 PICKLE_DIR="pickle_dir"
 UNSUPERVISED_DIR="classification_res\\unsupervised"
@@ -138,12 +138,14 @@ if __name__=="__main__":
     mapping={"short_genres":"short_genre","index":"ref_index","bow":"attr_map"}
 
     #SETTING UP LABEL
-    settings=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_feats=10000)
+    settings=LearningSettings(type="unsupervised",dim_reduction="chi",feature_selection="summary",num_attributes=10000)
     settings.parent_clusters=[] #used to record a tree of parent clusters for the current cluster
 
-    settings.clustering_alg="kNN_agglomerative"
+    #settings.clustering_alg="kNN_agglomerative"
+    settings.clustering_alg="lda"
     clustering_alg=KMeans
-    settings.num_clusters=list({10})
+    settings.num_clusters=list({16})
+    settings.num_top_words=20 #LDA only
     settings.max_cluster_size=10000 #the cluster will be further broken up if it is greater than this size
     settings.break_up_clusters=True
     settings.spectre_clustering_limit=15000 # if the cluster is less than 15K in size, use spectre clustering instead
@@ -167,4 +169,7 @@ if __name__=="__main__":
     clusterer=Clustering()
     clusterer.feature_selection(train_set,feature_selector,fit=True)
 
-    unsupervised(train_set=train_set, settings=settings,clusterer=clusterer, clustering_alg_cls=clustering_alg)
+    lda_alg=LDA(n_topics=settings.num_clusters[0],n_iter=500, random_state=1)
+
+    lda(lda_alg,train_set,settings.num_top_words)
+    #unsupervised(train_set=train_set, settings=settings,clusterer=clusterer, clustering_alg_cls=clustering_alg)

@@ -229,6 +229,7 @@ if __name__=="__main__":
         setting.ll_ranking=False
         setting.num_attributes={10000,#20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
+    settings[0].num_attributes,settings[1].num_attributes=({100000},{60000})
 
     """
     LOAD DATA, preprocess
@@ -297,61 +298,54 @@ if __name__=="__main__":
 
 
     """
-    CLASSIFICATION_WEIGHTS
+    CLASSIFICATION WEIGHTS INITIALIZATION
     """
     start_weight,end_weight=weights.weights_range
     stepping=weights.stepping
     all_weights=itertools.product(*itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers))
 
-    best_accuracy=("clsfier",0,("weights_tuple"))
-    for curr_weights in all_weights:
-        supervised_logger.info("Using the weights {}".format(curr_weights))
+
+    """
+    FEATURE SELECTION and EXTRACTION
+    """
+    for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
+        train_Xs=[]
+        train_y=train_sets[0].y
+        train_ref_indexes=train_sets[0].ref_index
+
+        test_Xs=[]
+        test_y=test_sets[0].y
+        test_ref_indexes=test_sets[0].ref_index
+
+        for index,setting in enumerate(settings):
+            setting.num_attribute=num_attrs[index]
+
+            num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
+
+            feature_selector=SelectKBest(chi2,setting.num_attribute)
+            #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
+
+            train_set=train_sets[index]
+            test_set=test_sets[index]
+
+            supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
+            train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
+
+            train_Xs.append(train_X)
+            test_Xs.append(test_X)
+
+            supervised_logger.info("Ending Dimension for train: {}".format(train_X.shape))
+            supervised_logger.info("Ending Dimension for test: {}".format(test_X.shape))
+
+        train_set=MultiData(train_Xs,train_y,train_ref_indexes)
+
+        test_set=MultiData(test_Xs,test_y,test_ref_indexes)
 
         """
-        FEATURE SELECTION and EXTRACTION
+        CLASSIFICATION
         """
-        for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
-            train_Xs=[]
-            train_y=train_sets[0].y
-            train_ref_indexes=train_sets[0].ref_index
+        classifier_name_to_accuracy=classify(settings,train_set,test_set,all_weights,global_settings.print_res)
 
-            test_Xs=[]
-            test_y=test_sets[0].y
-            test_ref_indexes=test_sets[0].ref_index
-
-            for index,setting in enumerate(settings):
-                setting.num_attribute=num_attrs[index]
-
-                num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
-
-                feature_selector=SelectKBest(chi2,setting.num_attribute)
-                #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
-
-                train_set=train_sets[index]
-                test_set=test_sets[index]
-
-                supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
-                train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
-
-                train_Xs.append(train_X)
-                test_Xs.append(test_X)
-
-                supervised_logger.info("Ending Dimension for train: {}".format(train_X.shape))
-                supervised_logger.info("Ending Dimension for test: {}".format(test_X.shape))
-
-            train_set=MultiData(train_Xs,train_y,train_ref_indexes)
-
-            test_set=MultiData(test_Xs,test_y,test_ref_indexes)
-
-            """
-            CLASSIFICATION
-            """
-            classifier_name_to_accuracy=classify(settings,train_set,test_set,curr_weights,global_settings.print_res)
-
-            best_curr_weight_acc=max(classifier_name_to_accuracy.items(),key=op.itemgetter(1))+tuple([curr_weights])
-            best_accuracy=max(best_curr_weight_acc,best_accuracy,key=op.itemgetter(1))
-
-
-    supervised_logger.info("Best accuracy achieved at: {}".format(best_accuracy))
+        supervised_logger.info("Best accuracy achieved at: {}".format(max(classifier_name_to_accuracy.items())))
 
 
