@@ -39,7 +39,7 @@ def extract_title(reference_db_cls,db_cls):
             title=None
 
         #bag of word
-        comp_logger.info(title)
+
         title_bow=bow_transformer.get_word_count(title) if title and title.strip() else {}
 
         #store into db
@@ -73,14 +73,17 @@ def extract_meta_data(reference_db_cls,db_cls):
         page_soup=BeautifulSoup(page,"html.parser")
 
         contents=[]
-        for meta_data_desc in page_soup.find_all("meta",{"name":"description"}):
-            contents.append(meta_data_desc["content"])
+        try:
+            for meta_data_desc in page_soup.find_all("meta",{"name":"description"}):
+                contents.append(meta_data_desc["content"])
 
-        for meta_data_desc in page_soup.find_all("meta",{"name":"Description"}):
-            contents.append(meta_data_desc["content"])
+            for meta_data_desc in page_soup.find_all("meta",{"name":"Description"}):
+                contents.append(meta_data_desc["content"])
 
-        for meta_data_desc in page_soup.find_all("meta",{"name":"keywords"}):
-            contents.append(meta_data_desc["content"])
+            for meta_data_desc in page_soup.find_all("meta",{"name":"keywords"}):
+                contents.append(meta_data_desc["content"])
+        except (KeyError,AttributeError):
+            not_found_data+=1
 
         if not len(contents):
             not_found_data+=1
