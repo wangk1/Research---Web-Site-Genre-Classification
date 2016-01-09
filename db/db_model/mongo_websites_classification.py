@@ -1,6 +1,9 @@
 __author__ = 'Kevin'
 from mongoengine import *
 
+#current db's alias
+db_aliase="Websites_classification"
+
 class TrainSet_urlFullTextBow(Document):
     short_genre=StringField(required=True)
     attr_map=DictField(field=IntField(),required=True)
@@ -11,7 +14,7 @@ class TrainSet_urlFullTextBow(Document):
               "ref_index"
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
           }
 
 class TestSet_urlFullTextBow(Document):
@@ -24,7 +27,7 @@ class TestSet_urlFullTextBow(Document):
               "ref_index"
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
           }
 
 class TrainSet_urlAllGram(Document):
@@ -37,7 +40,7 @@ class TrainSet_urlAllGram(Document):
               "ref_index"
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
           }
 
 class TestSet_urlAllGram(Document):
@@ -50,7 +53,7 @@ class TestSet_urlAllGram(Document):
               "ref_index"
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
           }
 
 class URLBow_fulltxt(Document):
@@ -64,7 +67,7 @@ class URLBow_fulltxt(Document):
               "bow_index"
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
           }
 
 class URLAllGram(Document):
@@ -79,5 +82,35 @@ class URLAllGram(Document):
 
 
           ],
-          "db_alias":"Websites_classification"
+          "db_alias":db_aliase
+          }
+
+class WebpageTitleBOW(Document):
+    short_genres=ListField(StringField(required=True))
+    attr_map= DictField(field=IntField(),default={})
+    ref_index=IntField(required=True)
+
+    meta={'collection':'WebpageTitleBOW',
+          'indexes':[
+              'short_genres',
+              "ref_index"
+
+
+          ],
+          "db_alias":db_aliase
+          }
+
+class WebpageMetaBOW(Document):
+    short_genres=ListField(StringField(required=True))
+    attr_map= DictField(field=IntField(),default={})
+    ref_index=IntField(required=True)
+
+    meta={'collection':'WebpageMetaBOW',
+          'indexes':[
+              'short_genres',
+              "ref_index"
+
+
+          ],
+          "db_alias":db_aliase
           }

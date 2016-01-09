@@ -4,7 +4,7 @@ from util.base_util import normalize_genre_string
 from analytics.graphics import add_bar_plot
 from data import bad_genre_set
 from tabulate import tabulate
-from data.util import normalizer
+from data.util import genre_normalizer
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ def tabulate_genre_dist(y,normalize_to_level=1):
     """
     genre_to_count=coll.Counter()
 
-    y=normalizer(y,normalize_to_level)
+    y=genre_normalizer(y,normalize_to_level)
 
     if np.issubdtype(y.dtype,np.str):
         genre_to_count.update(y)

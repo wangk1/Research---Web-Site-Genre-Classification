@@ -5,10 +5,16 @@ from classification_attribute.feature_selection import BagOfWords
 from classification_attribute.word_based import NGrams
 from db.db_model.mongo_queue_models import Queue_full_page
 from db.db_model.mongo_websites_models import URLToGenre,URLBow
-from db.db_model.mongo_websites_classification import URLBow_fulltxt,URLAllGram
+from db.db_model.mongo_websites_classification import *
 from db import DBQueue
 from util.base_util import normalize_genre_string,unreplace_dot_url
 from classification_attribute.url_based import URLTransformer
+from classification_attribute.webpage_components import extract_meta_data,extract_title
+from util.Logger import Logger
+from multiprocessing import Process
+
+attr_logger=Logger(__name__)
+
 
 def full_page_bow():
     """
@@ -67,14 +73,37 @@ def create_url_ngram():
         URLAllGram(attr_map=ngram,ref_index=ref_index,short_genres=list(set([normalize_genre_string(genre,1)
                                                                             for genre in url_bow_obj.short_genres]))).save()
 
+def create_meta_DB():
+    #clear db
+    attr_logger.info("Extracting webpage MetaData")
 
-def field_test():
-    for c,obj in enumerate(Queue_full_page.objects):
-        c%1000==0 and print("{} done".format(c))
+    WebpageMetaBOW.objects.delete()
+
+    extract_meta_data(URLBow,WebpageMetaBOW)
+
+    attr_logger.info("Done extracting webpage MetaData")
+
+def create_title_DB():
+    #clear db
+    attr_logger.info("Extracting webpage titles")
+
+    WebpageTitleBOW.objects.delete()
+
+    extract_title(URLBow,WebpageTitleBOW)
+
+    attr_logger.info("Done extracting webpage titles")
 
 
 if __name__=="__main__":
-    create_url_ngram()
+    p_title=Process(target=create_title_DB)
+    p_meta=Process(target=create_meta_DB)
+
+    p_title.start()
+    p_meta.start()
+
+    p_meta.join()
+    p_title.join()
+
     #url_ngram_queue()
     #DBQueue(Queue_full_page,"url_ngram_queue").create_queue(URLToGenre.objects(original=True))
     #full_page_bow()

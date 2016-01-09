@@ -122,7 +122,7 @@ def flatten_training(train_set):
     train_set.y=np.array(new_y)
     train_set.ref_index=np.array(new_ref_id)
 
-def normalizer(y,level=1):
+def genre_normalizer(y,level=1,dim=2):
     """
     Utility function for automatically normalizing a vector of list or a vector of genres to level @param level.
 
@@ -131,10 +131,15 @@ def normalizer(y,level=1):
     :param level:
     :return:
     """
-    if np.issubdtype(y.dtype,np.str):
+    if hasattr(y,"dtype") and np.issubdtype(y.dtype,np.str):
         new_y=np.array([normalize_genre_string(i,level) for i in y])
 
     else:
-        new_y=np.array([list(set(normalize_genre_string(g,level) for g in y_list))  for y_list in y])
+        if dim==2:
+            no_rep_list=[list(set((normalize_genre_string(g,level) for g in y_list)))  for y_list in y]
+        else:
+            no_rep_list=list(set([normalize_genre_string(g,level)  for g in y]))
+
+        new_y=np.array(no_rep_list)
 
     return new_y
