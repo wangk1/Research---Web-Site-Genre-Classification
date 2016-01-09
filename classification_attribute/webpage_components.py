@@ -34,13 +34,12 @@ def extract_title(reference_db_cls,db_cls):
         try:
             title=page_soup.title.string
 
-        except AttributeError:
+            #bag of word
+            title_bow=bow_transformer.get_word_count(title) if title and title.strip() else {}
+
+        except (AttributeError,ValueError):
             title_not_exists+=1
-            title=None
-
-        #bag of word
-
-        title_bow=bow_transformer.get_word_count(title) if title and title.strip() else {}
+            title_bow={}
 
         #store into db
         db_cls(ref_index=ref_index,attr_map=title_bow,short_genres=short_genres).save()
@@ -82,14 +81,15 @@ def extract_meta_data(reference_db_cls,db_cls):
 
             for meta_data_desc in page_soup.find_all("meta",{"name":"keywords"}):
                 contents.append(meta_data_desc["content"])
-        except (KeyError,AttributeError):
-            not_found_data+=1
 
-        if not len(contents):
-            not_found_data+=1
+            contents=" ".join(contents if contents else "")
+            meta_bow=bow_transformer.get_word_count(contents) if contents and contents.strip() else {}
 
-        contents=" ".join(contents if contents else "")
-        meta_bow=bow_transformer.get_word_count(contents) if contents and contents.strip() else {}
+            if not len(contents):
+                not_found_data+=1
+        except (KeyError,AttributeError,ValueError):
+            not_found_data+=1
+            meta_bow={}
 
         #store into db
         db_cls(ref_index=ref_index,attr_map=meta_bow,short_genres=short_genres).save()
