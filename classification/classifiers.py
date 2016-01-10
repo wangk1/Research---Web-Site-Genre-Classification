@@ -126,7 +126,7 @@ class BaseClassifier:
     def predict_proba(self,X):
         raise NotImplementedError("Not implemented")
 
-    def predict_multi(self, X,predictions_per_stack=1500,return_prediction_prob=False):
+    def predict_multi(self, X,predictions_per_stack=1000,return_prediction_prob=False):
         """
         Alternative predict function for logistic regression, returns the top predictions for test instances
 

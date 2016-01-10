@@ -205,13 +205,21 @@ if __name__=="__main__":
     """
     CLASSIFICATION SETTINGS
     """
-    setting=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
+    setting_summary=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
 
-    setting2=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
+    setting_url=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-    settings=[setting,
-              setting2
+
+    setting_meta=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="metadata",
+                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
+
+    setting_title=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="title",
+                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
+    settings=[setting_summary,
+              setting_url,
+              setting_meta,
+              setting_title
               ]
 
     weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
@@ -227,9 +235,10 @@ if __name__=="__main__":
         setting.result_file_label="no_region_kids_home_news"
         setting.threshold=4
         setting.ll_ranking=False
-        setting.num_attributes={10000,#20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
+        setting.num_attributes={
+                                10000,100000,200000
+                                #10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
-    settings[0].num_attributes,settings[1].num_attributes=({100000},{60000})
 
     """
     LOAD DATA, preprocess
@@ -288,12 +297,12 @@ if __name__=="__main__":
         threshold=setting.threshold
         ll_ranking=setting.ll_ranking
         setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
-                      #classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
-                      #classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      #classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
-                      #classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
-                      #classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
+                      classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
                                  ]
 
 
@@ -308,6 +317,8 @@ if __name__=="__main__":
     """
     FEATURE SELECTION and EXTRACTION
     """
+
+    best_result=("classifier_name",(0,"w1","w2"),["num_attributes"])
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
         train_Xs=[]
         train_y=train_sets[0].y
@@ -346,6 +357,13 @@ if __name__=="__main__":
         """
         classifier_name_to_accuracy=classify(settings,train_set,test_set,all_weights,global_settings.print_res)
 
-        supervised_logger.info("Best accuracy achieved at: {}".format(max(classifier_name_to_accuracy.items())))
+        best_result_at_curr_num_attr=max(classifier_name_to_accuracy.items(),key=op.itemgetter(1))+(num_attrs,)
+
+        #classifier_name_to_accracy is an association b/w a string of name of all the classifiers and the best weight for each
+        supervised_logger.info("Best accuracy achieved at: {} with num features {}".format(
+            best_result_at_curr_num_attr,num_attrs))
 
 
+        best_result=max(best_result,best_result_at_curr_num_attr,key=op.itemgetter(1))
+
+    print("Absolute best result at {}".format(best_result))
