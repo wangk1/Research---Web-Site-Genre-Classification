@@ -331,7 +331,14 @@ if __name__=="__main__":
         test_ref_indexes=test_sets[0].ref_index
 
         for index,setting in enumerate(settings):
+            #incase the num attr exceed the size
+            total_num_attr=train_sets[index].X.shape[1]
             setting.num_attribute=num_attrs[index]
+
+            if total_num_attr<setting.num_attribute:
+                setting.num_attribute=total_num_attr
+                num_attrs[index]=setting.num_attribute
+
 
             num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
 
