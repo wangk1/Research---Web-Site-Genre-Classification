@@ -306,15 +306,6 @@ if __name__=="__main__":
                                  ]
 
 
-    """
-    CLASSIFICATION WEIGHTS INITIALIZATION
-    """
-    start_weight,end_weight=weights.weights_range
-    stepping=weights.stepping
-    all_weights=itertools.repeat(itertools.product(
-        *itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers)
-    ))
-
 
     """
     FEATURE SELECTION and EXTRACTION
@@ -322,6 +313,8 @@ if __name__=="__main__":
 
     best_result=("classifier_name",(0,"w1","w2"),["num_attributes"])
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
+        num_attrs=list(num_attrs)
+
         train_Xs=[]
         train_y=train_sets[0].y
         train_ref_indexes=train_sets[0].ref_index
@@ -364,7 +357,7 @@ if __name__=="__main__":
         """
         CLASSIFICATION
         """
-        classifier_name_to_accuracy=classify(settings,train_set,test_set,all_weights,global_settings.print_res)
+        classifier_name_to_accuracy=classify(settings,train_set,test_set,weights,global_settings.print_res)
 
         best_result_at_curr_num_attr=max(classifier_name_to_accuracy.items(),key=op.itemgetter(1))+(num_attrs,)
 

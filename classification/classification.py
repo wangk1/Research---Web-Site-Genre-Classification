@@ -1,4 +1,5 @@
 import itertools
+import numpy as np
 from classification.classifiers import MultiClassifier
 from .classifiers import Classifier
 from util.Logger import Logger
@@ -8,7 +9,7 @@ __author__ = 'Kevin'
 
 classification_logger=Logger(__name__)
 
-def classify(settings,train_set,test_set,all_classifier_weights,print_res=True):
+def classify(settings,train_set,test_set,weights,print_res=True):
     """
     The main classification method
 
@@ -20,6 +21,11 @@ def classify(settings,train_set,test_set,all_classifier_weights,print_res=True):
     """
 
     classifier_to_accuracy={}
+    """
+    CLASSIFICATION WEIGHTS INITIALIZATION
+    """
+    start_weight,end_weight=weights.weights_range
+    stepping=weights.stepping
     for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
 
         multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
@@ -34,7 +40,9 @@ def classify(settings,train_set,test_set,all_classifier_weights,print_res=True):
 
         use_prev=False
 
-        for curr_weights in next(all_classifier_weights):
+        for curr_weights in itertools.product(
+            *itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers)
+        ):
             if all((i==0 for i in curr_weights)):
                 continue
 
