@@ -311,7 +311,9 @@ if __name__=="__main__":
     """
     start_weight,end_weight=weights.weights_range
     stepping=weights.stepping
-    all_weights=itertools.product(*itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers))
+    all_weights=itertools.repeat(itertools.product(
+        *itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers)
+    ))
 
 
     """

@@ -34,7 +34,7 @@ def classify(settings,train_set,test_set,all_classifier_weights,print_res=True):
 
         use_prev=False
 
-        for curr_weights in all_classifier_weights:
+        for curr_weights in next(all_classifier_weights):
             if all((i==0 for i in curr_weights)):
                 continue
 
