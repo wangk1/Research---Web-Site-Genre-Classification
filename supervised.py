@@ -216,10 +216,10 @@ if __name__=="__main__":
 
     setting_title=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="title",
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-    settings=[#setting_summary, #100000
-              #setting_url, #60000
-              #setting_meta, #60000
-              setting_title #
+    settings=[setting_summary, #100000
+              setting_url, #60000
+              setting_meta, #60000
+              setting_title #30000
               ]
 
     weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
@@ -238,6 +238,10 @@ if __name__=="__main__":
         setting.num_attributes={
                                 10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
+    settings[0].num_attributes,\
+    settings[1].num_attributes,\
+    settings[2].num_attributes,\
+    settings[3].num_attributes=({100000},{60000},{60000},{30000})
 
     """
     LOAD DATA, preprocess
