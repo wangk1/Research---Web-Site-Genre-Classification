@@ -216,10 +216,10 @@ if __name__=="__main__":
 
     setting_title=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="title",
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-    settings=[setting_summary,
-              setting_url,
-              setting_meta,
-              setting_title
+    settings=[#setting_summary, #100000
+              #setting_url, #60000
+              setting_meta, #
+              #setting_title #
               ]
 
     weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
@@ -236,8 +236,7 @@ if __name__=="__main__":
         setting.threshold=4
         setting.ll_ranking=False
         setting.num_attributes={
-                                10000,100000,200000
-                                #10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
+                                10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
 
     """
@@ -297,12 +296,12 @@ if __name__=="__main__":
         threshold=setting.threshold
         ll_ranking=setting.ll_ranking
         setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
-                      classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
+                      #classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
                                  ]
 
 
