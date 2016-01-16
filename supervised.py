@@ -14,7 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 __author__ = 'Kevin'
 import util.base_util as util,numpy as np
 from classification_attribute.feature_selection import feature_selection
-
+from sklearn.cross_validation import KFold
 from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
@@ -372,3 +372,18 @@ if __name__=="__main__":
         best_result=max(best_result,best_result_at_curr_num_attr,key=op.itemgetter(1))
 
     print("Absolute best result at {}".format(best_result))
+
+def cross_validate_gen(total_num_ele,k_folds):
+    """
+    Generator for generating folds for cross validation
+
+    :param total_num_ele:
+    :param k_folds:
+    :return:
+    """
+    kf=KFold(total_num_ele,n_folds=k_folds)
+
+    for train_ind, test_ind in kf:
+        yield train_ind,test_ind
+
+

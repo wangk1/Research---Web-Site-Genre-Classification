@@ -194,7 +194,7 @@ class MultiClassifier:
         return self.__str__()
 
     def __str__(self):
-        return ",".join((str(c) for c in self.classifiers))
+        return "-".join((str(c) for c in self.classifiers))
 
     def fit(self,train_X,train_y):
         """
