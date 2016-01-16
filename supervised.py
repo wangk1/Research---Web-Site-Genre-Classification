@@ -194,7 +194,7 @@ if __name__=="__main__":
         res_dir="classification_res",
         pickle_dir="pickle_dir",
         random_pick_test_training=False,
-        print_res=False,
+        print_res=True,
 
 
 
@@ -218,8 +218,8 @@ if __name__=="__main__":
                              pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
     settings=[#setting_summary, #100000
               #setting_url, #60000
-              setting_meta, #
-              #setting_title #
+              #setting_meta, #60000
+              setting_title #
               ]
 
     weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
