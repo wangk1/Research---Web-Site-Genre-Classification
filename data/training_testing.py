@@ -36,7 +36,7 @@ def _pick_random_samples(Xs,y,ref_index,num):
 
     return [X[choices] for X in Xs],y[choices],ref_index[choices],[X[non_choices] for X in Xs],y[non_choices],ref_index[non_choices]
 
-def randomized_training_testing_sets(settings,Xs,y,ref_index,num,do_pickle=True):
+def select_training_testing_sets(settings,Xs,y,ref_index,num,do_pickle=True):
     """
     Randomly choose from a super set of data and split it into a training set of size num. The remainder will become
         the Test set. Uses _pick_random_samples

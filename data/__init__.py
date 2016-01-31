@@ -59,3 +59,12 @@ class LearningSettings:
     @property
     def label(self):
         return str(self)
+
+    @property
+    def truncated_label(self):
+        """
+        Label that is truncated to 3 char per component
+
+        :return:
+        """
+        return "_".join((str(i)[:4] for i in self.attr_list))

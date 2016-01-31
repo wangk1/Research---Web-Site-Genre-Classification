@@ -1,6 +1,7 @@
 import itertools
 import re
 import os
+import statistics
 
 import numpy as np
 import pandas as pd
@@ -55,19 +56,31 @@ class Classifier:
 
 
 
+    def print_cross_validation_res(self,cv_results):
+
+        for classifiers_name in cv_results.results:
+            average=statistics.mean((res_single.accuracy for fold,res_single in cv_results.results[classifiers_name].items()))
+
+            print("")
 
 
-    def print_res(self,learn_settings,y,ref_indexes,predictions,classifier_name):
+
+    def print_res(self,learn_settings,y,ref_indexes,predictions,classifier_name,shorten_path=False):
         """
         Compare the prediction to the actual labels and print them into the appropriate *_wrong.txt or *_right.txt in
                their respective result directories
 
+        Shorten path is due to the fact that python glitches out if the number of characters in the filename is >65 char
+            So, we can fix the issue by just shortening each component of the filename to 3 characters
         :param classifier_name:
         :param predictions:
         :param labels:
         :param ref_indexes:
         :return:
         """
+        if shorten_path:
+            classifier_name=classifier_name[:4]
+
         label="_".join([setting.label for setting in learn_settings] if isinstance(learn_settings,coll.Iterable) else learn_settings.label)
 
         folder_path="{}/{}".format(self.res_dir,label)
@@ -75,13 +88,18 @@ class Classifier:
         #make dir if not exist
         os.makedirs(folder_path,exist_ok=True)
 
-        output_file="{}/{}{}_cres.txt".format(folder_path,classifier_name,"" if learn_settings[0].result_file_label=="" else "_"+learn_settings[0].result_file_label)
+        pwd=os.getcwd() #change to the other directory so the file path isn't excessively long
+        os.chdir(folder_path)
+
+        output_file="{}{}_cres.txt".format(classifier_name,"" if learn_settings[0].result_file_label=="" else "_"+learn_settings[0].result_file_label)
 
         #emit the csv
         with open(output_file,mode="w") as output_handler:
             output_handler.write(",".join(self.csv_indexes)+"\n")
             for l in range(0,y.shape[0]):
                 output_handler.write("{},{},{}\n".format(ref_indexes[l],list(predictions[l]),list(y[l])))
+
+        os.chdir(pwd)
 
     def calculate_accuracy(self,label,predictions,comparator=lambda l,p: p in l):
         """

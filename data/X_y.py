@@ -42,6 +42,7 @@ def match_sets_based_on_ref_id(Xs,ys,ref_ids):
     if len(Xs)>1:
         for index in range(0,len(ref_ids)):
             if index==smallest_index:
+                ys[index]=np.array([sorted(i) for i in ys[index]])
                 continue
 
             #make sure no repeats
@@ -66,7 +67,7 @@ def match_sets_based_on_ref_id(Xs,ys,ref_ids):
             new_index=remapped_index.argsort()
 
             Xs[index]=c_X[new_index]
-            ys[index]=c_y[new_index]
+            ys[index]=np.array([sorted(i) for i in c_y[new_index]])
             ref_ids[index]=c_ref_ids[new_index]
 
     return Xs,ys,ref_ids

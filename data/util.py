@@ -115,7 +115,7 @@ def flatten_training(train_set):
     for index,g_list in enumerate(train_set.y):
         new_ref_id.extend((len(g_list))*[train_set.ref_index[index]])
         new_x_index.extend([index]*len(g_list))
-        new_y.extend(g_list)
+        new_y.extend(sorted(g_list))
 
     #now project out
     train_set.X=train_set.X[new_x_index]

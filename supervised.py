@@ -13,23 +13,24 @@ from sklearn.tree import DecisionTreeClassifier
 
 __author__ = 'Kevin'
 import util.base_util as util,numpy as np
-from classification_attribute.feature_selection import feature_selection
+
 from sklearn.cross_validation import KFold
 from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 import classification.classifiers as classifiers
-from data.training_testing import Training,Testing,randomized_training_testing_sets,MultiData
+from data.training_testing import MultiData
 from data import LearningSettings
-from data.util import unpickle_obj,flatten_training
+from data.util import unpickle_obj
+from classification.classification import feature_selection
+from functools import partial
 from util.base_util import normalize_genre_string
-from classification_attribute.feature_selection import PerClassFeatureSelector
 from util.genre import filter_genres
 from util.Logger import Logger
-from classification.classifiers import MultiClassifier
 from data.X_y import match_sets_based_on_ref_id
-from classification.classification import classify
+from classification.classification import classify, load_training_testing
 import operator as op
+from classification.results import ResCrossValidation
 
 supervised_logger=Logger()
 
@@ -127,75 +128,33 @@ ignore_genre={
     "News"
 }
 
-
-
-
-
-def load_training_testing(Xs,ys,ref_indexes,settings,train_set_size,random_pick_test_training):
+def cross_validate_gen(total_num_ele,k_folds):
     """
-    Load training and testing set or randomly pick then from Xs,y,and ref_index.
+    Generator for generating folds for cross validation
 
-    :param Xs:
-    :param ys:
-    :param ref_indexes:
-    :param settings:
-    :param train_set_size:
-    :return: List of train_set and test_set objs
+    :param total_num_ele:
+    :param k_folds:
+    :return:
     """
+    kf=KFold(total_num_ele,n_folds=k_folds)
 
-    if random_pick_test_training:
-        train_sets,test_sets=randomized_training_testing_sets(settings,Xs,ys[0],ref_indexes[0],train_set_size)
-    else:
-        train_sets=[]
-        test_sets=[]
-
-        for setting in settings:
-            train_set=Training(setting,pickle_dir=setting.pickle_dir)
-            train_set.load_training(secondary_label=setting.result_file_label)
-
-            test_set=Testing(setting,pickle_dir=setting.pickle_dir)
-            test_set.load_testing(secondary_label=setting.result_file_label)
-
-            train_sets.append(train_set)
-            test_sets.append(test_set)
-
-    #flatten training
-    for train_set in train_sets:
-        flatten_training(train_set)
-
-    #make sure the sets match
-    supervised_logger.info("Checking the sets match")
-    ys=[train_set.y for train_set in train_sets]
-    ref_indexes=[train_set.ref_index for train_set in train_sets]
-
-    test_ys=[test_set.y for test_set in test_sets]
-    test_ref_indexes=[test_set.ref_index for test_set in test_sets]
-
-    for c,elem in enumerate((ys,ref_indexes,test_ys,test_ref_indexes)):
-
-        prev=elem[0]
-        match=True
-        for e in elem[1:]:
-            match=match and (e==prev).all()
-        if not match:
-            raise AttributeError("NOT MATCH FOR {} ELEMENT".format(c))
-
-    return train_sets,test_sets
+    for train_ind, test_ind in kf:
+        yield train_ind,test_ind
 
 
 if __name__=="__main__":
     #GLOBAL SETTINGS
 
     global_settings=namedtuple("GlobalSettings",
-                               ("train_set_size","res_dir","pickle_dir","random_pick_test_training","learning_rate","print_res")
+                               ("train_set_size","res_dir","pickle_dir","learning_rate","print_res",
+                                "k_folds")
                                ) (
         learning_rate=0.2,
         train_set_size=50000,
         res_dir="classification_res",
         pickle_dir="pickle_dir",
-        random_pick_test_training=False,
-        print_res=True,
-
+        print_res=False,
+        k_folds=10,
 
 
     )
@@ -232,7 +191,7 @@ if __name__=="__main__":
     supervised_logger.info("Number of Weights: {}".format(weights.num_classifiers))
 
     for setting in settings:
-        setting.result_file_label="no_region_kids_home_news"
+        setting.result_file_label="no_reg_kid_hom_new"
         setting.threshold=4
         setting.ll_ranking=False
         setting.num_attributes={
@@ -252,44 +211,34 @@ if __name__=="__main__":
     ys=[]
     ref_indexes_unmatched=[]
     ref_indexes=[]
-    if global_settings.random_pick_test_training:
 
-        for setting in settings:
-            supervised_logger.info("Loading data for {}".format(setting))
-            X=unpickle_obj("pickle_dir\\{}\\X_{}_pickle".format(setting.feature_selection,setting.feature_selection))
-            ref_index=unpickle_obj("pickle_dir\\{}\\refIndex_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
-            y=unpickle_obj("pickle_dir\\{}\\y_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
-            y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
+    for setting in settings:
+        supervised_logger.info("Loading data for {}".format(setting))
+        X=unpickle_obj("pickle_dir\\{}\\X_{}_pickle".format(setting.feature_selection,setting.feature_selection))
+        ref_index=unpickle_obj("pickle_dir\\{}\\refIndex_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+        y=unpickle_obj("pickle_dir\\{}\\y_{}_pickle".format(*itertools.repeat(setting.feature_selection,2)))
+        y=np.array([list(set((normalize_genre_string(g,1) for g in g_list))) for g_list in y])
 
-            #filter out unwanted genres
-            X_filtered,y_filtered,ref_index_filtered=filter_genres(X,y,ref_index,ignore_genre)
-            ref_indexes_unmatched.append(ref_index_filtered)
-            Xs.append(X_filtered)
-            ys.append(y_filtered)
+        #filter out unwanted genres
+        X_filtered,y_filtered,ref_index_filtered=filter_genres(X,y,ref_index,ignore_genre)
+        ref_indexes_unmatched.append(ref_index_filtered)
+        Xs.append(X_filtered)
+        ys.append(y_filtered)
 
-        #match refids
-        supervised_logger.info("Making ref indexes match for the data sets")
-        Xs,ys,ref_indexes=match_sets_based_on_ref_id(Xs,ys,ref_indexes_unmatched)
+    #match refids
+    supervised_logger.info("Making ref indexes match for the data sets")
+    Xs,ys,ref_indexes=match_sets_based_on_ref_id(Xs,ys,ref_indexes_unmatched)
 
-        #make sure ref indexes match
-        match=True
-        prev_index=ref_indexes_unmatched[0]
-        for ref_index in ref_indexes_unmatched[1:]:
-            match=(prev_index==ref_index).all()
-            prev_index=ref_index
+    #make sure ref indexes match
+    match=True
+    prev_index=ref_indexes_unmatched[0]
+    for ref_index in ref_indexes_unmatched[1:]:
+        match=(prev_index==ref_index).all()
+        prev_index=ref_index
 
-        if not match:
-            raise AttributeError("The matrices's reference indexes do not match, proceeding will resulting in wrong mapping"
-                                 "between instances")
-
-    """
-    TRAINING AND TESTING SETS LOADING, NO FEATURE EXTRACT and DIMENSIONALITY REDUCTION YET
-
-
-    """
-    supervised_logger.info("Generating or loading training samples")
-    train_sets,test_sets=load_training_testing(Xs,ys,ref_indexes,settings,global_settings.train_set_size,global_settings.random_pick_test_training)
-
+    if not match:
+        raise AttributeError("The matrices's reference indexes do not match, proceeding will resulting in wrong mapping"
+                             "between instances")
 
     """
     INITIALIZE CLASSIFIERS
@@ -310,80 +259,64 @@ if __name__=="__main__":
 
 
 
-    """
-    FEATURE SELECTION and EXTRACTION
-    """
-
     best_result=("classifier_name",(0,"w1","w2"),["num_attributes"])
+
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
         num_attrs=list(num_attrs)
 
-        train_Xs=[]
-        train_y=train_sets[0].y
-        train_ref_indexes=train_sets[0].ref_index
+        cv_res=ResCrossValidation() #store crossvalidation results
+        for fold,(train_index,test_index) in enumerate(cross_validate_gen(Xs[0].shape[0],global_settings.k_folds)):
+            supervised_logger.info("On the {}th fold currently".format(fold))
 
-        test_Xs=[]
-        test_y=test_sets[0].y
-        test_ref_indexes=test_sets[0].ref_index
+            """
+            LOAD TRAINING AND TESTING SETS WITH CROSS VALIDATION
+            """
 
-        for index,setting in enumerate(settings):
-            #incase the num attr exceed the size
-            total_num_attr=train_sets[index].X.shape[1]
-            setting.num_attribute=num_attrs[index]
+            train_sets,test_sets=load_training_testing(Xs,ys,ref_indexes,settings,train_index,test_index)
 
-            if total_num_attr<setting.num_attribute:
-                setting.num_attribute=total_num_attr
-                num_attrs[index]=setting.num_attribute
+            train_y=train_sets[0].y
+            train_ref_indexes=train_sets[0].ref_index
 
+            test_y=test_sets[0].y
+            test_ref_indexes=test_sets[0].ref_index
 
-            num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
+            """
+            FEATURE SELECTION and EXTRACTION
+            """
 
-            feature_selector=SelectKBest(chi2,setting.num_attribute)
+            feature_selector=partial(SelectKBest,chi2)
             #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
 
-            train_set=train_sets[index]
-            test_set=test_sets[index]
+            train_Xs,test_Xs=feature_selection(settings,feature_selector,train_sets,test_sets,num_attrs)
 
-            supervised_logger.info("Currently doing feature selection on {}th data set".format(index))
-            train_X,test_X=feature_selection(train_set,test_set,feature_selector,fit=True)
+            train_set=MultiData(train_Xs,train_y,train_ref_indexes)
 
-            train_Xs.append(train_X)
-            test_Xs.append(test_X)
+            test_set=MultiData(test_Xs,test_y,test_ref_indexes)
 
-            supervised_logger.info("Ending Dimension for train: {}".format(train_X.shape))
-            supervised_logger.info("Ending Dimension for test: {}".format(test_X.shape))
+            """
+            CLASSIFICATION
+            """
+            classifier_name_to_accuracy=classify(settings,train_set,test_set,weights,global_settings.print_res)
 
-        train_set=MultiData(train_Xs,train_y,train_ref_indexes)
+            #Go through each classifier's ResultSingle for different settings
+            for c_n, res_single_list in classifier_name_to_accuracy.items():
+                cv_res.update(*res_single_list,kth_fold=fold)
 
-        test_set=MultiData(test_Xs,test_y,test_ref_indexes)
+        results_list=cv_res.results
 
-        """
-        CLASSIFICATION
-        """
-        classifier_name_to_accuracy=classify(settings,train_set,test_set,weights,global_settings.print_res)
+        for res in results_list:
+            print(results_list+(num_attrs,))
 
-        best_result_at_curr_num_attr=max(classifier_name_to_accuracy.items(),key=op.itemgetter(1))+(num_attrs,)
+        best_result_at_curr_num_attr=max(results_list,key=op.itemgetter(0))+(num_attrs,)
 
         #classifier_name_to_accracy is an association b/w a string of name of all the classifiers and the best weight for each
         supervised_logger.info("Best accuracy achieved at: {} with num features {}".format(
             best_result_at_curr_num_attr,num_attrs))
 
-
-        best_result=max(best_result,best_result_at_curr_num_attr,key=op.itemgetter(1))
+        best_result=max(best_result,best_result_at_curr_num_attr,key=op.itemgetter(0))
 
     print("Absolute best result at {}".format(best_result))
 
-def cross_validate_gen(total_num_ele,k_folds):
-    """
-    Generator for generating folds for cross validation
 
-    :param total_num_ele:
-    :param k_folds:
-    :return:
-    """
-    kf=KFold(total_num_ele,n_folds=k_folds)
-
-    for train_ind, test_ind in kf:
-        yield train_ind,test_ind
 
 
