@@ -6,7 +6,7 @@ from data.training_testing import Testing, Training
 from util.Logger import Logger
 import operator as op,collections as coll
 from classification_attribute.feature_selection import feature_selection as feat_select
-from data.util import unpickle_obj,flatten_training
+from data.util import unpickle_obj,flatten_train_set
 from .results import ResSingle
 
 __author__ = 'Kevin'
@@ -129,7 +129,7 @@ def load_training_testing(Xs,ys,ref_indexes,settings,train_set_index,test_set_in
 
     #flatten training
     for train_set in train_sets:
-        flatten_training(train_set)
+        flatten_train_set(train_set)
 
     #make sure the sets match
     classification_logger.info("Checking the sets match")

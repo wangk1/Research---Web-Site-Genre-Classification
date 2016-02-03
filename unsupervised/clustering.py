@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from analytics.graphics import subplot_four_corner,plot_word_frequency
 from sklearn.preprocessing import MultiLabelBinarizer
-from data.util import flatten_training
+from data.util import flatten_train_set
 from tabulate import tabulate
 
 import sklearn.metrics.pairwise as pw
@@ -97,7 +97,7 @@ class Clustering:
         if fit:
             X,y,ref_id=data_set.X,data_set.y,data_set.ref_index
 
-            flatten_training(data_set)
+            flatten_train_set(data_set)
             feature_selector.fit(data_set.X,data_set.y)
 
             data_set.X,data_set.y,data_set.ref_index=X,y,ref_id

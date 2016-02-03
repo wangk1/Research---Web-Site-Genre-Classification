@@ -1,6 +1,6 @@
 __author__ = 'Kevin'
 
-import numpy as np
+import numpy as np,random as rand
 import scipy.sparse as sp
 
 import pickle,itertools
@@ -101,26 +101,45 @@ def unpickle_obj(file_path):
 
     return obj
 
-def flatten_training(train_set):
+def flatten_train_set(train_set):
     """
     Flatten the training set where there may be multiple genre classes. Split that into 2
 
     :param train_set:
     :return:
     """
+    train_set.X,train_set.y,train_set.ref_index=flatten_set(train_set.X,train_set.y,train_set.ref_index)
+
+    return train_set.X,train_set.y,train_set.ref_index
+
+def flatten_set(X,y,ref_index=None,has_ref_index=False):
+    """
+    Flatten data set so that each instance/index only has one label. Any instance that has multiple y's get a clone
+        created with different label as y.
+
+    :param X:
+    :param y:
+    :param ref_index:
+    :return:
+    """
     new_y=[]
     new_x_index=[]
-    new_ref_id=[]
+    if has_ref_index:
+        new_ref_id=[]
 
-    for index,g_list in enumerate(train_set.y):
-        new_ref_id.extend((len(g_list))*[train_set.ref_index[index]])
+    for index,g_list in enumerate(y):
+        has_ref_index and new_ref_id.extend((len(g_list))*[ref_index[index]])
         new_x_index.extend([index]*len(g_list))
         new_y.extend(sorted(g_list))
 
     #now project out
-    train_set.X=train_set.X[new_x_index]
-    train_set.y=np.array(new_y)
-    train_set.ref_index=np.array(new_ref_id)
+    X=X[new_x_index]
+    y=np.array(new_y)
+    if has_ref_index:
+        ref_index=np.array(new_ref_id)
+
+    return X,y,ref_index
+
 
 def genre_normalizer(y,level=1,dim=2):
     """
@@ -143,3 +162,25 @@ def genre_normalizer(y,level=1,dim=2):
         new_y=np.array(no_rep_list)
 
     return new_y
+
+
+def random_pick_samples(X,y,ref_index=None,num_samples=40000):
+    """
+    Randomly pick num_samples indices in X,y,and ref_index
+
+    :param X:
+    :param y:
+    :param ref_index:
+    :param num_samples:
+    :return:
+    """
+
+    chosen_index=sorted(rand.sample(range(0,X.shape[0]),num_samples))
+
+    X=X[chosen_index]
+    y=y[chosen_index]
+    if ref_index:
+        ref_index=ref_index[chosen_index]
+
+    return X,y,ref_index
+

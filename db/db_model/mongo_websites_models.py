@@ -292,3 +292,18 @@ class TopWordGenre(Document):
           ],
           "db_alias":"Websites_mutual"
           }
+
+class Summary(Document):
+    ref_index=IntField(required=True,unique=True)
+    url=StringField(required=True)
+    attr_map=DictField(field=IntField(default=0))
+    short_genres=ListField(StringField(),required=True)
+
+    meta={'collection':'Summary',
+          'indexes':[
+              'ref_index',
+              "url"
+
+          ],
+          "db_alias":"Websites"
+          }

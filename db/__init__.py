@@ -10,7 +10,7 @@ import db.settings as db_settings
 """
 This init file will contain the DBQueue class and the connectors for the databases in mongo db
 """
-
+queue_logger=Logger(__name__)
 class DBQueue:
     #self.queue_cls
     #self.queue_name
@@ -45,9 +45,9 @@ class DBQueue:
 
         The iterable items becomes the document portion
         """
-
+        raise NotImplementedError("Method is no longer used")
         for c,doc_obj in enumerate(filter(lambda x: x, iterable)):
-            c%1000==0 and Logger.info("{} done".format(c))
+            c%1000==0 and queue_logger.info("{} done".format(c))
 
 
             self.queue_cls(number=c,url=doc_obj.url).save()
