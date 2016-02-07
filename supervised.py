@@ -141,7 +141,6 @@ def cross_validate_gen(total_num_ele,k_folds):
     for train_ind, test_ind in kf:
         yield train_ind,test_ind
 
-
 if __name__=="__main__":
     #GLOBAL SETTINGS
 
@@ -183,7 +182,7 @@ if __name__=="__main__":
 
     weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
         num_classifiers=len(settings),
-        weights_range=(0,2),
+        weights_range=(1.8,2),
         stepping=0.2,
 
     )
@@ -195,7 +194,7 @@ if __name__=="__main__":
         setting.threshold=4
         setting.ll_ranking=False
         setting.num_attributes={
-                                10000,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
+                                10000#,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
                                 }
     settings[0].num_attributes,\
     settings[1].num_attributes,\
