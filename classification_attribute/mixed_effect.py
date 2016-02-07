@@ -2,7 +2,7 @@ import itertools
 
 __author__ = 'Kevin'
 
-from data.util import unpickle_obj,flatten_set,random_pick_samples,genre_normalizer
+from data.util import unpickle_obj,flatten_set,random_pick_samples,genre_normalizer,pickle_obj
 from sklearn.feature_selection import chi2,SelectKBest
 from util.Logger import Logger
 import numpy as np
@@ -64,13 +64,16 @@ def _generate_mixed_effect_matrix(X_path,y_path,feat_selector):
 
 def mixed_effect_chisq():
     k=5000
-    X_path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\summary\\X_summary_pickle"
-    y_path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\summary\\y_summary_pickle"
-    vocab_vect_path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\pickle_dir\\summary\\vocab_vectorizer_summary_pickle"
+    X_path="../pickle_dir\\summary\\X_summary_pickle"
+    y_path="../pickle_dir\\summary\\y_summary_pickle"
+    vocab_vect_path="../pickle_dir\\summary\\vocab_vectorizer_summary_pickle"
+    pickle_x_mixed_path="../pickle_dir/summary/X_mixed_summary_pickle"
 
     feat_selector=SelectKBest(chi2,k)
 
     X_mixed=_generate_mixed_effect_matrix(X_path,y_path,feat_selector)
+
+    pickle_obj(X_mixed,pickle_x_mixed_path)
 
 if __name__=="__main__":
     mixed_effect_chisq()
