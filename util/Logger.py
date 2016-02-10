@@ -9,7 +9,7 @@ from warnings import warn
 #     ehandle.write(day)
 #     blog.write(day)
 
-
+DEBUG=False
 class Logger:
 
     def __init__(self,module=""):
@@ -25,6 +25,13 @@ class Logger:
         with open(file,mode='a') as ehandle:
             ehandle.write(msg+'\n')
 
+    def warn(self,msg):
+        msg='WARNING: {}'.format(msg)
+        try:
+            print(msg)
+        except:
+            print("Can't print for some reason")
+
     def info(self,msg):
         msg='Info: {}'.format(msg)
         try:
@@ -33,6 +40,8 @@ class Logger:
             print("Can't print for some reason")
 
     def debug(self,msg):
+        if not DEBUG:
+            return
         msg='Debug: {}'.format(msg)
         try:
             print(msg)

@@ -120,3 +120,5 @@ def convert_to_bow_dict(html_page):
 
     return bow_model.get_word_count(text_page)
 
+def feature_selector_adapter():
+    pass

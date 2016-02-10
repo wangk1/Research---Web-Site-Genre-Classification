@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
 from classification.classifiers import MultiClassifier
-from .classifiers import Classifier
+from .classifiers import ClassifierUtil
 from data.training_testing import Testing, Training
 from util.Logger import Logger
 import operator as op,collections as coll
@@ -13,7 +13,7 @@ __author__ = 'Kevin'
 
 classification_logger=Logger(__name__)
 
-def classify(settings,train_set,test_set,weights,print_res=True):
+def classify(classifier_util,settings,train_set,test_set,weights,print_res=True):
     """
     The main classification method
 
@@ -39,29 +39,36 @@ def classify(settings,train_set,test_set,weights,print_res=True):
         multi_classifier.fit(train_set.X,train_set.y)
         classification_logger.info("Fitting done, predicting with test set")
 
-        #CLASSIFICATION, adjust weights
-        classifier_util=Classifier()
+
 
         use_prev=False
 
         for curr_weights in itertools.product(
             *itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers)
         ):
+
+            for i,s in enumerate(settings):
+                s.weight=round(curr_weights[i],3)
+
             if all((i==0 for i in curr_weights)):
                 continue
 
-            classification_logger.info("Using the weights {}".format(curr_weights))
+            classification_logger.debug("Using the weights {}".format(curr_weights))
 
             res_matrix=multi_classifier.predict_multi(test_set.X,classifier_weights=curr_weights,use_prev_prob=use_prev)
             use_prev=True # we cache the prediction, makes it faster to try out new weights
 
             if print_res:
-                print("Done, printing Results for {}".format(classifier_names))
-                classifier_util.print_res(settings,
-                    y=test_set.y,
-                    predictions=res_matrix,
-                    ref_indexes=test_set.ref_index,
-                    classifier_name=classifier_names,shorten_path=True)
+                if (end_weight-start_weight)//stepping >3:
+                    classification_logger.warn("Printing reject, too may possible weights")
+
+                else:
+                    classification_logger.info("Done, printing Results for {}".format(classifier_names))
+                    classifier_util.print_res(settings,
+                        y=test_set.y,
+                        predictions=res_matrix,
+                        ref_indexes=test_set.ref_index,
+                        classifier_name=classifier_names,shorten_path=True)
 
             accuracy=classifier_util.calculate_accuracy(test_set.y,res_matrix)
 
@@ -86,10 +93,9 @@ def feature_selection(settings,feature_selector_partial,train_sets,test_sets,num
             setting.num_attribute=total_num_attr
             num_attrs[index]=setting.num_attribute
 
-
         num_genres=len(set(itertools.chain(*([i for i in i_list]for i_list in train_sets[index].y))))
 
-        classification_logger.info("Currently doing feature selection on {}th data set".format(index))
+        classification_logger.info("Currently doing feature selection on {}th data set with {}".format(index,str(feature_selector_partial)))
         classification_logger.info("Pre feature selection: num features: {}".format(train_set.X.shape[1]))
 
         feature_selector=feature_selector_partial(setting.num_attribute)

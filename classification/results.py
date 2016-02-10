@@ -27,10 +27,10 @@ class ResCrossValidation:
     def results(self):
         result=[]
         for res_key in self._results.keys():
-            assert all(res_single.weights==self._results[res_key][0].weights and res_single.classifier_names==self._results[res_key][0].classifier_names
-                       for fold, res_single in self._results[res_key].items())
+            assert all((res_single.weights==self._results[res_key][0].weights and res_single.classifier_names==self._results[res_key][0].classifier_names
+                       for fold, res_single in enumerate(self._results[res_key])))
 
-            all_acc=[res_single.accuracy for fold, res_single in self._results[res_key].items()]
+            all_acc=[res_single.accuracy for fold, res_single in enumerate(self._results[res_key])]
 
             res_single=self._results[res_key][0]
             result.append((statistics.mean(all_acc),statistics.stdev(all_acc),res_single.weights,res_single.classifier_names))

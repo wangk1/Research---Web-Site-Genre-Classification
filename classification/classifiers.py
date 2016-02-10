@@ -26,7 +26,7 @@ classifier_logger=Logger()
 
 
 
-class Classifier:
+class ClassifierUtil:
     """
     Important formats:
         Coming soon
@@ -42,9 +42,7 @@ class Classifier:
     """
     def __init__(self):
         self.csv_indexes=["ref id","Predicted","Actual"] #output csv column labels
-        self.res_dir="classification_res\\supervised"
-
-
+        self.already_exist_output_file_set=set()
 
 
                 # #write out the probability
@@ -83,7 +81,7 @@ class Classifier:
 
         label="_".join([setting.label for setting in learn_settings] if isinstance(learn_settings,coll.Iterable) else learn_settings.label)
 
-        folder_path="{}/{}".format(self.res_dir,label)
+        folder_path="{}/{}".format(os.path.join(learn_settings[0].res_dir,learn_settings[0].type),label)
 
         #make dir if not exist
         os.makedirs(folder_path,exist_ok=True)
@@ -93,12 +91,17 @@ class Classifier:
 
         output_file="{}{}_cres.txt".format(classifier_name,"" if learn_settings[0].result_file_label=="" else "_"+learn_settings[0].result_file_label)
 
+        abs_path=os.path.join(folder_path,output_file)
         #emit the csv
-        with open(output_file,mode="w") as output_handler:
+        with open(output_file,mode="w" if abs_path not in self.already_exist_output_file_set else "a") \
+                as output_handler:
             output_handler.write(",".join(self.csv_indexes)+"\n")
             for l in range(0,y.shape[0]):
                 output_handler.write("{},{},{}\n".format(ref_indexes[l],list(predictions[l]),list(y[l])))
 
+        #register this path with already printed to output file. This allows us to truncate the file before writing
+        #Then append to it for the next few iterations
+        self.already_exist_output_file_set.add(abs_path)
         os.chdir(pwd)
 
     def calculate_accuracy(self,label,predictions,comparator=lambda l,p: p in l):
@@ -157,6 +160,7 @@ class BaseClassifier:
         predictions_classes=None
 
         if self.ll_ranking:
+            raise NotImplementedError("Log Likelihood prediction not supported")
             #get the best class based on log likelihood
             predictions_classes=self.predict_proba(X)
             indexes=np.argsort(predictions_classes)
@@ -243,7 +247,7 @@ class MultiClassifier:
 
         self.classes_=self.classifiers[0].classes_
         if use_prev_prob:
-            print("Using Previous Predicted Probabiliyt")
+            classifier_logger.debug("Using Previous Predicted Probabiliyt")
 
             prediction_probs=classifier_weights[0]*self.prev_cache[0]
 

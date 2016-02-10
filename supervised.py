@@ -1,6 +1,7 @@
-import functools
+import functools,collections as coll
 import itertools
 import re
+from classification.classification_settings import *
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, chi2
@@ -10,17 +11,17 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 from sklearn.tree import DecisionTreeClassifier
+from classification.classifiers import ClassifierUtil
 
 __author__ = 'Kevin'
 import util.base_util as util,numpy as np
 
-from sklearn.cross_validation import KFold
+from sklearn.cross_validation import KFold,ShuffleSplit
 from collections import namedtuple
 from db.db_model.mongo_websites_classification import URLAllGram,TestSet_urlAllGram,TrainSet_urlAllGram,URLBow_fulltxt, \
     TrainSet_urlFullTextBow,TestSet_urlFullTextBow
 import classification.classifiers as classifiers
 from data.training_testing import MultiData
-from data import LearningSettings
 from data.util import unpickle_obj
 from classification.classification import feature_selection
 from functools import partial
@@ -112,21 +113,7 @@ def map_urlFullText(genre_dict):
                               ,test_set_nums,genre_dict.keys()
                               ,train_coll_cls=TrainSet_urlFullTextBow,test_coll_cls=TestSet_urlFullTextBow)
 
-#genres to filter out with filter genre methods
-ignore_genre={
-    "World",
-    "id",
-    "desc",
-    "page",
-    "parent",
-    "url",
-    "genres",
-    "Kids_and_Teens",
-    "Kids",
-    "Regional",
-    "Home",
-    "News"
-}
+
 
 def cross_validate_gen(total_num_ele,k_folds):
     """
@@ -141,65 +128,28 @@ def cross_validate_gen(total_num_ele,k_folds):
     for train_ind, test_ind in kf:
         yield train_ind,test_ind
 
+def randomized_cross_validation_gen(total_num_ele,k_folds):
+    """
+    Cross validation stradegy that first randomly shuffles the indices. Then,
+    it divides the set into X folds
+
+    :param total_num_ele:
+    :param k_folds:
+    :return:
+    """
+    for train_ind, test_ind in ShuffleSplit(total_num_ele,test_size=1/k_folds):
+        yield train_ind,test_ind
+
+
+
 if __name__=="__main__":
-    #GLOBAL SETTINGS
+    #See classification.classification_settings for the adjustable settings
 
-    global_settings=namedtuple("GlobalSettings",
-                               ("train_set_size","res_dir","pickle_dir","learning_rate","print_res",
-                                "k_folds")
-                               ) (
-        learning_rate=0.2,
-        train_set_size=50000,
-        res_dir="classification_res",
-        pickle_dir="pickle_dir",
-        print_res=False,
-        k_folds=10,
-
-
-    )
-
-
-
-    """
-    CLASSIFICATION SETTINGS
-    """
-    setting_summary=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="summary",
-                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-
-    setting_url=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="url",
-                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-
-    setting_meta=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="metadata",
-                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-
-    setting_title=LearningSettings(type="supervised",dim_reduction="chi_sq",num_attributes=0,feature_selection="title",
-                             pickle_dir=global_settings.pickle_dir,res_dir=global_settings.res_dir)
-    settings=[setting_summary, #100000
-              setting_url, #60000
-              setting_meta, #60000
-              setting_title #30000
-              ]
-
-    weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
-        num_classifiers=len(settings),
-        weights_range=(1.8,2),
-        stepping=0.2,
-
-    )
 
     supervised_logger.info("Number of Weights: {}".format(weights.num_classifiers))
 
-    for setting in settings:
-        setting.result_file_label="no_reg_kid_hom_new"
-        setting.threshold=4
-        setting.ll_ranking=False
-        setting.num_attributes={
-                                10000#,20000,30000,40000,50000,60000,70000,80000,100000,120000,130000,160000,200000
-                                }
-    settings[0].num_attributes,\
-    settings[1].num_attributes,\
-    settings[2].num_attributes,\
-    settings[3].num_attributes=({100000},{60000},{60000},{30000})
+    #CLASSIFICATION, adjust weights
+    classifier_util=ClassifierUtil()
 
     """
     LOAD DATA, preprocess
@@ -242,29 +192,29 @@ if __name__=="__main__":
     """
     INITIALIZE CLASSIFIERS
     """
-    classifier=classifiers.Classifier()
+    classifier=classifiers.ClassifierUtil()
 
     for setting in settings:
         threshold=setting.threshold
         ll_ranking=setting.ll_ranking
         setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
                       #classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      #classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
                                  ]
 
 
 
-    best_result=("classifier_name",(0,"w1","w2"),["num_attributes"])
+    best_result=(0,("w1","w2"),"classifier_name",["num_attributes"])
 
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
         num_attrs=list(num_attrs)
 
         cv_res=ResCrossValidation() #store crossvalidation results
-        for fold,(train_index,test_index) in enumerate(cross_validate_gen(Xs[0].shape[0],global_settings.k_folds)):
+        for fold,(train_index,test_index) in enumerate(randomized_cross_validation_gen(Xs[0].shape[0],global_settings.k_folds)):
             supervised_logger.info("On the {}th fold currently".format(fold))
 
             """
@@ -283,7 +233,7 @@ if __name__=="__main__":
             FEATURE SELECTION and EXTRACTION
             """
 
-            feature_selector=partial(SelectKBest,chi2)
+            feature_selector=feature_selection_strategy[global_settings.feature_selector_name]
             #feature_selector= PerClassFeatureSelector(*[SelectKBest(chi2,setting.num_attributes//num_genres)])
 
             train_Xs,test_Xs=feature_selection(settings,feature_selector,train_sets,test_sets,num_attrs)
@@ -295,7 +245,7 @@ if __name__=="__main__":
             """
             CLASSIFICATION
             """
-            classifier_name_to_accuracy=classify(settings,train_set,test_set,weights,global_settings.print_res)
+            classifier_name_to_accuracy=classify(classifier_util,settings,train_set,test_set,weights,global_settings.print_res)
 
             #Go through each classifier's ResultSingle for different settings
             for c_n, res_single_list in classifier_name_to_accuracy.items():
@@ -304,9 +254,9 @@ if __name__=="__main__":
         results_list=cv_res.results
 
         for res in results_list:
-            print(results_list+(num_attrs,))
+            print("Result: {}".format(tuple(res)+(num_attrs,)))
 
-        best_result_at_curr_num_attr=max(results_list,key=op.itemgetter(0))+(num_attrs,)
+        best_result_at_curr_num_attr=tuple(max(results_list,key=op.itemgetter(0)))+(num_attrs,)
 
         #classifier_name_to_accracy is an association b/w a string of name of all the classifiers and the best weight for each
         supervised_logger.info("Best accuracy achieved at: {} with num features {}".format(

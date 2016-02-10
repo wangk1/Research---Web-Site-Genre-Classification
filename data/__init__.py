@@ -16,17 +16,17 @@ class LearningSettings:
 
     """
 
-    def __init__(self,type,dim_reduction,num_attributes,feature_selection,**kwargs):
+    def __init__(self,type,dim_reduction,num_attributes,feature_selection,weights=tuple(),**kwargs):
         #DO NOT PUT ANYTHING UNLESS AFTER NOTED, WILL CAUSE INFINITE LOOP
-        self.attr={"type":0,"feature_selection":1,"num_attribute":3,"dim_reduction":2}
+        self.attr={"feature_selection":0,"dim_reduction":1,"num_attribute":2,"weight":3}
         self.attr_list=[]
 
-        self.attr_list.append(type)
         self.attr_list.append(feature_selection)
         self.attr_list.append(dim_reduction)
         self.attr_list.append(0)
+        self.attr_list.append(weights)
         #SET VARIABLES ONLY AFTER THIS POINT
-
+        self.type=type
         self.res_dir=kwargs.get("res_dir",None)
         self.kwargs=kwargs
         self.num_attributes=num_attributes
