@@ -31,14 +31,15 @@ Global Settings for classification
 """
 global_settings=namedtuple("GlobalSettings",
                                ("train_set_size","res_dir","pickle_dir","print_res",
-                                "k_folds","feature_selector_name")
+                                "k_folds","feature_selector_name","k_fold_random_state")
                                ) (
         train_set_size=50000,
         res_dir="classification_res", #store results into this directory
         pickle_dir="pickle_dir", #where to pickle objects such as matrices to be used later
-        print_res=False, #print res into file in res_dir directory
+        print_res=True, #print res into file in res_dir directory
         k_folds=10,
-        feature_selector_name="chi_sq",
+        feature_selector_name="anova",
+        k_fold_random_state=744149
         #print_if_less_than_x_weight=4 #not used yet
 
     )
@@ -84,10 +85,13 @@ settings[3].num_attributes={30000}
 """
 Weights
 """
-weights=namedtuple("weights",("num_classifiers","weights_range","stepping")) (
+weights=namedtuple("weights",("num_classifiers","weights_range","stepping","fixed",
+                              "fixed_weight")) (
     num_classifiers=len(settings),
     weights_range=(0,1),
     stepping=0.2,
+    fixed=True, #Set true to lock wieghts to fixed_weight tuple instead of using range
+    fixed_weight=(0.6,0.2,0.4,0.4) #Tuple of (w1,w2...) for each classifier
 
 )
 

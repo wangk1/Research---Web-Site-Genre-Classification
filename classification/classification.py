@@ -30,7 +30,8 @@ def classify(classifier_util,settings,train_set,test_set,weights,print_res=True)
     """
     start_weight,end_weight=weights.weights_range
     stepping=weights.stepping
-    for classifiers_list in itertools.product(*[setting.classifier_list for setting in settings]):
+    for classifiers_list in \
+            itertools.product(*[setting.classifier_list for setting in settings]) :
 
         multi_classifier=MultiClassifier(classifiers_list,threshold=1,ll_ranking=False)
         classifier_names=str(multi_classifier)
@@ -43,9 +44,9 @@ def classify(classifier_util,settings,train_set,test_set,weights,print_res=True)
 
         use_prev=False
 
-        for curr_weights in itertools.product(
+        for curr_weights in (itertools.product(
             *itertools.repeat(np.arange(start_weight,end_weight+stepping,stepping),weights.num_classifiers)
-        ):
+        ) if not weights.fixed else (weights.fixed_weight,)):
 
             for i,s in enumerate(settings):
                 s.weight=round(curr_weights[i],3)
@@ -59,7 +60,7 @@ def classify(classifier_util,settings,train_set,test_set,weights,print_res=True)
             use_prev=True # we cache the prediction, makes it faster to try out new weights
 
             if print_res:
-                if (end_weight-start_weight)//stepping >3:
+                if not weights.fixed and (end_weight-start_weight)//stepping >3:
                     classification_logger.warn("Printing reject, too may possible weights")
 
                 else:

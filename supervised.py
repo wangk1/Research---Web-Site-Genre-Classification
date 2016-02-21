@@ -1,6 +1,7 @@
 import functools,collections as coll
 import itertools
 import re
+import random
 from classification.classification_settings import *
 
 from sklearn.ensemble import RandomForestClassifier
@@ -123,7 +124,7 @@ def cross_validate_gen(total_num_ele,k_folds):
     :param k_folds:
     :return:
     """
-    kf=KFold(total_num_ele,n_folds=k_folds)
+    kf=KFold(total_num_ele,n_folds=k_folds,shuffle=True,random_state=24829555)
 
     for train_ind, test_ind in kf:
         yield train_ind,test_ind
@@ -137,7 +138,16 @@ def randomized_cross_validation_gen(total_num_ele,k_folds):
     :param k_folds:
     :return:
     """
-    for train_ind, test_ind in ShuffleSplit(total_num_ele,test_size=1/k_folds):
+    shuffled_indexes=random.sample(range(0,total_num_ele),total_num_ele)
+
+    num_per_fold=total_num_ele//k_folds
+    for fold in range(0,k_folds):
+        test_end_fold=(fold+1)*num_per_fold if fold != k_folds-1 else len(shuffled_indexes)
+        test_start_fold=fold*num_per_fold
+
+        test_ind=shuffled_indexes[test_start_fold:test_end_fold]
+        train_ind=shuffled_indexes[:test_start_fold]+shuffled_indexes[test_end_fold:]
+
         yield train_ind,test_ind
 
 
@@ -200,7 +210,7 @@ if __name__=="__main__":
         setting.classifier_list=[#classifiers.Ada(threshold=threshold,ll_ranking=ll_ranking,base_estimator=MultinomialNB()),
                       #classifiers.kNN(n_neighbors=16,threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.RandomForest(threshold=threshold,ll_ranking=ll_ranking),
-                      classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
+                      #classifiers.mNB(threshold=threshold,ll_ranking=ll_ranking),
                       classifiers.LogisticRegression(threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.DecisionTree(threshold=threshold,ll_ranking=ll_ranking),
                       #classifiers.SVC(probability=True,threshold=threshold,ll_ranking=ll_ranking)
