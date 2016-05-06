@@ -111,9 +111,12 @@ class ClassificationResultStream:
         with open(filepath) as res_file:
             next(res_file) #burn first line, the column headings
             for line in res_file:
-                line=line[:-1]
-
                 lines=re.split(",(?= *\[)",line)
+
+                try:
+                    int(line[0])
+                except ValueError:
+                    continue
 
                 prediction_objs.append(ClassificationResultInstance(ref_id=lines[0],predicted=ast.literal_eval(lines[1])
                                                                 ,actual=ast.literal_eval(lines[2]),
@@ -134,11 +137,16 @@ class ClassificationResultStream:
 
         #in case we only chose some classifiers
         if self.classifiers is not None:
-            res_files=(f for f in os.listdir(abs_result_path)
+            curr_dir=os.getcwd()
+            os.chdir(abs_result_path)
+            res_files=(f for f in os.listdir(".")
                          if any(f=="_".join((c,suffix)) for c in self.classifiers))
-
+            os.chdir(curr_dir)
         else:
-            res_files=(f for f in os.listdir(abs_result_path) if f=="_".join((self.classifiers[0],suffix)))
+            curr_dir=os.getcwd()
+            os.chdir(abs_result_path)
+            res_files=(f for f in os.listdir(".") if f=="_".join((self.classifiers[0],suffix)))
+            os.chdir(curr_dir)
 
         for res_file in res_files:
             for res_obj in self.get_classification_res(os.path.join(abs_result_path,res_file)):

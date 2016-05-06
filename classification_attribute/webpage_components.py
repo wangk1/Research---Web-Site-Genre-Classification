@@ -21,7 +21,7 @@ def extract_title(reference_db_cls,db_cls):
     bow_transformer=BagOfWords()
     title_not_exists=0
     for c,ref_object in enumerate(reference_db_cls.objects.no_cache()):
-        c%10000==0 and comp_logger.info("Done with {} titles".format(c))
+        c%10==0 and comp_logger.info("Done with {} titles".format(c))
 
         url=ref_object.url
         ref_index=ref_object.ref_index
@@ -35,14 +35,14 @@ def extract_title(reference_db_cls,db_cls):
             title=page_soup.title.string
 
             #bag of word
-            title_bow=bow_transformer.get_word_count(title) if title and title.strip() else {}
+            #title_bow=bow_transformer.get_word_count(title) if title and title.strip() else {}
 
         except (AttributeError,ValueError):
             title_not_exists+=1
             title_bow={}
 
         #store into db
-        db_cls(ref_index=ref_index,attr_map=title_bow,short_genres=short_genres).save()
+        #db_cls(ref_index=ref_index,attr_map=title_bow,short_genres=short_genres).save()
 
     comp_logger.info("The title does not exists in {} instances".format(title_not_exists))
 
@@ -83,7 +83,7 @@ def extract_meta_data(reference_db_cls,db_cls):
                 contents.append(meta_data_desc["content"])
 
             contents=" ".join(contents if contents else "")
-            meta_bow=bow_transformer.get_word_count(contents) if contents and contents.strip() else {}
+            #meta_bow=bow_transformer.get_word_count(contents) if contents and contents.strip() else {}
 
             if not len(contents):
                 not_found_data+=1
@@ -92,6 +92,6 @@ def extract_meta_data(reference_db_cls,db_cls):
             meta_bow={}
 
         #store into db
-        db_cls(ref_index=ref_index,attr_map=meta_bow,short_genres=short_genres).save()
+        #db_cls(ref_index=ref_index,attr_map=meta_bow,short_genres=short_genres).save()
 
     comp_logger.info("The MetaData does not exists in {} instances".format(not_found_data))

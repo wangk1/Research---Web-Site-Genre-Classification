@@ -77,7 +77,7 @@ def create_meta_DB():
     #clear db
     attr_logger.info("Extracting webpage MetaData")
 
-    WebpageMetaBOW.objects.delete()
+    #WebpageMetaBOW.objects.delete()
 
     extract_meta_data(URLBow,WebpageMetaBOW)
 
@@ -87,7 +87,7 @@ def create_title_DB():
     #clear db
     attr_logger.info("Extracting webpage titles")
 
-    WebpageTitleBOW.objects.delete()
+    #WebpageTitleBOW.objects.delete()
 
     extract_title(URLBow,WebpageTitleBOW)
 
@@ -95,14 +95,15 @@ def create_title_DB():
 
 
 if __name__=="__main__":
-    p_title=Process(target=create_title_DB)
-    p_meta=Process(target=create_meta_DB)
-
-    p_title.start()
-    p_meta.start()
-
-    p_meta.join()
-    p_title.join()
+    create_meta_DB()
+    # p_title=Process(target=create_title_DB)
+    # p_meta=Process(target=create_meta_DB)
+    #
+    # p_title.start()
+    # p_meta.start()
+    #
+    # p_meta.join()
+    # p_title.join()
 
     #url_ngram_queue()
     #DBQueue(Queue_full_page,"url_ngram_queue").create_queue(URLToGenre.objects(original=True))

@@ -1,5 +1,6 @@
 
 from sklearn.feature_extraction import DictVectorizer
+from data.clean_db import remove_references_in_attr_map
 
 import collections as coll,os
 import numpy as np
@@ -26,11 +27,12 @@ def db_to_pickle(src_db,secondary_path=""):
         y is nx1 where n is number of labels. It is an np array of lists where list are all the genres an instance may
             have.
     """
+
     if secondary_path == "":
         print("No secondary path set.")
 
     vocabulary_set=set()
-    for all_gram_obj in src_db.objects:
+    for all_gram_obj in src_db.objects.no_cache():
         vocabulary_set |=set(all_gram_obj.attr_map.keys())
         del all_gram_obj
 
@@ -72,3 +74,4 @@ def db_to_pickle(src_db,secondary_path=""):
     pickle_obj(y,y_path)
     pickle_obj(ref_index,ref_path)
     pickle_obj(vectorizer,vectorizer_path)
+

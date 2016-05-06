@@ -13,8 +13,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 from classification.classifiers import ClassifierUtil
-
-__author__ = 'Kevin'
 import util.base_util as util,numpy as np
 
 from sklearn.cross_validation import KFold,ShuffleSplit
@@ -33,6 +31,9 @@ from data.X_y import match_sets_based_on_ref_id
 from classification.classification import classify, load_training_testing
 import operator as op
 from classification.results import ResCrossValidation
+
+__author__ = 'Kevin'
+
 
 supervised_logger=Logger()
 
@@ -220,7 +221,11 @@ if __name__=="__main__":
 
     best_result=(0,("w1","w2"),"classifier_name",["num_attributes"])
 
+    #This is just the cross product of different attribute counts.
+    supervised_logger.info("We are using {} different attribute".format([len(setting.num_attributes) for setting in settings]))
     for num_attrs in itertools.product(*[setting.num_attributes for setting in settings]):
+
+
         num_attrs=list(num_attrs)
 
         cv_res=ResCrossValidation() #store crossvalidation results

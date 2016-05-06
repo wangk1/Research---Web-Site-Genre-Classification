@@ -58,14 +58,14 @@ class TestSet_urlAllGram(Document):
 
 class URLBow_fulltxt(Document):
     short_genres=ListField(StringField(required=True))
-    bow= DictField(field=IntField(),required=True)
-    bow_index=IntField(required=True)
+    attr_map= DictField(field=IntField(),required=True)
+    ref_index=IntField(required=True)
+    url=StringField(required=True)
 
     meta={'collection':'URLBow_fulltxt',
           'indexes':[
-              'short_genres',
-              "bow_index"
-
+              "ref_index",
+              "url"
           ],
           "db_alias":db_aliase
           }

@@ -12,6 +12,7 @@ Calculate how many
 
 '''
 def dmoz_alexa_similarity():
+
     #our results
     similarity_res={}
 
@@ -57,8 +58,8 @@ def _extract_genre_on_type(genre_info_list):
 Edit distance is only for urls that do not have
 '''
 def _calculate_similarity(alexa_genres,dmoz_genres,url):
-    alexa_dict=dict(zip((normalize_genre_string(g['genre']['genre'],2) for g in alexa_genres),alexa_genres))
-    dmoz_dict=dict(zip((normalize_genre_string(g['genre']['genre'],2) for g in dmoz_genres),dmoz_genres))
+    alexa_dict=dict(zip((normalize_genre_string(g['genre']['genre'],1) for g in alexa_genres),alexa_genres))
+    dmoz_dict=dict(zip((normalize_genre_string(g['genre']['genre'],1) for g in dmoz_genres),dmoz_genres))
 
     genre_exact_match=0
     edit_distance_count=0

@@ -46,6 +46,8 @@ def calculate_top_percent():
 
 
 if __name__=="__main__":
+    dmoz_alexa_similarity()
+    exit(0)
     path="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_chi_top1cls_10000"
     outpath="C:\\Users\\Kevin\\Desktop\\GitHub\\Research\\Webscraper\\classification_res\\summary_2000_chi2\\miss_plt"
 
